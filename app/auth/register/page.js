@@ -3,33 +3,29 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useApp } from '../../../lib/store'
-import { Mountain, CheckCircle, ArrowRight, AlertCircle, Eye, EyeOff, Mail, Key, Home, MapPin, Plus, X } from 'lucide-react'
+import { Mountain, CheckCircle, ArrowRight, AlertCircle, Eye, EyeOff, Home, Plus, X } from 'lucide-react'
 
 const STEPS = [
   { n: 1, icon: '👤', title: 'Tu cuenta' },
-  { n: 2, icon: '✉️', title: 'Verifica tu email' },
-  { n: 3, icon: '🏠', title: 'Tu hogar' },
+  { n: 2, icon: '🏠', title: 'Tu hogar' },
 ]
 
 const TYPES = ['Departamento', 'Casa', 'Cabaña', 'Estudio', 'Loft', 'Villa', 'Otro']
 const AMENITIES = ['WiFi', 'Cocina equipada', 'Lavadora', 'AC', 'Calefacción', 'Smart TV', 'Terraza', 'Jardín', 'Piscina privada', 'Estacionamiento', 'Chimenea', 'Parrilla/BBQ', 'Bicicletas', 'Ascensor']
 
 export default function RegisterPage() {
-  const { startRegister, verifyEmail, completeRegister } = useApp()
+  const { completeRegister } = useApp()
   const router = useRouter()
 
   const [step, setStep] = useState(1)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const [demoCode, setDemoCode] = useState('')   // shown to user in demo mode
   const [showPwd, setShowPwd] = useState(false)
 
   // Step 1
   const [acc, setAcc] = useState({ name: '', email: '', password: '', city: '', country: '' })
+
   // Step 2
-  const [code, setCode] = useState('')
-  const [pendingData, setPendingData] = useState(null)
-  // Step 3
   const [homeForm, setHomeForm] = useState({
     title: '', type: '', location: '', city: '', country: '',
     bedrooms: 1, bathrooms: 1, maxGuests: 2, size: '',
@@ -40,31 +36,14 @@ export default function RegisterPage() {
 
   // ── STEP 1 ──
   const handleStep1 = async e => {
-    e.preventDefault(); setError('')
+    e.preventDefault()
+    setError('')
     if (!acc.name.trim()) { setError('Ingresa tu nombre'); return }
     if (acc.password.length < 6) { setError('La contraseña debe tener al menos 6 caracteres'); return }
-    setLoading(true)
-    await new Promise(r => setTimeout(r, 700))
-    const res = startRegister(acc)
-    if (!res.success) { setError(res.error); setLoading(false); return }
-    setDemoCode(res.code)
-    setPendingData({ ...acc, code: res.code })
-    setStep(2); setLoading(false)
+    setStep(2)
   }
 
   // ── STEP 2 ──
-  const handleStep2 = async e => {
-    e.preventDefault(); setError('')
-    if (code.trim().length !== 6) { setError('El código tiene 6 dígitos'); return }
-    setLoading(true)
-    await new Promise(r => setTimeout(r, 500))
-    const res = verifyEmail(acc.email, code.trim())
-    if (!res.success) { setError(res.error); setLoading(false); return }
-    setPendingData(res.pendingData)
-    setStep(3); setLoading(false)
-  }
-
-  // ── STEP 3 ──
   const toggleAmenity = a => setHomeForm(f => ({
     ...f, amenities: f.amenities.includes(a) ? f.amenities.filter(x => x !== a) : [...f.amenities, a]
   }))
@@ -79,8 +58,9 @@ export default function RegisterPage() {
     ...f, availabilityPeriods: f.availabilityPeriods.map(p => p.id === id ? { ...p, [field]: val } : p)
   }))
 
-  const handleStep3 = async e => {
-    e.preventDefault(); setError('')
+  const handleStep2 = async e => {
+    e.preventDefault()
+    setError('')
     if (!homeForm.type) { setError('Selecciona el tipo de hogar'); return }
     if (!homeForm.title.trim()) { setError('Ingresa el título del hogar'); return }
     if (!homeForm.location.trim()) { setError('Ingresa la ubicación'); return }
@@ -89,20 +69,35 @@ export default function RegisterPage() {
     if (validPeriods.length === 0) { setError('Agrega al menos un período de disponibilidad'); return }
 
     setLoading(true)
-    await new Promise(r => setTimeout(r, 800))
-    const images = homeForm.imageUrl ? [homeForm.imageUrl, `https://picsum.photos/seed/${Date.now()}/800/500`] : [`https://picsum.photos/seed/${Date.now()}/800/500`, `https://picsum.photos/seed/${Date.now() + 1}/800/500`]
-    const res = completeRegister(pendingData, {
-      title: homeForm.title, type: homeForm.type,
-      location: homeForm.location || `${homeForm.city}, ${homeForm.country}`,
-      city: homeForm.city || acc.city, country: homeForm.country || acc.country,
-      bedrooms: Number(homeForm.bedrooms), bathrooms: Number(homeForm.bathrooms),
-      maxGuests: Number(homeForm.maxGuests), size: homeForm.size ? Number(homeForm.size) : null,
-      description: homeForm.description, amenities: homeForm.amenities, images,
+    const images = homeForm.imageUrl
+      ? [homeForm.imageUrl, `https://picsum.photos/seed/${Date.now()}/800/500`]
+      : [`https://picsum.photos/seed/${Date.now()}/800/500`, `https://picsum.photos/seed/${Date.now() + 1}/800/500`]
+
+    const res = await completeRegister(acc, {
+      title: homeForm.title,
+      type: homeForm.type,
+      location: homeForm.location || `${homeForm.city || acc.city}, ${homeForm.country || acc.country}`,
+      city: homeForm.city || acc.city,
+      country: homeForm.country || acc.country,
+      bedrooms: Number(homeForm.bedrooms),
+      bathrooms: Number(homeForm.bathrooms),
+      maxGuests: Number(homeForm.maxGuests),
+      size: homeForm.size ? Number(homeForm.size) : null,
+      description: homeForm.description,
+      amenities: homeForm.amenities,
+      images,
       availabilityPeriods: validPeriods,
       nearbyAttractions: [],
     })
-    if (!res.success) { setError(res.error); setLoading(false); return }
-    router.push('/dashboard'); setLoading(false)
+
+    setLoading(false)
+    if (!res.success) {
+      setError(res.error || 'Error al crear la cuenta. Intenta de nuevo.')
+      return
+    }
+
+    // Supabase envía email de confirmación — informar al usuario
+    router.push('/auth/confirm')
   }
 
   const hf = homeForm
@@ -174,47 +169,14 @@ export default function RegisterPage() {
               </div>
               {error && <div className="flex items-center gap-2 bg-red-50 border border-red-100 text-red-600 text-xs px-4 py-3 rounded-xl"><AlertCircle className="w-4 h-4 flex-shrink-0" /> {error}</div>}
               <button type="submit" disabled={loading} className="w-full bg-forest text-white py-3.5 rounded-xl font-bold hover:bg-forest-dark disabled:opacity-60 transition-colors flex items-center justify-center gap-2">
-                {loading ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <>Siguiente: Verificar email <ArrowRight className="w-4 h-4" /></>}
+                {loading ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <>Siguiente: Tu hogar <ArrowRight className="w-4 h-4" /></>}
               </button>
             </form>
           )}
 
-          {/* ── STEP 2: Email Verification ──────────────────────────────────── */}
+          {/* ── STEP 2: Home Registration ───────────────────────────────────── */}
           {step === 2 && (
             <form onSubmit={handleStep2} className="space-y-5">
-              <div className="text-center">
-                <div className="w-16 h-16 bg-forest-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Mail className="w-8 h-8 text-forest" />
-                </div>
-                <h3 className="font-bold text-gray-900 mb-1">Verifica tu email</h3>
-                <p className="text-sm text-gray-500">Hemos "enviado" un código a <strong>{acc.email}</strong></p>
-              </div>
-
-              {/* Demo mode: show code */}
-              <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
-                <p className="text-xs font-bold text-amber-700 mb-1 flex items-center gap-1.5">
-                  <Key className="w-3.5 h-3.5" /> Modo demo – código de verificación:
-                </p>
-                <p className="text-3xl font-black text-amber-800 text-center tracking-widest my-2">{demoCode}</p>
-                <p className="text-xs text-amber-600 text-center">En producción esto llegará a tu email real</p>
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Ingresa el código de 6 dígitos</label>
-                <input type="text" value={code} onChange={e => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                  placeholder="000000" maxLength={6}
-                  className="w-full border border-gray-200 rounded-xl px-4 py-3 text-center text-2xl font-black tracking-widest focus:outline-none focus:ring-2 focus:ring-forest" />
-              </div>
-              {error && <div className="flex items-center gap-2 bg-red-50 border border-red-100 text-red-600 text-xs px-4 py-3 rounded-xl"><AlertCircle className="w-4 h-4 flex-shrink-0" /> {error}</div>}
-              <button type="submit" disabled={loading || code.length !== 6} className="w-full bg-forest text-white py-3.5 rounded-xl font-bold hover:bg-forest-dark disabled:opacity-60 transition-colors flex items-center justify-center gap-2">
-                {loading ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <>Verificar y continuar <ArrowRight className="w-4 h-4" /></>}
-              </button>
-            </form>
-          )}
-
-          {/* ── STEP 3: Home Registration ───────────────────────────────────── */}
-          {step === 3 && (
-            <form onSubmit={handleStep3} className="space-y-5">
               <div className="bg-forest-50 border border-forest-100 rounded-xl p-4 text-sm text-forest-dark">
                 <p className="font-bold flex items-center gap-1.5 mb-1"><Home className="w-4 h-4" /> Paso obligatorio</p>
                 <p className="text-xs text-forest">Para unirte a Ruka necesitas registrar tu hogar. Así todos los miembros tienen algo que ofrecer.</p>
@@ -284,11 +246,8 @@ export default function RegisterPage() {
                 <p className="text-xs text-gray-400 mt-1">{hf.description.length} / mín. 30 caracteres</p>
               </div>
 
-              {/* Availability Calendar */}
               <div>
-                <label className="block text-xs font-bold text-gray-700 mb-2 uppercase tracking-wide flex items-center gap-1.5">
-                  <span className="available-dot" /> Períodos de disponibilidad
-                </label>
+                <label className="block text-xs font-bold text-gray-700 mb-2 uppercase tracking-wide">Períodos de disponibilidad</label>
                 <p className="text-xs text-gray-400 mb-3">¿Cuándo está disponible tu hogar para intercambio?</p>
                 <div className="space-y-2">
                   {hf.availabilityPeriods.map(p => (
@@ -318,7 +277,6 @@ export default function RegisterPage() {
                 </div>
               </div>
 
-              {/* Amenities */}
               <div>
                 <label className="block text-xs font-bold text-gray-700 mb-2 uppercase tracking-wide">Comodidades</label>
                 <div className="grid grid-cols-2 gap-2">
