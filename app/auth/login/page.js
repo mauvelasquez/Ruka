@@ -18,8 +18,7 @@ export default function LoginPage() {
     e.preventDefault()
     setError('')
     setLoading(true)
-    await new Promise(r => setTimeout(r, 600))
-    const result = login(email, password)
+    const result = await login(email, password)
     setLoading(false)
     if (result.success) {
       router.push('/dashboard')
@@ -133,22 +132,6 @@ export default function LoginPage() {
               )}
             </button>
           </form>
-
-          <div className="mt-6 p-4 bg-amber-50 border border-amber-200 rounded-xl">
-            <p className="text-amber-800 text-xs font-bold mb-2">🧪 Modo demo — prueba con:</p>
-            <div className="space-y-1">
-              {[
-                { email: 'camila@ruka.cl', pw: 'demo123' },
-                { email: 'lars@ruka.cl', pw: 'demo123' },
-                { email: 'yuki@ruka.cl', pw: 'demo123' },
-              ].map((u, i) => (
-                <button key={i} onClick={() => { setEmail(u.email); setPassword(u.pw) }}
-                  className="block w-full text-left text-xs text-amber-700 hover:text-amber-900 font-mono bg-amber-100/50 rounded px-2 py-1 hover:bg-amber-100 transition-colors">
-                  {u.email} / {u.pw}
-                </button>
-              ))}
-            </div>
-          </div>
 
           <p className="mt-6 text-center text-sm text-gray-500">
             ¿Primera vez?{' '}
