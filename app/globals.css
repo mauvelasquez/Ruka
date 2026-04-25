@@ -1,0 +1,64 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { font-family: 'Inter', system-ui, sans-serif; background-color: #F8F4EE; }
+
+/* Ruka Design System */
+:root {
+  --ruka-forest: #2A5C45;
+  --ruka-forest-light: #3D7A5E;
+  --ruka-terra: #C4622D;
+  --ruka-andean: #5BA3C9;
+  --ruka-sand: #E8D5B0;
+  --ruka-bg: #F8F4EE;
+  --ruka-dark: #1A2E1E;
+}
+
+/* Hero with parallax effect */
+.hero-ruka {
+  background-image:
+    linear-gradient(to bottom, rgba(26,46,30,0.75) 0%, rgba(42,92,69,0.55) 60%, rgba(248,244,238,1) 100%);
+}
+
+/* Card hover */
+.card-lift {
+  transition: transform 0.2s ease, box-shadow 0.25s ease;
+}
+.card-lift:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 24px 48px rgba(42,92,69,0.14);
+}
+
+/* Matching badge animation */
+@keyframes pulse-match {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+.match-badge { animation: pulse-match 2s ease-in-out infinite; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #F8F4EE; }
+::-webkit-scrollbar-thumb { background: #2A5C45; border-radius: 3px; }
+
+/* Availability badge colors */
+.available-dot {
+  width: 8px; height: 8px;
+  background: #2A5C45;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+/* Line clamp */
+.line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.line-clamp-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+
+/* Chile landscape gradient */
+.landscape-gradient {
+  background: linear-gradient(135deg, #1A2E1E 0%, #2A5C45 40%, #5BA3C9 80%, #E8D5B0 100%);
+}
