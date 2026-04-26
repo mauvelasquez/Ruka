@@ -1,14 +1,30 @@
 'use client'
 import Link from 'next/link'
 import { useApp } from '../../../lib/store'
-import { MapPin, Home, Calendar, Star, ArrowLeft, Globe } from 'lucide-react'
+import { MapPin, Home, Calendar, Star, ArrowLeft, Gift } from 'lucide-react'
+
+function AdBanner() {
+  return (
+    <div className="bg-gradient-to-r from-forest to-forest-dark rounded-2xl p-5 text-white flex flex-col sm:flex-row items-center gap-4 shadow-md my-6">
+      <div className="flex-1">
+        <span className="inline-block bg-white/20 text-white text-xs font-black px-3 py-1 rounded-full mb-2">🎉 100% GRATIS</span>
+        <h3 className="font-black text-base sm:text-lg mb-1">¿También quieres intercambiar tu hogar?</h3>
+        <p className="text-white/80 text-xs">Regístrate gratis, publica tu hogar y viaja por Chile sin pagar alojamiento.</p>
+      </div>
+      <Link href="/auth/register"
+        className="flex-shrink-0 bg-white text-forest-dark font-black px-5 py-2.5 rounded-xl text-sm hover:bg-sand transition-colors flex items-center gap-2 whitespace-nowrap">
+        <Gift className="w-4 h-4" /> Unirme gratis
+      </Link>
+    </div>
+  )
+}
 
 export default function ProfileClient({ id }) {
   const { users, homes, wishes } = useApp()
 
-  const user  = users.find(u => u.id === id)
-  const uHomes = homes.filter(h => h.userId === id)
-  const uWishes = wishes.filter(w => w.userId === id)
+  const user   = users.find(u => u.id === id)
+  const uHomes = homes.filter(h => h.user_id === id || h.userId === id)
+  const uWishes = wishes.filter(w => w.user_id === id || w.userId === id)
 
   if (!user) {
     return (
@@ -33,20 +49,19 @@ export default function ProfileClient({ id }) {
         {/* Profile header */}
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-6">
           <div className="flex items-start gap-5">
-            <div className="w-20 h-20 rounded-2xl bg-forest flex items-center justify-center text-white text-3xl font-black flex-shrink-0">
-              {initial}
+            <div className="w-20 h-20 rounded-2xl bg-forest flex items-center justify-center text-white text-3xl font-black flex-shrink-0 overflow-hidden">
+              {user.avatar
+                ? <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
+                : initial
+              }
             </div>
             <div className="flex-1">
               <h1 className="text-2xl font-black text-gray-900">{user.name}</h1>
               <div className="flex flex-wrap items-center gap-4 mt-2 text-sm text-gray-500">
-                <span className="flex items-center gap-1.5">
-                  <MapPin className="w-4 h-4 text-terra" />
-                  {user.city}{user.country ? `, ${user.country}` : ''}
-                </span>
-                {user.language && (
+                {user.city && (
                   <span className="flex items-center gap-1.5">
-                    <Globe className="w-4 h-4 text-andean" />
-                    {user.language}
+                    <MapPin className="w-4 h-4 text-terra" />
+                    {user.city}{user.country ? `, ${user.country}` : ''}
                   </span>
                 )}
               </div>
@@ -71,9 +86,12 @@ export default function ProfileClient({ id }) {
           </div>
         </div>
 
+        {/* ── AD BANNER ── */}
+        <AdBanner />
+
         {/* Homes */}
         <h2 className="font-black text-gray-800 text-lg mb-3 flex items-center gap-2">
-          <Home className="w-5 h-5 text-forest" /> Hogares de {user.name.split(' ')[0]}
+          <Home className="w-5 h-5 text-forest" /> Hogares de {user.name?.split(' ')[0]}
         </h2>
         {uHomes.length === 0 ? (
           <div className="bg-white rounded-2xl p-8 text-center border border-dashed border-gray-200 mb-6">
@@ -84,8 +102,11 @@ export default function ProfileClient({ id }) {
             {uHomes.map(home => (
               <Link key={home.id} href={`/homes/${home.id}`}
                 className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:shadow-md transition-all flex gap-4 group">
-                <div className="w-16 h-16 rounded-xl bg-forest-50 flex items-center justify-center text-2xl flex-shrink-0 group-hover:scale-105 transition-transform">
-                  🏠
+                <div className="w-16 h-16 rounded-xl bg-forest-50 overflow-hidden flex-shrink-0 group-hover:scale-105 transition-transform">
+                  {home.images?.[0]
+                    ? <img src={home.images[0]} alt="" className="w-full h-full object-cover" />
+                    : <div className="w-full h-full flex items-center justify-center text-2xl">🏠</div>
+                  }
                 </div>
                 <div className="flex-1 min-w-0">
                   <h3 className="font-black text-gray-900 text-base group-hover:text-forest transition-colors">{home.title}</h3>
@@ -93,16 +114,6 @@ export default function ProfileClient({ id }) {
                     <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5" />{home.city}</span>
                     <span className="flex items-center gap-1"><Home className="w-3.5 h-3.5" />{home.bedrooms} hab.</span>
                   </div>
-                  {home.availabilityPeriods?.length > 0 && (
-                    <div className="flex flex-wrap gap-1.5 mt-2">
-                      {home.availabilityPeriods.map(p => (
-                        <span key={p.id} className="text-xs bg-green-50 text-green-700 font-medium px-2 py-0.5 rounded-full flex items-center gap-1">
-                          <Calendar className="w-2.5 h-2.5" />
-                          {new Date(p.start).toLocaleDateString('es-CL', { day:'numeric', month:'short' })} – {new Date(p.end).toLocaleDateString('es-CL', { day:'numeric', month:'short' })}
-                        </span>
-                      ))}
-                    </div>
-                  )}
                 </div>
               </Link>
             ))}
@@ -113,7 +124,7 @@ export default function ProfileClient({ id }) {
         {uWishes.length > 0 && (
           <>
             <h2 className="font-black text-gray-800 text-lg mb-3 flex items-center gap-2">
-              <Star className="w-5 h-5 text-terra" /> Le gustaría visitar
+              <Star className="w-5 h-5 text-terra" /> Le gustaría visitar en Chile
             </h2>
             <div className="grid gap-3">
               {uWishes.map(w => (
@@ -122,9 +133,9 @@ export default function ProfileClient({ id }) {
                     <MapPin className="w-4 h-4 text-terra" />
                   </div>
                   <div>
-                    <p className="font-bold text-gray-900 text-sm">{w.toCity}</p>
+                    <p className="font-bold text-gray-900 text-sm">{w.to_city || w.toCity}</p>
                     <p className="text-xs text-gray-500">
-                      {new Date(w.startDate).toLocaleDateString('es-CL')} – {new Date(w.endDate).toLocaleDateString('es-CL')} · {w.guests} viajero{w.guests !== 1 ? 's' : ''}
+                      {w.start_date || w.startDate} → {w.end_date || w.endDate}
                     </p>
                   </div>
                 </div>
