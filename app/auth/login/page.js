@@ -46,30 +46,48 @@ export default function LoginPage() {
             <Mountain className="w-8 h-8 text-white" />
             <span className="text-2xl font-black text-white tracking-tight">Ruka</span>
           </Link>
+
           <div>
+            <div className="inline-flex items-center gap-2 bg-white/20 text-white rounded-full px-4 py-1.5 text-sm font-bold mb-6">
+              🎉 100% gratuito para siempre
+            </div>
+
             <h2 className="text-4xl font-black text-white mb-4 leading-tight">
-              El mundo está<br />lleno de hogares<br />esperándote
+              Chile te está<br />esperando.<br />Sin pagar hotel.
             </h2>
-            <p className="text-green-200 text-lg">
-              Intercambia tu casa y viaja sin pagar alojamiento.
+            <p className="text-green-200 text-lg mb-10">
+              Intercambia tu hogar y vive como local en cualquier ciudad de Chile. Completamente gratis.
             </p>
-            <div className="mt-10 flex flex-col gap-4">
+
+            <div className="flex flex-col gap-3">
               {[
-                { city: 'Santiago, Chile', flag: '🇨🇱', text: 'quiere visitar Tokio' },
-                { city: 'Barcelona, España', flag: '🇪🇸', text: 'quiere visitar Santiago' },
-                { city: 'Tokio, Japón', flag: '🇯🇵', text: 'quiere visitar Barcelona' },
+                { city: 'Santiago', dest: 'Pucón', emoji: '🏙️' },
+                { city: 'Valparaíso', dest: 'San Pedro de Atacama', emoji: '🎨' },
+                { city: 'Temuco', dest: 'Viña del Mar', emoji: '🌲' },
               ].map((item, i) => (
                 <div key={i} className="flex items-center gap-3 bg-white/10 rounded-xl px-4 py-3 backdrop-blur-sm">
-                  <span className="text-2xl">{item.flag}</span>
+                  <span className="text-2xl">{item.emoji}</span>
                   <div>
                     <p className="text-white font-semibold text-sm">{item.city}</p>
-                    <p className="text-green-300 text-xs">{item.text}</p>
+                    <p className="text-green-300 text-xs">quiere visitar {item.dest}</p>
                   </div>
                 </div>
               ))}
             </div>
+
+            <div className="mt-8 grid grid-cols-2 gap-3">
+              {[
+                '✓ Sin costo de alojamiento',
+                '✓ Sin comisiones ocultas',
+                '✓ Matches automáticos',
+                '✓ Solo en Chile 🇨🇱',
+              ].map((b, i) => (
+                <p key={i} className="text-green-200 text-xs">{b}</p>
+              ))}
+            </div>
           </div>
-          <p className="text-green-300 text-sm">© 2025 Ruka — Intercambio de hogares</p>
+
+          <p className="text-green-300 text-sm">© 2025 Ruka — Intercambio de hogares en Chile</p>
         </div>
       </div>
 
@@ -81,8 +99,10 @@ export default function LoginPage() {
             <span className="text-xl font-black text-forest">Ruka</span>
           </Link>
 
-          <h1 className="text-3xl font-black text-gray-900 mb-2">Bienvenido de vuelta</h1>
-          <p className="text-gray-500 mb-8">Inicia sesión para ver tus matches y hogares</p>
+          <div className="mb-8">
+            <h1 className="text-3xl font-black text-gray-900 mb-2">Bienvenido de vuelta</h1>
+            <p className="text-gray-500">Inicia sesión para ver tus matches en Chile</p>
+          </div>
 
           {error && (
             <div className="mb-5 bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-red-700 text-sm font-medium">
@@ -93,27 +113,17 @@ export default function LoginPage() {
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-1.5">Email</label>
-              <input
-                type="email"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                placeholder="tu@email.com"
-                required
-                className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-forest bg-white"
-              />
+              <input type="email" value={email} onChange={e => setEmail(e.target.value)}
+                placeholder="tu@email.com" required
+                className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-forest bg-white" />
             </div>
 
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-1.5">Contraseña</label>
               <div className="relative">
-                <input
-                  type={showPw ? 'text' : 'password'}
-                  value={password}
-                  onChange={e => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  required
-                  className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-forest bg-white pr-11"
-                />
+                <input type={showPw ? 'text' : 'password'} value={password}
+                  onChange={e => setPassword(e.target.value)} placeholder="••••••••" required
+                  className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-forest bg-white pr-11" />
                 <button type="button" onClick={() => setShowPw(!showPw)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
                   {showPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -121,22 +131,24 @@ export default function LoginPage() {
               </div>
             </div>
 
-            <button
-              type="submit"
-              disabled={loading}
+            <button type="submit" disabled={loading}
               className="w-full bg-forest text-white py-3.5 rounded-xl font-bold text-sm hover:bg-forest-dark transition-colors flex items-center justify-center gap-2 disabled:opacity-60">
-              {loading ? (
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-              ) : (
-                <>Entrar <ArrowRight className="w-4 h-4" /></>
-              )}
+              {loading
+                ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                : <>Entrar <ArrowRight className="w-4 h-4" /></>
+              }
             </button>
           </form>
 
+          <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-xl text-center">
+            <p className="text-green-800 text-sm font-bold mb-1">🎉 Ruka es 100% gratis</p>
+            <p className="text-green-700 text-xs">Sin costo de alojamiento, sin comisiones, sin letra chica.</p>
+          </div>
+
           <p className="mt-6 text-center text-sm text-gray-500">
-            ¿Primera vez?{' '}
+            ¿Primera vez en Ruka?{' '}
             <Link href="/auth/register" className="text-forest font-bold hover:text-forest-dark">
-              Crea tu cuenta gratis
+              Crea tu cuenta gratis →
             </Link>
           </p>
         </div>
