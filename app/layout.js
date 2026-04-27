@@ -2,9 +2,27 @@ import './globals.css'
 import Providers from './providers'
 
 export const metadata = {
-  title: 'Ruka – Intercambia tu hogar, vive Chile y el mundo',
-  description: 'Ruka conecta viajeros que quieren intercambiar sus hogares. Vive como local en Chile y el mundo sin gastar en alojamiento.',
-  keywords: 'ruka, intercambio hogar, home exchange, chile, viajes, mapuche',
+  metadataBase: new URL('https://rukka.cl'),
+  title: 'Rukka – Intercambia tu hogar, vive Chile y el mundo',
+  description: 'Rukka conecta viajeros que quieren intercambiar sus hogares. Vive como local en Chile y el mundo sin gastar en alojamiento.',
+  keywords: 'rukka, intercambio hogar, home exchange, chile, viajes, mapuche',
+  openGraph: {
+    title: 'Rukka – Intercambia tu hogar, vive Chile y el mundo',
+    description: 'Intercambia tu hogar y vive como local en Chile. Gratis, sin comisiones.',
+    url: 'https://rukka.cl',
+    siteName: 'Rukka',
+    locale: 'es_CL',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Rukka – Intercambio de hogares en Chile',
+    description: 'Intercambia tu hogar y vive como local en Chile. Gratis, sin comisiones.',
+    site: '@rukka_cl',
+  },
+  alternates: {
+    canonical: 'https://rukka.cl',
+  },
 }
 
 export default function RootLayout({ children }) {

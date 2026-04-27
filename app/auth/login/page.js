@@ -42,7 +42,7 @@ export default function LoginPage() {
         <div className="relative z-10 flex flex-col justify-between p-12 w-full">
           <Link href="/" className="flex items-center gap-3">
             <Mountain className="w-8 h-8 text-white" />
-            <span className="text-2xl font-black text-white tracking-tight">Ruka</span>
+            <span className="text-2xl font-black text-white tracking-tight">Rukka</span>
           </Link>
 
           <div>
@@ -69,7 +69,7 @@ export default function LoginPage() {
             </div>
           </div>
 
-          <p className="text-white/40 text-sm">© 2026 Ruka — Intercambio de hogares en Chile</p>
+          <p className="text-white/40 text-sm">© 2026 Rukka — Intercambio de hogares en Chile</p>
         </div>
       </div>
 
@@ -78,7 +78,7 @@ export default function LoginPage() {
         <div className="w-full max-w-md">
           <Link href="/" className="flex items-center gap-2 mb-10 lg:hidden">
             <Mountain className="w-6 h-6 text-forest" />
-            <span className="text-xl font-black text-forest">Ruka</span>
+            <span className="text-xl font-black text-forest">Rukka</span>
           </Link>
 
           <div className="mb-8">
@@ -122,12 +122,12 @@ export default function LoginPage() {
           </form>
 
           <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-xl text-center">
-            <p className="text-green-800 text-sm font-bold mb-1">🎉 Ruka es 100% gratis</p>
+            <p className="text-green-800 text-sm font-bold mb-1">🎉 Rukka es 100% gratis</p>
             <p className="text-green-700 text-xs">Sin costo de alojamiento, sin comisiones, sin letra chica.</p>
           </div>
 
           <p className="mt-6 text-center text-sm text-gray-500">
-            ¿Primera vez en Ruka?{' '}
+            ¿Primera vez en Rukka?{' '}
             <Link href="/auth/register" className="text-forest font-bold hover:text-forest-dark">
               Crea tu cuenta gratis →
             </Link>

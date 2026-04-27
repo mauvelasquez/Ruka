@@ -37,7 +37,7 @@ export async function middleware(req) {
       .eq('id', session.user.id)
       .single()
 
-    if (profile?.status === 'pending') {
+    if (!profile || profile.status === 'pending') {
       return NextResponse.redirect(new URL('/onboarding', req.url))
     }
   }

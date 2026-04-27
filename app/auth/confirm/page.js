@@ -10,7 +10,7 @@ export default function ConfirmPage() {
           <div className="w-12 h-12 landscape-gradient rounded-2xl flex items-center justify-center shadow-lg">
             <Mountain className="w-6 h-6 text-white" />
           </div>
-          <span className="text-2xl font-black text-forest-dark">Ruka</span>
+          <span className="text-2xl font-black text-forest-dark">Rukka</span>
         </Link>
         <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-10">
           <div className="w-20 h-20 bg-forest-50 rounded-full flex items-center justify-center mx-auto mb-6">

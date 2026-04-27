@@ -19,7 +19,7 @@ export default function Navbar() {
               <Mountain className="w-5 h-5 text-white" />
             </div>
             <div>
-              <span className="text-xl font-black text-forest-dark tracking-tight">Ruka</span>
+              <span className="text-xl font-black text-forest-dark tracking-tight">Rukka</span>
               <span className="hidden sm:inline text-xs text-stone ml-2 font-normal">· intercambia tu hogar</span>
             </div>
           </Link>

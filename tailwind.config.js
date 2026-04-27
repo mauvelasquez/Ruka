@@ -9,7 +9,7 @@ module.exports = {
         andean: { DEFAULT: '#5BA3C9', light: '#7BBDDC', dark: '#3D82A8', 50: '#EEF7FC' },
         sand: { DEFAULT: '#E8D5B0', dark: '#C9B48A' },
         stone: '#6B7280',
-        ruka: {
+        rukka: {
           bg: '#F8F4EE',
           dark: '#1A2E1E',
           card: '#FFFFFF',

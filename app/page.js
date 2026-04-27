@@ -11,14 +11,14 @@ import { Mountain, ArrowRight, MapPin, Calendar, Users, Sparkles, Shield, Lock, 
 const CHILE_CITIES = CHILE_BANNERS.map(b => b.city)
 
 const STEPS = [
-  { n: '01', icon: '🏔️', title: 'Publica tu ruka', desc: 'Crea tu perfil y registra tu hogar con fotos y descripción.' },
+  { n: '01', icon: '🏔️', title: 'Publica tu rukka', desc: 'Crea tu perfil y registra tu hogar con fotos y descripción.' },
   { n: '02', icon: '🗺️', title: 'Elige tu destino', desc: 'Busca hogares en tu ciudad soñada dentro de Chile.' },
-  { n: '03', icon: '✦', title: 'El algoritmo trabaja', desc: 'Ruka detecta matches perfectos entre viajeros con fechas compatibles.' },
+  { n: '03', icon: '✦', title: 'El algoritmo trabaja', desc: 'Rukka detecta matches perfectos entre viajeros con fechas compatibles.' },
   { n: '04', icon: '🤝', title: 'Intercambia y viaja', desc: 'Confirmen el intercambio y vivan como locales en la ciudad del otro.' },
 ]
 
 const BENEFITS = [
-  { icon: '🏕️', title: 'Inspirado en Chile', desc: 'Nace del espíritu Mapuche de compartir la "ruka". Conexión auténtica entre chilenos.' },
+  { icon: '🏕️', title: 'Inspirado en Chile', desc: 'Nace del espíritu Mapuche de compartir la "rukka". Conexión auténtica entre chilenos.' },
   { icon: '💸', title: '100% gratis', desc: 'Sin hoteles, sin Airbnb, sin comisiones. Tu hogar como moneda de cambio.' },
   { icon: '🔁', title: 'Match bilateral', desc: 'El sistema detecta cuándo dos viajeros quieren visitarse en fechas compatibles.' },
   { icon: '🔒', title: 'Comunidad verificada', desc: 'Verificación de email obligatoria y perfil completo para todos los miembros.' },
@@ -46,7 +46,7 @@ function AdBanner({ variant = 'primary', className = '' }) {
       bg: 'bg-gradient-to-r from-terra to-amber-700',
       badge: '✦ MATCH AUTOMÁTICO',
       title: `¿Quieres ir a ${heroBanner.city}? Hay alguien que quiere venir a tu ciudad`,
-      desc: 'El algoritmo Ruka conecta viajeros que se quieren visitar mutuamente. ¡Gratis!',
+      desc: 'El algoritmo Rukka conecta viajeros que se quieren visitar mutuamente. ¡Gratis!',
       cta: 'Buscar mi match',
       href: '/auth/register',
       icon: Zap,
@@ -227,7 +227,7 @@ export default function HomePage() {
       <section className="relative min-h-[95vh] flex items-center overflow-hidden">
         <div className="absolute inset-0">
           <img src={heroBanner.image} alt={heroBanner.city} className="w-full h-full object-cover" />
-          <div className="absolute inset-0 hero-ruka" />
+          <div className="absolute inset-0 hero-rukka" />
         </div>
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full py-16">
@@ -331,7 +331,7 @@ export default function HomePage() {
       )}
 
       {/* ── HOW IT WORKS ─────────────────────────────────────────────────────── */}
-      <section className="py-20 bg-ruka-dark">
+      <section className="py-20 bg-rukka-dark">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-14">
             <p className="text-xs font-bold uppercase tracking-widest text-forest-light mb-3">Cómo funciona</p>
@@ -362,10 +362,10 @@ export default function HomePage() {
       <section className="py-20 bg-white">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <p className="text-xs font-bold uppercase tracking-widest text-terra mb-3">El corazón de Ruka</p>
+            <p className="text-xs font-bold uppercase tracking-widest text-terra mb-3">El corazón de Rukka</p>
             <h2 className="text-3xl font-extrabold text-gray-900 mb-4">El sistema de match bilateral</h2>
             <p className="text-gray-500 max-w-xl mx-auto">
-              Ruka detecta automáticamente cuando dos viajeros quieren visitarse mutuamente en fechas compatibles.
+              Rukka detecta automáticamente cuando dos viajeros quieren visitarse mutuamente en fechas compatibles.
             </p>
           </div>
           <div className="bg-forest-50 border border-forest-100 rounded-3xl p-8 sm:p-12">
@@ -423,7 +423,7 @@ export default function HomePage() {
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <p className="text-xs font-bold uppercase tracking-widest text-terra mb-3">Por qué Ruka</p>
+            <p className="text-xs font-bold uppercase tracking-widest text-terra mb-3">Por qué Rukka</p>
             <h2 className="text-3xl font-extrabold text-gray-900">Viajar diferente, en Chile</h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -443,7 +443,7 @@ export default function HomePage() {
         <div className="max-w-3xl mx-auto px-4 text-center">
           <div className="landscape-gradient rounded-3xl p-12 text-white">
             <p className="text-5xl mb-6">🏔️ ↔ 🌿</p>
-            <h2 className="text-3xl sm:text-4xl font-extrabold mb-4">¿Lista tu ruka para el intercambio?</h2>
+            <h2 className="text-3xl sm:text-4xl font-extrabold mb-4">¿Lista tu rukka para el intercambio?</h2>
             <p className="text-white/80 mb-8 text-lg">
               Únete gratis, registra tu hogar y deja que el algoritmo encuentre tu match perfecto en Chile.
             </p>

@@ -134,7 +134,7 @@ export default function DashboardPage() {
             <div className="text-5xl mb-4">🗺️</div>
             <h2 className="text-2xl font-black mb-2">¿A dónde quieres ir?</h2>
             <p className="text-white/80 text-sm mb-6 max-w-md mx-auto">
-              Dinos a qué ciudad quieres viajar y el algoritmo Ruka buscará tu match perfecto.
+              Dinos a qué ciudad quieres viajar y el algoritmo Rukka buscará tu match perfecto.
             </p>
             <button onClick={() => setShowWishForm(true)}
               className="bg-white text-andean font-black px-8 py-3.5 rounded-xl hover:bg-blue-50 transition-colors flex items-center gap-2 mx-auto">

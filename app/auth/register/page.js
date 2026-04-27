@@ -33,7 +33,7 @@ export default function RegisterPage() {
             <div className="w-12 h-12 landscape-gradient rounded-2xl flex items-center justify-center shadow-lg">
               <Mountain className="w-6 h-6 text-white" />
             </div>
-            <span className="text-2xl font-black text-forest-dark">Ruka</span>
+            <span className="text-2xl font-black text-forest-dark">Rukka</span>
           </Link>
           <h1 className="text-2xl font-extrabold text-gray-900">Crea tu cuenta</h1>
           <p className="text-gray-500 mt-1 text-sm">Gratis, sin letra chica, solo para Chile 🇨🇱</p>

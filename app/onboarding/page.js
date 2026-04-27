@@ -181,7 +181,7 @@ export default function OnboardingPage() {
             <div className="w-9 h-9 landscape-gradient rounded-xl flex items-center justify-center shadow-md">
               <Mountain className="w-5 h-5 text-white" />
             </div>
-            <span className="text-xl font-black text-forest-dark">Ruka</span>
+            <span className="text-xl font-black text-forest-dark">Rukka</span>
           </div>
           <p className="text-sm text-gray-400">Paso {step} de 3</p>
         </div>
@@ -297,7 +297,7 @@ export default function OnboardingPage() {
             {/* Categoría */}
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
               <h2 className="text-lg font-black text-gray-900 mb-1">Tu hogar</h2>
-              <p className="text-sm text-gray-400 mb-5">Este será tu primer hogar en Ruka.</p>
+              <p className="text-sm text-gray-400 mb-5">Este será tu primer hogar en Rukka.</p>
 
               <div className="grid grid-cols-2 gap-3 mb-4">
                 {CATEGORY_OPTIONS.map(opt => (
@@ -501,7 +501,7 @@ export default function OnboardingPage() {
                 className="flex-1 bg-forest text-white py-4 rounded-2xl font-extrabold text-sm hover:bg-forest-dark disabled:opacity-60 transition flex items-center justify-center gap-2">
                 {loading
                   ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  : <><CheckCircle className="w-5 h-5" /> Publicar mi hogar y entrar a Ruka</>
+                  : <><CheckCircle className="w-5 h-5" /> Publicar mi hogar y entrar a Rukka</>
                 }
               </button>
             </div>
