@@ -1,6 +1,7 @@
 'use client'
 import { useState } from 'react'
 import Link from 'next/link'
+import ChileLocationSelect from '@/components/ChileLocationSelect'
 import { useRouter } from 'next/navigation'
 import { useApp } from '../../../lib/store'
 import { Mountain, CheckCircle, ArrowRight, AlertCircle, Eye, EyeOff, Home, Plus, X } from 'lucide-react'
@@ -22,15 +23,20 @@ export default function RegisterPage() {
   const [error, setError] = useState('')
   const [showPwd, setShowPwd] = useState(false)
 
+  // Ubicación del usuario (paso 1)
+  const [accLocation, setAccLocation] = useState({ region: '', comuna: '' })
+
+  // Ubicación de la propiedad (paso 2)
+  const [homeLocation, setHomeLocation] = useState({ region: '', comuna: '', direccion: '' })
+
   // Step 1
-  const [acc, setAcc] = useState({ name: '', email: '', password: '', city: '', country: '' })
+  const [acc, setAcc] = useState({ name: '', email: '', password: '' })
 
   // Step 2
   const [homeForm, setHomeForm] = useState({
-    title: '', type: '', location: '', city: '', country: '',
+    title: '', type: '',
     bedrooms: 1, bathrooms: 1, maxGuests: 2, size: '',
     description: '', amenities: [],
-    availabilityPeriods: [{ id: 'new1', start: '', end: '' }],
     imageUrl: '',
   })
 
@@ -39,6 +45,8 @@ export default function RegisterPage() {
     e.preventDefault()
     setError('')
     if (!acc.name.trim()) { setError('Ingresa tu nombre'); return }
+    if (!accLocation.region) { setError('Selecciona tu región'); return }
+    if (!accLocation.comuna) { setError('Selecciona tu comuna'); return }
     if (acc.password.length < 6) { setError('La contraseña debe tener al menos 6 caracteres'); return }
     setStep(2)
   }
@@ -48,47 +56,50 @@ export default function RegisterPage() {
     ...f, amenities: f.amenities.includes(a) ? f.amenities.filter(x => x !== a) : [...f.amenities, a]
   }))
 
-  const addPeriod = () => setHomeForm(f => ({
-    ...f, availabilityPeriods: [...f.availabilityPeriods, { id: `new${Date.now()}`, start: '', end: '' }]
-  }))
-  const removePeriod = id => setHomeForm(f => ({
-    ...f, availabilityPeriods: f.availabilityPeriods.filter(p => p.id !== id)
-  }))
-  const updatePeriod = (id, field, val) => setHomeForm(f => ({
-    ...f, availabilityPeriods: f.availabilityPeriods.map(p => p.id === id ? { ...p, [field]: val } : p)
-  }))
-
   const handleStep2 = async e => {
     e.preventDefault()
     setError('')
     if (!homeForm.type) { setError('Selecciona el tipo de hogar'); return }
     if (!homeForm.title.trim()) { setError('Ingresa el título del hogar'); return }
-    if (!homeForm.location.trim()) { setError('Ingresa la ubicación'); return }
+    if (!homeLocation.region) { setError('Selecciona la región de tu hogar'); return }
+    if (!homeLocation.comuna) { setError('Selecciona la comuna de tu hogar'); return }
     if (homeForm.description.trim().length < 30) { setError('La descripción debe tener al menos 30 caracteres'); return }
-    const validPeriods = homeForm.availabilityPeriods.filter(p => p.start && p.end)
-    if (validPeriods.length === 0) { setError('Agrega al menos un período de disponibilidad'); return }
 
     setLoading(true)
     const images = homeForm.imageUrl
       ? [homeForm.imageUrl, `https://picsum.photos/seed/${Date.now()}/800/500`]
       : [`https://picsum.photos/seed/${Date.now()}/800/500`, `https://picsum.photos/seed/${Date.now() + 1}/800/500`]
 
-    const res = await completeRegister(acc, {
-      title: homeForm.title,
-      type: homeForm.type,
-      location: homeForm.location || `${homeForm.city || acc.city}, ${homeForm.country || acc.country}`,
-      city: homeForm.city || acc.city,
-      country: homeForm.country || acc.country,
-      bedrooms: Number(homeForm.bedrooms),
-      bathrooms: Number(homeForm.bathrooms),
-      maxGuests: Number(homeForm.maxGuests),
-      size: homeForm.size ? Number(homeForm.size) : null,
-      description: homeForm.description,
-      amenities: homeForm.amenities,
-      images,
-      availabilityPeriods: validPeriods,
-      nearbyAttractions: [],
-    })
+    const res = await completeRegister(
+      {
+        ...acc,
+        region: accLocation.region,
+        comuna: accLocation.comuna,
+        city:   accLocation.comuna,
+        country: 'Chile',
+      },
+      {
+        title:       homeForm.title,
+        type:        homeForm.type,
+        region:      homeLocation.region,
+        comuna:      homeLocation.comuna,
+        direccion:   homeLocation.direccion,
+        location:    homeLocation.direccion
+          ? `${homeLocation.direccion}, ${homeLocation.comuna}, ${homeLocation.region}`
+          : `${homeLocation.comuna}, ${homeLocation.region}`,
+        city:        homeLocation.comuna,
+        country:     'Chile',
+        bedrooms:    Number(homeForm.bedrooms),
+        bathrooms:   Number(homeForm.bathrooms),
+        maxGuests:   Number(homeForm.maxGuests),
+        size:        homeForm.size ? Number(homeForm.size) : null,
+        description: homeForm.description,
+        amenities:   homeForm.amenities,
+        images,
+        availabilityPeriods: [],
+        nearbyAttractions:   [],
+      }
+    )
 
     setLoading(false)
     if (!res.success) {
@@ -96,7 +107,6 @@ export default function RegisterPage() {
       return
     }
 
-    // Supabase envía email de confirmación — informar al usuario
     router.push('/auth/confirm')
   }
 
@@ -145,18 +155,18 @@ export default function RegisterPage() {
                 <input type="email" value={acc.email} onChange={e => setAcc({ ...acc, email: e.target.value })} placeholder="tu@email.com" required
                   className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-forest transition-all" />
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Ciudad</label>
-                  <input type="text" value={acc.city} onChange={e => setAcc({ ...acc, city: e.target.value })} placeholder="Santiago"
-                    className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-forest" />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">País</label>
-                  <input type="text" value={acc.country} onChange={e => setAcc({ ...acc, country: e.target.value })} placeholder="Chile"
-                    className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-forest" />
-                </div>
+
+              {/* ← REEMPLAZADO: Ciudad + País por selects de Chile */}
+              <div>
+                <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">¿Dónde vives?</label>
+                <ChileLocationSelect
+                  value={accLocation}
+                  onChange={setAccLocation}
+                  showDireccion={false}
+                  required
+                />
               </div>
+
               <div>
                 <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Contraseña</label>
                 <div className="relative">
@@ -167,6 +177,7 @@ export default function RegisterPage() {
                   </button>
                 </div>
               </div>
+
               {error && <div className="flex items-center gap-2 bg-red-50 border border-red-100 text-red-600 text-xs px-4 py-3 rounded-xl"><AlertCircle className="w-4 h-4 flex-shrink-0" /> {error}</div>}
               <button type="submit" disabled={loading} className="w-full bg-forest text-white py-3.5 rounded-xl font-bold hover:bg-forest-dark disabled:opacity-60 transition-colors flex items-center justify-center gap-2">
                 {loading ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <>Siguiente: Tu hogar <ArrowRight className="w-4 h-4" /></>}
@@ -201,26 +212,15 @@ export default function RegisterPage() {
                   className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-forest" />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Ciudad del hogar</label>
-                  <input type="text" value={hf.city} onChange={e => setHomeForm(f => ({ ...f, city: e.target.value }))}
-                    placeholder={acc.city || 'Santiago'}
-                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-forest" />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">País</label>
-                  <input type="text" value={hf.country} onChange={e => setHomeForm(f => ({ ...f, country: e.target.value }))}
-                    placeholder={acc.country || 'Chile'}
-                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-forest" />
-                </div>
-              </div>
-
+              {/* ← REEMPLAZADO: Ciudad + País + Dirección por selects de Chile */}
               <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Dirección / Barrio</label>
-                <input type="text" value={hf.location} onChange={e => setHomeForm(f => ({ ...f, location: e.target.value }))}
-                  placeholder="ej. Providencia, Santiago, Chile"
-                  className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-forest" />
+                <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Ubicación del hogar</label>
+                <ChileLocationSelect
+                  value={homeLocation}
+                  onChange={setHomeLocation}
+                  showDireccion={true}
+                  required
+                />
               </div>
 
               <div className="grid grid-cols-3 gap-3">
@@ -244,37 +244,6 @@ export default function RegisterPage() {
                   placeholder="Describe tu hogar: qué lo hace especial, el barrio, qué incluye..." rows={4}
                   className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-forest resize-none" />
                 <p className="text-xs text-gray-400 mt-1">{hf.description.length} / mín. 30 caracteres</p>
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-gray-700 mb-2 uppercase tracking-wide">Períodos de disponibilidad</label>
-                <p className="text-xs text-gray-400 mb-3">¿Cuándo está disponible tu hogar para intercambio?</p>
-                <div className="space-y-2">
-                  {hf.availabilityPeriods.map(p => (
-                    <div key={p.id} className="flex items-center gap-2 bg-forest-50 rounded-xl p-3 border border-forest-100">
-                      <div className="flex items-center gap-2 flex-1 min-w-0">
-                        <input type="date" value={p.start} min={new Date().toISOString().split('T')[0]}
-                          onChange={e => updatePeriod(p.id, 'start', e.target.value)}
-                          className="flex-1 min-w-0 border border-forest-100 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-forest bg-white" />
-                        <span className="text-xs text-forest font-bold">→</span>
-                        <input type="date" value={p.end} min={p.start || new Date().toISOString().split('T')[0]}
-                          onChange={e => updatePeriod(p.id, 'end', e.target.value)}
-                          className="flex-1 min-w-0 border border-forest-100 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-forest bg-white" />
-                      </div>
-                      {hf.availabilityPeriods.length > 1 && (
-                        <button type="button" onClick={() => removePeriod(p.id)} className="text-red-400 hover:text-red-600 flex-shrink-0">
-                          <X className="w-4 h-4" />
-                        </button>
-                      )}
-                    </div>
-                  ))}
-                  {hf.availabilityPeriods.length < 5 && (
-                    <button type="button" onClick={addPeriod}
-                      className="flex items-center gap-1.5 text-forest text-xs font-semibold hover:text-forest-dark transition-colors mt-1">
-                      <Plus className="w-4 h-4" /> Agregar otro período
-                    </button>
-                  )}
-                </div>
               </div>
 
               <div>
