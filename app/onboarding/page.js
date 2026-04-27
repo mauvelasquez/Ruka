@@ -3,15 +3,14 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useApp } from '../../lib/store'
 import ChileLocationSelect from '../../components/ChileLocationSelect'
-import { Mountain, User, Home, Calendar, CheckCircle, ArrowRight, AlertCircle,
-         Camera, Plus, X, ChevronDown, BedDouble, Bath, Users, Wifi, Car,
+import { Mountain, User, Home, CheckCircle, ArrowRight, AlertCircle,
+         Camera, X, ChevronDown, BedDouble, Bath, Users, Wifi, Car,
          Snowflake, Flame, Tv, Coffee, Utensils, Shirt, Dog, Baby } from 'lucide-react'
 
 // ── Constantes ────────────────────────────────────────────────────────────────
 const STEPS = [
-  { n: 1, icon: User,     label: 'Tu perfil'   },
-  { n: 2, icon: Home,     label: 'Tu hogar'    },
-  { n: 3, icon: Calendar, label: 'Disponibilidad' },
+  { n: 1, icon: User, label: 'Tu perfil' },
+  { n: 2, icon: Home, label: 'Tu hogar'  },
 ]
 
 const CATEGORY_OPTIONS = [
@@ -101,42 +100,29 @@ export default function OnboardingPage() {
   const [homeLocation, setHomeLocation] = useState({ region: '', comuna: '', direccion: '' })
   const [photos, setPhotos] = useState([])
 
-  // Paso 3 — disponibilidad
-  const [periods, setPeriods] = useState([{ id: 'p1', start: '', end: '' }])
-
   const toggleAmenity = (id) => setHomeForm(f => ({
     ...f, amenities: f.amenities.includes(id)
       ? f.amenities.filter(a => a !== id)
       : [...f.amenities, id]
   }))
 
-  const addPeriod = () => setPeriods(p => [...p, { id: `p${Date.now()}`, start: '', end: '' }])
-  const removePeriod = (id) => setPeriods(p => p.filter(x => x.id !== id))
-  const updatePeriod = (id, field, val) => setPeriods(p => p.map(x => x.id === id ? { ...x, [field]: val } : x))
-
   // ── Validación y avance ────────────────────────────────────────────────────
   const next = (e) => {
     e.preventDefault()
     setError('')
-    if (step === 1) {
-      if (!profile.location.region) { setError('Selecciona tu región'); return }
-      if (!profile.location.comuna) { setError('Selecciona tu comuna'); return }
-      setStep(2)
-    } else if (step === 2) {
-      if (!homeForm.title.trim()) { setError('Ingresa el título del hogar'); return }
-      if (!homeLocation.region)   { setError('Selecciona la región del hogar'); return }
-      if (!homeLocation.comuna)   { setError('Selecciona la comuna del hogar'); return }
-      if (!subtype)               { setError('Selecciona el tipo de hogar'); return }
-      if (homeForm.description.trim().length < 20) { setError('La descripción debe tener al menos 20 caracteres'); return }
-      setStep(3)
-    }
+    if (!profile.location.region) { setError('Selecciona tu región'); return }
+    if (!profile.location.comuna) { setError('Selecciona tu comuna'); return }
+    setStep(2)
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
-    const validPeriods = periods.filter(p => p.start && p.end)
-    if (validPeriods.length === 0) { setError('Agrega al menos un período de disponibilidad'); return }
+    if (!homeForm.title.trim()) { setError('Ingresa el título del hogar'); return }
+    if (!homeLocation.region)   { setError('Selecciona la región del hogar'); return }
+    if (!homeLocation.comuna)   { setError('Selecciona la comuna del hogar'); return }
+    if (!subtype)               { setError('Selecciona el tipo de hogar'); return }
+    if (homeForm.description.trim().length < 20) { setError('La descripción debe tener al menos 20 caracteres'); return }
     setLoading(true)
     const res = await completeOnboarding({
       profileData: {
@@ -159,7 +145,7 @@ export default function OnboardingPage() {
         maxGuests:        homeForm.maxGuests,
         amenities:        homeForm.amenities,
         images:           photos,
-        availabilityPeriods: validPeriods,
+        availabilityPeriods: [],
         private_bathroom: homeForm.private_bathroom,
         bed_type:         homeForm.bed_type,
         shared_with:      homeForm.shared_with,
@@ -183,7 +169,7 @@ export default function OnboardingPage() {
             </div>
             <span className="text-xl font-black text-forest-dark">Rukka</span>
           </div>
-          <p className="text-sm text-gray-400">Paso {step} de 3</p>
+          <p className="text-sm text-gray-400">Paso {step} de 2</p>
         </div>
       </div>
 
@@ -293,7 +279,7 @@ export default function OnboardingPage() {
 
         {/* ── PASO 2: HOGAR ── */}
         {step === 2 && (
-          <form onSubmit={next} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-5">
             {/* Categoría */}
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
               <h2 className="text-lg font-black text-gray-900 mb-1">Tu hogar</h2>
@@ -443,60 +429,6 @@ export default function OnboardingPage() {
                 className="px-6 py-4 rounded-2xl border border-gray-200 font-bold text-sm text-gray-600 hover:border-gray-300 transition">
                 Atrás
               </button>
-              <button type="submit"
-                className="flex-1 bg-forest text-white py-4 rounded-2xl font-bold text-sm hover:bg-forest-dark transition flex items-center justify-center gap-2">
-                Siguiente: Disponibilidad <ArrowRight className="w-4 h-4" />
-              </button>
-            </div>
-          </form>
-        )}
-
-        {/* ── PASO 3: DISPONIBILIDAD ── */}
-        {step === 3 && (
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-              <h2 className="text-lg font-black text-gray-900 mb-1">¿Cuándo está disponible tu hogar?</h2>
-              <p className="text-sm text-gray-400 mb-5">Agrega los períodos en que otros pueden solicitar intercambio.</p>
-
-              <div className="space-y-3">
-                {periods.map(p => (
-                  <div key={p.id} className="flex items-center gap-2 bg-forest-50 rounded-xl p-3 border border-forest-100">
-                    <div className="flex items-center gap-2 flex-1 min-w-0">
-                      <input type="date" value={p.start} min={new Date().toISOString().split('T')[0]}
-                        onChange={e => updatePeriod(p.id, 'start', e.target.value)}
-                        className="flex-1 min-w-0 border border-forest-100 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-forest bg-white" />
-                      <span className="text-xs text-forest font-bold">→</span>
-                      <input type="date" value={p.end} min={p.start || new Date().toISOString().split('T')[0]}
-                        onChange={e => updatePeriod(p.id, 'end', e.target.value)}
-                        className="flex-1 min-w-0 border border-forest-100 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-forest bg-white" />
-                    </div>
-                    {periods.length > 1 && (
-                      <button type="button" onClick={() => removePeriod(p.id)} className="text-red-400 hover:text-red-600 flex-shrink-0">
-                        <X className="w-4 h-4" />
-                      </button>
-                    )}
-                  </div>
-                ))}
-                {periods.length < 5 && (
-                  <button type="button" onClick={addPeriod}
-                    className="flex items-center gap-1.5 text-forest text-xs font-semibold hover:text-forest-dark transition mt-1">
-                    <Plus className="w-4 h-4" /> Agregar otro período
-                  </button>
-                )}
-              </div>
-            </div>
-
-            {error && (
-              <div className="flex items-center gap-2 bg-red-50 border border-red-100 text-red-600 text-xs px-4 py-3 rounded-xl">
-                <AlertCircle className="w-4 h-4 flex-shrink-0" /> {error}
-              </div>
-            )}
-
-            <div className="flex gap-3">
-              <button type="button" onClick={() => setStep(2)}
-                className="px-6 py-4 rounded-2xl border border-gray-200 font-bold text-sm text-gray-600 hover:border-gray-300 transition">
-                Atrás
-              </button>
               <button type="submit" disabled={loading}
                 className="flex-1 bg-forest text-white py-4 rounded-2xl font-extrabold text-sm hover:bg-forest-dark disabled:opacity-60 transition flex items-center justify-center gap-2">
                 {loading
@@ -507,6 +439,7 @@ export default function OnboardingPage() {
             </div>
           </form>
         )}
+
       </div>
     </div>
   )
