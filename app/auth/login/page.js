@@ -1,12 +1,10 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useApp } from '../../../lib/store'
 import { Mountain, Eye, EyeOff, ArrowRight } from 'lucide-react'
 import { getRandomBanner } from '../../../lib/chile-banners'
-
-const banner = getRandomBanner()
 
 export default function LoginPage() {
   const router = useRouter()
@@ -16,6 +14,9 @@ export default function LoginPage() {
   const [showPw,   setShowPw]   = useState(false)
   const [error,    setError]    = useState('')
   const [loading,  setLoading]  = useState(false)
+  const [banner,   setBanner]   = useState(null)
+
+  useEffect(() => { setBanner(getRandomBanner()) }, [])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -34,43 +35,47 @@ export default function LoginPage() {
     <div className="min-h-screen flex" style={{ background: '#F8F4EE' }}>
       {/* Left panel — banner dinámico */}
       <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden"
-        style={{ background: `linear-gradient(135deg, ${banner.color} 0%, ${banner.color}dd 100%)` }}>
-        <div className="absolute inset-0">
-          <img src={banner.image} alt={banner.city}
-            className="w-full h-full object-cover opacity-30" />
-        </div>
-        <div className="relative z-10 flex flex-col justify-between p-12 w-full">
-          <Link href="/" className="flex items-center gap-3">
-            <Mountain className="w-8 h-8 text-white" />
-            <span className="text-2xl font-black text-white tracking-tight">Rukka</span>
-          </Link>
-
-          <div>
-            <div className="inline-flex items-center gap-2 bg-white/20 text-white rounded-full px-4 py-1.5 text-sm font-bold mb-6">
-              {banner.emoji} {banner.tagline}
+        style={{ background: banner ? `linear-gradient(135deg, ${banner.color} 0%, ${banner.color}dd 100%)` : '#2A5C45' }}>
+        {banner && (
+          <>
+            <div className="absolute inset-0">
+              <img src={banner.image} alt={banner.city}
+                className="w-full h-full object-cover opacity-30" />
             </div>
-            <h2 className="text-4xl font-black text-white mb-4 leading-tight">
-              Chile te está<br />esperando.<br />Sin pagar hotel.
-            </h2>
-            <p className="text-white/80 text-lg mb-10">{banner.description}</p>
+            <div className="relative z-10 flex flex-col justify-between p-12 w-full">
+              <Link href="/" className="flex items-center gap-3">
+                <Mountain className="w-8 h-8 text-white" />
+                <span className="text-2xl font-black text-white tracking-tight">Rukka</span>
+              </Link>
 
-            <div className="flex flex-wrap gap-2 mb-8">
-              {banner.tags.map(tag => (
-                <span key={tag} className="bg-white/20 text-white text-xs font-bold px-3 py-1.5 rounded-full">
-                  {tag}
-                </span>
-              ))}
+              <div>
+                <div className="inline-flex items-center gap-2 bg-white/20 text-white rounded-full px-4 py-1.5 text-sm font-bold mb-6">
+                  {banner.emoji} {banner.tagline}
+                </div>
+                <h2 className="text-4xl font-black text-white mb-4 leading-tight">
+                  Chile te está<br />esperando.<br />Sin pagar hotel.
+                </h2>
+                <p className="text-white/80 text-lg mb-10">{banner.description}</p>
+
+                <div className="flex flex-wrap gap-2 mb-8">
+                  {banner.tags.map(tag => (
+                    <span key={tag} className="bg-white/20 text-white text-xs font-bold px-3 py-1.5 rounded-full">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  {['✓ Sin costo de alojamiento', '✓ Sin comisiones ocultas', '✓ Matches automáticos', '✓ Solo en Chile 🇨🇱'].map((b, i) => (
+                    <p key={i} className="text-white/70 text-xs">{b}</p>
+                  ))}
+                </div>
+              </div>
+
+              <p className="text-white/40 text-sm">© 2026 Rukka — Intercambio de hogares en Chile</p>
             </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              {['✓ Sin costo de alojamiento', '✓ Sin comisiones ocultas', '✓ Matches automáticos', '✓ Solo en Chile 🇨🇱'].map((b, i) => (
-                <p key={i} className="text-white/70 text-xs">{b}</p>
-              ))}
-            </div>
-          </div>
-
-          <p className="text-white/40 text-sm">© 2026 Rukka — Intercambio de hogares en Chile</p>
-        </div>
+          </>
+        )}
       </div>
 
       {/* Right panel */}

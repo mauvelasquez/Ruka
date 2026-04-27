@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
@@ -24,14 +24,8 @@ const BENEFITS = [
   { icon: '🔒', title: 'Comunidad verificada', desc: 'Verificación de email obligatoria y perfil completo para todos los miembros.' },
 ]
 
-// Banner principal dinámico — rota en cada visita
-const heroBanner = CHILE_BANNERS[Math.floor(Math.random() * CHILE_BANNERS.length)]
-
-// 6 destinos aleatorios para la sección de ciudades
-const destinoBanners = getRandomBanners(6)
-
 // ── AD BANNER ─────────────────────────────────────────────────────────────────
-function AdBanner({ variant = 'primary', className = '' }) {
+function AdBanner({ variant = 'primary', className = '', heroBanner = null }) {
   const variants = {
     primary: {
       bg: 'bg-gradient-to-r from-forest to-forest-dark',
@@ -45,7 +39,7 @@ function AdBanner({ variant = 'primary', className = '' }) {
     secondary: {
       bg: 'bg-gradient-to-r from-terra to-amber-700',
       badge: '✦ MATCH AUTOMÁTICO',
-      title: `¿Quieres ir a ${heroBanner.city}? Hay alguien que quiere venir a tu ciudad`,
+      title: `¿Quieres ir a ${heroBanner?.city ?? 'Chile'}? Hay alguien que quiere venir a tu ciudad`,
       desc: 'El algoritmo Rukka conecta viajeros que se quieren visitar mutuamente. ¡Gratis!',
       cta: 'Buscar mi match',
       href: '/auth/register',
@@ -219,6 +213,14 @@ export default function HomePage() {
   const { homes, users } = useApp()
   const featured = homes.filter(h => h.featured).slice(0, 3)
 
+  const [heroBanner,     setHeroBanner]     = useState(null)
+  const [destinoBanners, setDestinoBanners] = useState([])
+
+  useEffect(() => {
+    setHeroBanner(CHILE_BANNERS[Math.floor(Math.random() * CHILE_BANNERS.length)])
+    setDestinoBanners(getRandomBanners(6))
+  }, [])
+
   return (
     <div className="min-h-screen" style={{ background: '#F8F4EE' }}>
       <Navbar />
@@ -226,32 +228,38 @@ export default function HomePage() {
       {/* ── HERO con banner dinámico ──────────────────────────────────────── */}
       <section className="relative min-h-[95vh] flex items-center overflow-hidden">
         <div className="absolute inset-0">
-          <img src={heroBanner.image} alt={heroBanner.city} className="w-full h-full object-cover" />
+          {heroBanner && (
+            <img src={heroBanner.image} alt={heroBanner.city} className="w-full h-full object-cover" />
+          )}
           <div className="absolute inset-0 hero-rukka" />
         </div>
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full py-16">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
-              <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm border border-white/20 text-white rounded-full px-4 py-2 text-sm font-medium mb-4">
-                <span>{heroBanner.emoji}</span>
-                <span>{heroBanner.tagline}</span>
-              </div>
+              {heroBanner && (
+                <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm border border-white/20 text-white rounded-full px-4 py-2 text-sm font-medium mb-4">
+                  <span>{heroBanner.emoji}</span>
+                  <span>{heroBanner.tagline}</span>
+                </div>
+              )}
               <h1 className="text-5xl sm:text-6xl font-black text-white leading-[1.05] mb-5">
                 Intercambia<br />
                 <span className="text-sand">tu hogar,</span><br />
                 viaja por Chile.
               </h1>
               <p className="text-lg text-white/80 leading-relaxed mb-4 max-w-lg">
-                {heroBanner.description}
+                {heroBanner?.description}
               </p>
-              <div className="flex flex-wrap gap-2 mb-6">
-                {heroBanner.tags.map(tag => (
-                  <span key={tag} className="bg-white/20 backdrop-blur-sm text-white text-xs font-bold px-3 py-1.5 rounded-full">
-                    {tag}
-                  </span>
-                ))}
-              </div>
+              {heroBanner && (
+                <div className="flex flex-wrap gap-2 mb-6">
+                  {heroBanner.tags.map(tag => (
+                    <span key={tag} className="bg-white/20 backdrop-blur-sm text-white text-xs font-bold px-3 py-1.5 rounded-full">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              )}
               <div className="flex flex-wrap gap-3 text-white/80 text-sm">
                 {['✓ 100% gratis para siempre', '✓ Solo en Chile', '✓ Matches automáticos'].map(t => (
                   <span key={t} className="bg-white/10 backdrop-blur-sm px-3 py-1.5 rounded-full">{t}</span>
@@ -304,7 +312,7 @@ export default function HomePage() {
       {/* ── BANNER 2 ─────────────────────────────────────────────────────────── */}
       <section className="py-6" style={{ background: '#F8F4EE' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <AdBanner variant="secondary" />
+          <AdBanner variant="secondary" heroBanner={heroBanner} />
         </div>
       </section>
 
