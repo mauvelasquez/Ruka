@@ -4,15 +4,18 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useApp } from '../../../lib/store'
 import { Mountain, Eye, EyeOff, ArrowRight } from 'lucide-react'
+import { getRandomBanner } from '../../../lib/chile-banners'
+
+const banner = getRandomBanner()
 
 export default function LoginPage() {
   const router = useRouter()
   const { login } = useApp()
-  const [email, setEmail] = useState('')
+  const [email,    setEmail]    = useState('')
   const [password, setPassword] = useState('')
-  const [showPw, setShowPw] = useState(false)
-  const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
+  const [showPw,   setShowPw]   = useState(false)
+  const [error,    setError]    = useState('')
+  const [loading,  setLoading]  = useState(false)
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -29,17 +32,12 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex" style={{ background: '#F8F4EE' }}>
-      {/* Left panel */}
-      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #1A3C2C 0%, #2A5C45 50%, #3D7A5E 100%)' }}>
-        <div className="absolute inset-0 opacity-10">
-          <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse">
-                <path d="M 60 0 L 0 0 0 60" fill="none" stroke="white" strokeWidth="0.5"/>
-              </pattern>
-            </defs>
-            <rect width="100%" height="100%" fill="url(#grid)" />
-          </svg>
+      {/* Left panel — banner dinámico */}
+      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden"
+        style={{ background: `linear-gradient(135deg, ${banner.color} 0%, ${banner.color}dd 100%)` }}>
+        <div className="absolute inset-0">
+          <img src={banner.image} alt={banner.city}
+            className="w-full h-full object-cover opacity-30" />
         </div>
         <div className="relative z-10 flex flex-col justify-between p-12 w-full">
           <Link href="/" className="flex items-center gap-3">
@@ -49,45 +47,29 @@ export default function LoginPage() {
 
           <div>
             <div className="inline-flex items-center gap-2 bg-white/20 text-white rounded-full px-4 py-1.5 text-sm font-bold mb-6">
-              🎉 100% gratuito para siempre
+              {banner.emoji} {banner.tagline}
             </div>
-
             <h2 className="text-4xl font-black text-white mb-4 leading-tight">
               Chile te está<br />esperando.<br />Sin pagar hotel.
             </h2>
-            <p className="text-green-200 text-lg mb-10">
-              Intercambia tu hogar y vive como local en cualquier ciudad de Chile. Completamente gratis.
-            </p>
+            <p className="text-white/80 text-lg mb-10">{banner.description}</p>
 
-            <div className="flex flex-col gap-3">
-              {[
-                { city: 'Santiago', dest: 'Pucón', emoji: '🏙️' },
-                { city: 'Valparaíso', dest: 'San Pedro de Atacama', emoji: '🎨' },
-                { city: 'Temuco', dest: 'Viña del Mar', emoji: '🌲' },
-              ].map((item, i) => (
-                <div key={i} className="flex items-center gap-3 bg-white/10 rounded-xl px-4 py-3 backdrop-blur-sm">
-                  <span className="text-2xl">{item.emoji}</span>
-                  <div>
-                    <p className="text-white font-semibold text-sm">{item.city}</p>
-                    <p className="text-green-300 text-xs">quiere visitar {item.dest}</p>
-                  </div>
-                </div>
+            <div className="flex flex-wrap gap-2 mb-8">
+              {banner.tags.map(tag => (
+                <span key={tag} className="bg-white/20 text-white text-xs font-bold px-3 py-1.5 rounded-full">
+                  {tag}
+                </span>
               ))}
             </div>
 
-            <div className="mt-8 grid grid-cols-2 gap-3">
-              {[
-                '✓ Sin costo de alojamiento',
-                '✓ Sin comisiones ocultas',
-                '✓ Matches automáticos',
-                '✓ Solo en Chile 🇨🇱',
-              ].map((b, i) => (
-                <p key={i} className="text-green-200 text-xs">{b}</p>
+            <div className="grid grid-cols-2 gap-3">
+              {['✓ Sin costo de alojamiento', '✓ Sin comisiones ocultas', '✓ Matches automáticos', '✓ Solo en Chile 🇨🇱'].map((b, i) => (
+                <p key={i} className="text-white/70 text-xs">{b}</p>
               ))}
             </div>
           </div>
 
-          <p className="text-green-300 text-sm">© 2025 Ruka — Intercambio de hogares en Chile</p>
+          <p className="text-white/40 text-sm">© 2026 Ruka — Intercambio de hogares en Chile</p>
         </div>
       </div>
 
@@ -117,7 +99,6 @@ export default function LoginPage() {
                 placeholder="tu@email.com" required
                 className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-forest bg-white" />
             </div>
-
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-1.5">Contraseña</label>
               <div className="relative">

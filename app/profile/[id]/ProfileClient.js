@@ -1,7 +1,8 @@
 'use client'
+import { useState } from 'react'
 import Link from 'next/link'
 import { useApp } from '../../../lib/store'
-import { MapPin, Home, Calendar, Star, ArrowLeft, Gift } from 'lucide-react'
+import { MapPin, Home, Calendar, Star, ArrowLeft, Gift, Camera, CheckCircle } from 'lucide-react'
 
 function AdBanner() {
   return (
@@ -20,13 +21,31 @@ function AdBanner() {
 }
 
 export default function ProfileClient({ id }) {
-  const { users, homes, wishes } = useApp()
+  const { users, homes, wishes, user, updateProfile } = useApp()
+  const [uploadingAvatar, setUploadingAvatar] = useState(false)
+  const [avatarSaved,     setAvatarSaved]     = useState(false)
 
-  const user   = users.find(u => u.id === id)
-  const uHomes = homes.filter(h => h.user_id === id || h.userId === id)
-  const uWishes = wishes.filter(w => w.user_id === id || w.userId === id)
+  const profileUser = users.find(u => u.id === id)
+  const uHomes  = homes.filter(h => (h.user_id || h.userId) === id)
+  const uWishes = wishes.filter(w => (w.user_id || w.userId) === id)
+  const isOwner = user?.id === id
 
-  if (!user) {
+  const handleAvatarUpload = async (e) => {
+    const file = e.target.files[0]
+    if (!file) return
+    if (file.size > 1024 * 1024) { alert('La foto debe pesar menos de 1MB'); return }
+    setUploadingAvatar(true)
+    const reader = new FileReader()
+    reader.onload = async (ev) => {
+      await updateProfile({ avatar: ev.target.result })
+      setUploadingAvatar(false)
+      setAvatarSaved(true)
+      setTimeout(() => setAvatarSaved(false), 3000)
+    }
+    reader.readAsDataURL(file)
+  }
+
+  if (!profileUser) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: '#F8F4EE' }}>
         <div className="text-center">
@@ -37,7 +56,10 @@ export default function ProfileClient({ id }) {
     )
   }
 
-  const initial = user.name?.[0]?.toUpperCase() || '?'
+  const initial    = profileUser.name?.[0]?.toUpperCase() || '?'
+  const memberYear = profileUser.created_at
+    ? new Date(profileUser.created_at).getFullYear()
+    : 2026
 
   return (
     <div className="min-h-screen" style={{ background: '#F8F4EE' }}>
@@ -49,24 +71,48 @@ export default function ProfileClient({ id }) {
         {/* Profile header */}
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-6">
           <div className="flex items-start gap-5">
-            <div className="w-20 h-20 rounded-2xl bg-forest flex items-center justify-center text-white text-3xl font-black flex-shrink-0 overflow-hidden">
-              {user.avatar
-                ? <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
-                : initial
-              }
+            {/* Avatar con opción de cambio */}
+            <div className="relative flex-shrink-0">
+              <div className="w-20 h-20 rounded-2xl bg-forest flex items-center justify-center text-white text-3xl font-black overflow-hidden">
+                {profileUser.avatar
+                  ? <img src={profileUser.avatar} alt={profileUser.name} className="w-full h-full object-cover" />
+                  : initial
+                }
+              </div>
+              {isOwner && (
+                <label className="absolute -bottom-1 -right-1 bg-forest text-white rounded-full p-1.5 cursor-pointer hover:bg-forest-dark transition shadow-md">
+                  {uploadingAvatar
+                    ? <div className="w-3 h-3 border border-white border-t-transparent rounded-full animate-spin" />
+                    : avatarSaved
+                    ? <CheckCircle className="w-3 h-3" />
+                    : <Camera className="w-3 h-3" />
+                  }
+                  <input type="file" accept="image/*" className="hidden" onChange={handleAvatarUpload} />
+                </label>
+              )}
             </div>
+
             <div className="flex-1">
-              <h1 className="text-2xl font-black text-gray-900">{user.name}</h1>
+              <h1 className="text-2xl font-black text-gray-900">{profileUser.name}</h1>
               <div className="flex flex-wrap items-center gap-4 mt-2 text-sm text-gray-500">
-                {user.city && (
+                {(profileUser.comuna || profileUser.city) && (
                   <span className="flex items-center gap-1.5">
                     <MapPin className="w-4 h-4 text-terra" />
-                    {user.city}{user.country ? `, ${user.country}` : ''}
+                    {profileUser.comuna || profileUser.city}
+                    {profileUser.region ? `, ${profileUser.region}` : ''}
+                  </span>
+                )}
+                {profileUser.verified && (
+                  <span className="flex items-center gap-1 text-forest text-xs font-bold">
+                    <CheckCircle className="w-3.5 h-3.5" /> Verificado
                   </span>
                 )}
               </div>
-              {user.bio && (
-                <p className="mt-3 text-gray-600 text-sm leading-relaxed">{user.bio}</p>
+              {isOwner && avatarSaved && (
+                <p className="mt-2 text-xs text-forest font-semibold">✓ Foto actualizada</p>
+              )}
+              {profileUser.bio && (
+                <p className="mt-3 text-gray-600 text-sm leading-relaxed">{profileUser.bio}</p>
               )}
             </div>
           </div>
@@ -75,7 +121,7 @@ export default function ProfileClient({ id }) {
             {[
               { label: 'Hogares',  value: uHomes.length,  icon: Home,     color: 'text-forest' },
               { label: 'Destinos', value: uWishes.length, icon: Star,     color: 'text-terra' },
-              { label: 'Miembro',  value: '2025',         icon: Calendar, color: 'text-andean' },
+              { label: 'Miembro',  value: memberYear,     icon: Calendar, color: 'text-andean' },
             ].map((s, i) => (
               <div key={i} className="text-center">
                 <s.icon className={`w-5 h-5 mx-auto mb-1 ${s.color}`} />
@@ -86,12 +132,12 @@ export default function ProfileClient({ id }) {
           </div>
         </div>
 
-        {/* ── AD BANNER ── */}
-        <AdBanner />
+        {/* Banner para no logueados */}
+        {!user && <AdBanner />}
 
         {/* Homes */}
         <h2 className="font-black text-gray-800 text-lg mb-3 flex items-center gap-2">
-          <Home className="w-5 h-5 text-forest" /> Hogares de {user.name?.split(' ')[0]}
+          <Home className="w-5 h-5 text-forest" /> Hogares de {profileUser.name?.split(' ')[0]}
         </h2>
         {uHomes.length === 0 ? (
           <div className="bg-white rounded-2xl p-8 text-center border border-dashed border-gray-200 mb-6">
@@ -111,8 +157,13 @@ export default function ProfileClient({ id }) {
                 <div className="flex-1 min-w-0">
                   <h3 className="font-black text-gray-900 text-base group-hover:text-forest transition-colors">{home.title}</h3>
                   <div className="flex items-center gap-3 mt-1 text-sm text-gray-500">
-                    <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5" />{home.city}</span>
-                    <span className="flex items-center gap-1"><Home className="w-3.5 h-3.5" />{home.bedrooms} hab.</span>
+                    <span className="flex items-center gap-1">
+                      <MapPin className="w-3.5 h-3.5" />
+                      {home.comuna || home.city}
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Home className="w-3.5 h-3.5" />{home.bedrooms} hab.
+                    </span>
                   </div>
                 </div>
               </Link>
