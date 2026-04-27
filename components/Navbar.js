@@ -29,6 +29,9 @@ export default function Navbar() {
             <Link href="/homes" className="text-gray-600 hover:text-forest font-medium text-sm transition-colors flex items-center gap-1.5">
               <Globe className="w-4 h-4" /> Explorar hogares
             </Link>
+            <Link href="/como-funciona" className="text-gray-600 hover:text-forest font-medium text-sm transition-colors">
+              ¿Cómo funciona?
+            </Link>
             {user && (
               <Link href="/matches" className="text-gray-600 hover:text-terra font-medium text-sm transition-colors flex items-center gap-1.5">
                 <Sparkles className="w-4 h-4" /> Buscar match
@@ -104,6 +107,9 @@ export default function Navbar() {
         <div className="md:hidden bg-white border-t border-gray-100 py-4 px-4 space-y-2">
           <Link href="/homes" onClick={() => setMenuOpen(false)} className="flex items-center gap-2 p-3 rounded-xl text-gray-700 hover:bg-forest-50 hover:text-forest">
             <Globe className="w-4 h-4 text-forest" /> Explorar hogares
+          </Link>
+          <Link href="/como-funciona" onClick={() => setMenuOpen(false)} className="flex items-center gap-2 p-3 rounded-xl text-gray-700 hover:bg-forest-50 hover:text-forest">
+            ¿Cómo funciona?
           </Link>
           {user ? (
             <>
