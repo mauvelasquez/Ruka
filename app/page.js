@@ -1,19 +1,14 @@
 'use client'
 import { useState } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import HomeCard from '../components/HomeCard'
 import { useApp } from '../lib/store'
-import { Mountain, ArrowRight, MapPin, Calendar, Users, Sparkles, CheckCircle, ArrowLeftRight, Star, Shield, Lock, ChevronRight, Gift, Zap, Heart } from 'lucide-react'
+import { CHILE_BANNERS, getRandomBanners } from '../lib/chile-banners'
+import { Mountain, ArrowRight, MapPin, Calendar, Users, Sparkles, Shield, Lock, ArrowLeftRight, Gift, Zap, Heart } from 'lucide-react'
 
-const CHILE_CITIES = [
-  'Santiago', 'Valparaíso', 'Viña del Mar', 'Concepción', 'La Serena',
-  'Antofagasta', 'Temuco', 'Puerto Montt', 'Pucón', 'San Pedro de Atacama',
-  'Iquique', 'Arica', 'Rancagua', 'Talca', 'Chillán', 'Osorno',
-  'Castro', 'Punta Arenas', 'Coyhaique', 'Calama'
-]
+const CHILE_CITIES = CHILE_BANNERS.map(b => b.city)
 
 const STEPS = [
   { n: '01', icon: '🏔️', title: 'Publica tu ruka', desc: 'Crea tu perfil y registra tu hogar con fotos y descripción.' },
@@ -29,7 +24,13 @@ const BENEFITS = [
   { icon: '🔒', title: 'Comunidad verificada', desc: 'Verificación de email obligatoria y perfil completo para todos los miembros.' },
 ]
 
-// ── BANNER COMPONENT ──────────────────────────────────────────────────────────
+// Banner principal dinámico — rota en cada visita
+const heroBanner = CHILE_BANNERS[Math.floor(Math.random() * CHILE_BANNERS.length)]
+
+// 6 destinos aleatorios para la sección de ciudades
+const destinoBanners = getRandomBanners(6)
+
+// ── AD BANNER ─────────────────────────────────────────────────────────────────
 function AdBanner({ variant = 'primary', className = '' }) {
   const variants = {
     primary: {
@@ -44,7 +45,7 @@ function AdBanner({ variant = 'primary', className = '' }) {
     secondary: {
       bg: 'bg-gradient-to-r from-terra to-amber-700',
       badge: '✦ MATCH AUTOMÁTICO',
-      title: '¿Quieres ir a Pucón? Hay alguien que quiere venir a tu ciudad',
+      title: `¿Quieres ir a ${heroBanner.city}? Hay alguien que quiere venir a tu ciudad`,
       desc: 'El algoritmo Ruka conecta viajeros que se quieren visitar mutuamente. ¡Gratis!',
       cta: 'Buscar mi match',
       href: '/auth/register',
@@ -53,7 +54,7 @@ function AdBanner({ variant = 'primary', className = '' }) {
     tertiary: {
       bg: 'bg-gradient-to-r from-andean to-blue-700',
       badge: '🇨🇱 SOLO CHILE',
-      title: 'Santiago · Valparaíso · Pucón · Atacama · Patagonia',
+      title: 'Pucón · Atacama · Valparaíso · Chiloé · Patagonia',
       desc: 'Hogares disponibles en todo Chile. Regístrate gratis y empieza a intercambiar hoy.',
       cta: 'Ver hogares disponibles',
       href: '/homes',
@@ -92,13 +93,12 @@ function SearchWizard({ homes, users }) {
     if (!dest) return
     const matches = homes.filter(h =>
       h.city?.toLowerCase().includes(dest.toLowerCase()) ||
+      h.comuna?.toLowerCase().includes(dest.toLowerCase()) ||
       h.location?.toLowerCase().includes(dest.toLowerCase())
     )
     setResults(matches)
     setShowGate(false)
   }
-
-  const handleViewMore = () => setShowGate(true)
 
   return (
     <div className="bg-white rounded-3xl shadow-2xl p-6 sm:p-8 max-w-2xl w-full mx-auto">
@@ -108,30 +108,24 @@ function SearchWizard({ homes, users }) {
       </div>
 
       <form onSubmit={handleSearch} className="space-y-4">
-        {/* Destino */}
         <div>
-          <label className="block text-xs font-bold text-gray-600 mb-1.5 uppercase tracking-wide flex items-center gap-1.5">
-            <MapPin className="w-3.5 h-3.5 text-terra" /> ¿A qué ciudad de Chile quieres ir?
+          <label className="block text-xs font-bold text-gray-600 mb-1.5 uppercase tracking-wide">
+            <MapPin className="w-3.5 h-3.5 text-terra inline mr-1" /> ¿A qué ciudad de Chile quieres ir?
           </label>
           <div className="relative">
-            <input
-              list="cities-list"
-              value={dest}
-              onChange={e => setDest(e.target.value)}
+            <input list="cities-list" value={dest} onChange={e => setDest(e.target.value)}
               placeholder="ej. Pucón, Valparaíso, Atacama..."
-              className="w-full border-2 border-gray-200 focus:border-forest rounded-xl px-4 py-3 text-sm outline-none transition-colors"
-            />
+              className="w-full border-2 border-gray-200 focus:border-forest rounded-xl px-4 py-3 text-sm outline-none transition-colors" />
             <datalist id="cities-list">
               {CHILE_CITIES.map(c => <option key={c} value={c} />)}
             </datalist>
           </div>
         </div>
 
-        {/* Fechas */}
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-xs font-bold text-gray-600 mb-1.5 uppercase tracking-wide flex items-center gap-1.5">
-              <Calendar className="w-3.5 h-3.5 text-terra" /> Desde
+            <label className="block text-xs font-bold text-gray-600 mb-1.5 uppercase tracking-wide">
+              <Calendar className="w-3.5 h-3.5 text-terra inline mr-1" /> Desde
             </label>
             <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)}
               min={new Date().toISOString().split('T')[0]}
@@ -145,10 +139,9 @@ function SearchWizard({ homes, users }) {
           </div>
         </div>
 
-        {/* Personas */}
         <div>
-          <label className="block text-xs font-bold text-gray-600 mb-1.5 uppercase tracking-wide flex items-center gap-1.5">
-            <Users className="w-3.5 h-3.5 text-terra" /> ¿Cuántas personas?
+          <label className="block text-xs font-bold text-gray-600 mb-1.5 uppercase tracking-wide">
+            <Users className="w-3.5 h-3.5 text-terra inline mr-1" /> ¿Cuántas personas?
           </label>
           <div className="flex items-center gap-3 border-2 border-gray-200 rounded-xl px-4 py-2.5">
             <button type="button" onClick={() => setGuests(g => Math.max(1, g - 1))}
@@ -165,50 +158,39 @@ function SearchWizard({ homes, users }) {
         </button>
       </form>
 
-      {/* Resultados */}
       {results !== null && (
         <div className="mt-6 pt-6 border-t border-gray-100">
           {results.length === 0 ? (
             <div className="text-center py-4">
               <p className="text-gray-500 text-sm mb-3">No encontramos hogares en <strong>{dest}</strong> aún.</p>
-              <p className="text-xs text-gray-400">¡Sé el primero en registrar tu hogar ahí!</p>
               <Link href="/auth/register" className="mt-3 inline-flex items-center gap-1.5 text-forest font-bold text-sm hover:text-forest-dark">
                 Registrar mi hogar <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
           ) : (
             <div>
-              <div className="flex items-center justify-between mb-4">
-                <p className="font-black text-gray-900">
-                  <span className="text-forest text-2xl">{results.length}</span> hogar{results.length !== 1 ? 'es' : ''} encontrado{results.length !== 1 ? 's' : ''} en <span className="text-terra">{dest}</span>
-                </p>
-              </div>
-
-              {/* Preview de hasta 2 resultados */}
+              <p className="font-black text-gray-900 mb-4">
+                <span className="text-forest text-2xl">{results.length}</span> hogar{results.length !== 1 ? 'es' : ''} en <span className="text-terra">{dest}</span>
+              </p>
               <div className="space-y-3 mb-4">
-                {results.slice(0, 2).map(h => {
-                  const owner = users.find(u => u.id === h.user_id || u.id === h.userId)
-                  return (
-                    <div key={h.id} className="flex gap-3 bg-gray-50 rounded-xl p-3 border border-gray-100">
-                      <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 bg-forest-50">
-                        {h.images?.[0] && <img src={h.images[0]} alt="" className="w-full h-full object-cover" />}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-bold text-gray-900 text-sm truncate">{h.title}</p>
-                        <p className="text-xs text-gray-500 flex items-center gap-1 mt-0.5">
-                          <MapPin className="w-3 h-3" /> {h.city}
-                        </p>
-                        <p className="text-xs text-forest font-bold mt-1">✓ Disponible · {h.max_guests || h.maxGuests} pers. máx.</p>
-                      </div>
+                {results.slice(0, 2).map(h => (
+                  <div key={h.id} className="flex gap-3 bg-gray-50 rounded-xl p-3 border border-gray-100">
+                    <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 bg-forest-50">
+                      {h.images?.[0] && <img src={h.images[0]} alt="" className="w-full h-full object-cover" />}
                     </div>
-                  )
-                })}
+                    <div className="flex-1 min-w-0">
+                      <p className="font-bold text-gray-900 text-sm truncate">{h.title}</p>
+                      <p className="text-xs text-gray-500 flex items-center gap-1 mt-0.5">
+                        <MapPin className="w-3 h-3" /> {h.comuna || h.city}
+                      </p>
+                      <p className="text-xs text-forest font-bold mt-1">✓ Disponible · {h.max_guests || h.maxGuests} pers. máx.</p>
+                    </div>
+                  </div>
+                ))}
               </div>
-
-              {/* Gate */}
               {!showGate ? (
                 results.length > 2 && (
-                  <button onClick={handleViewMore}
+                  <button onClick={() => setShowGate(true)}
                     className="w-full border-2 border-dashed border-gray-300 rounded-xl py-3 text-sm text-gray-500 font-bold hover:border-forest hover:text-forest transition-colors">
                     +{results.length - 2} hogares más — ver todos
                   </button>
@@ -217,15 +199,10 @@ function SearchWizard({ homes, users }) {
                 <div className="bg-forest-50 border-2 border-forest rounded-2xl p-5 text-center">
                   <Lock className="w-8 h-8 text-forest mx-auto mb-2" />
                   <h3 className="font-black text-gray-900 mb-1">Crea tu cuenta gratis para continuar</h3>
-                  <p className="text-sm text-gray-500 mb-4">
-                    Regístrate gratis, publica tu hogar y contacta a los {results.length} anfitriones en {dest}.
-                  </p>
+                  <p className="text-sm text-gray-500 mb-4">Regístrate y contacta a los {results.length} anfitriones en {dest}.</p>
                   <Link href="/auth/register"
                     className="w-full bg-forest text-white py-3 rounded-xl font-black text-sm hover:bg-forest-dark transition-colors flex items-center justify-center gap-2">
-                    <Sparkles className="w-4 h-4" /> Registrarme gratis — es 100% gratuito
-                  </Link>
-                  <Link href="/auth/login" className="mt-2 block text-xs text-gray-400 hover:text-gray-600">
-                    ¿Ya tienes cuenta? Iniciar sesión
+                    <Sparkles className="w-4 h-4" /> Registrarme gratis
                   </Link>
                 </div>
               )}
@@ -246,38 +223,41 @@ export default function HomePage() {
     <div className="min-h-screen" style={{ background: '#F8F4EE' }}>
       <Navbar />
 
-      {/* ── HERO con Search Wizard ─────────────────────────────────────────── */}
+      {/* ── HERO con banner dinámico ──────────────────────────────────────── */}
       <section className="relative min-h-[95vh] flex items-center overflow-hidden">
         <div className="absolute inset-0">
-          <img src="https://picsum.photos/seed/chile-landscape/1600/900" alt=""
-            className="w-full h-full object-cover" />
+          <img src={heroBanner.image} alt={heroBanner.city} className="w-full h-full object-cover" />
           <div className="absolute inset-0 hero-ruka" />
         </div>
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full py-16">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
-            {/* Left: copy */}
             <div>
-              <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm border border-white/20 text-white rounded-full px-4 py-2 text-sm font-medium mb-6">
-                <Mountain className="w-4 h-4" />
-                <span>Ruka significa "hogar" en Mapudungun 🇨🇱</span>
+              <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm border border-white/20 text-white rounded-full px-4 py-2 text-sm font-medium mb-4">
+                <span>{heroBanner.emoji}</span>
+                <span>{heroBanner.tagline}</span>
               </div>
               <h1 className="text-5xl sm:text-6xl font-black text-white leading-[1.05] mb-5">
                 Intercambia<br />
                 <span className="text-sand">tu hogar,</span><br />
                 viaja por Chile.
               </h1>
-              <p className="text-lg text-white/80 leading-relaxed mb-6 max-w-lg">
-                La plataforma chilena de intercambio de hogares. Viaja sin gastar en alojamiento. El algoritmo Ruka conecta viajeros que quieren visitarse mutuamente.
+              <p className="text-lg text-white/80 leading-relaxed mb-4 max-w-lg">
+                {heroBanner.description}
               </p>
+              <div className="flex flex-wrap gap-2 mb-6">
+                {heroBanner.tags.map(tag => (
+                  <span key={tag} className="bg-white/20 backdrop-blur-sm text-white text-xs font-bold px-3 py-1.5 rounded-full">
+                    {tag}
+                  </span>
+                ))}
+              </div>
               <div className="flex flex-wrap gap-3 text-white/80 text-sm">
                 {['✓ 100% gratis para siempre', '✓ Solo en Chile', '✓ Matches automáticos'].map(t => (
                   <span key={t} className="bg-white/10 backdrop-blur-sm px-3 py-1.5 rounded-full">{t}</span>
                 ))}
               </div>
             </div>
-
-            {/* Right: Search wizard */}
             <div>
               <SearchWizard homes={homes} users={users} />
             </div>
@@ -285,14 +265,14 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── BANNER 1 ──────────────────────────────────────────────────────────── */}
+      {/* ── BANNER 1 ─────────────────────────────────────────────────────────── */}
       <section className="py-8 bg-white border-y border-stone-200/60">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <AdBanner variant="primary" />
         </div>
       </section>
 
-      {/* ── CIUDADES CHILE ────────────────────────────────────────────────────── */}
+      {/* ── DESTINOS CHILE — banners dinámicos ───────────────────────────────── */}
       <section className="py-16" style={{ background: '#F8F4EE' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between mb-8">
@@ -305,22 +285,15 @@ export default function HomePage() {
             </Link>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-            {[
-              { city: 'Santiago', emoji: '🏙️', img: 'seed/stgo-city' },
-              { city: 'Valparaíso', emoji: '🎨', img: 'seed/valpo-city' },
-              { city: 'Pucón', emoji: '🌋', img: 'seed/pucon-city' },
-              { city: 'San Pedro de Atacama', emoji: '🏜️', img: 'seed/atacama-city' },
-              { city: 'Viña del Mar', emoji: '🌊', img: 'seed/vina-city' },
-              { city: 'Puerto Montt', emoji: '🐚', img: 'seed/pmontt-city' },
-            ].map(c => (
-              <Link key={c.city} href={`/homes?search=${c.city}`}
+            {destinoBanners.map(b => (
+              <Link key={b.id} href={`/homes?search=${encodeURIComponent(b.city)}`}
                 className="group relative rounded-2xl overflow-hidden h-32 block shadow-sm hover:shadow-md transition-shadow">
-                <img src={`https://picsum.photos/${c.img}/400/300`} alt={c.city}
+                <img src={b.image} alt={b.city}
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
                 <div className="absolute bottom-0 left-0 right-0 p-3">
-                  <p className="text-lg mb-0.5">{c.emoji}</p>
-                  <p className="text-white font-bold text-xs leading-tight">{c.city}</p>
+                  <p className="text-lg mb-0.5">{b.emoji}</p>
+                  <p className="text-white font-bold text-xs leading-tight">{b.city}</p>
                 </div>
               </Link>
             ))}
@@ -328,14 +301,14 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── BANNER 2 ──────────────────────────────────────────────────────────── */}
+      {/* ── BANNER 2 ─────────────────────────────────────────────────────────── */}
       <section className="py-6" style={{ background: '#F8F4EE' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <AdBanner variant="secondary" />
         </div>
       </section>
 
-      {/* ── FEATURED HOMES ────────────────────────────────────────────────────── */}
+      {/* ── FEATURED HOMES ───────────────────────────────────────────────────── */}
       {featured.length > 0 && (
         <section className="py-16 bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -357,7 +330,7 @@ export default function HomePage() {
         </section>
       )}
 
-      {/* ── HOW IT WORKS ──────────────────────────────────────────────────────── */}
+      {/* ── HOW IT WORKS ─────────────────────────────────────────────────────── */}
       <section className="py-20 bg-ruka-dark">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-14">
@@ -385,7 +358,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── MATCH EXPLAINER ───────────────────────────────────────────────────── */}
+      {/* ── MATCH EXPLAINER ──────────────────────────────────────────────────── */}
       <section className="py-20 bg-white">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
@@ -428,8 +401,7 @@ export default function HomePage() {
             </div>
             <div className="text-center">
               <p className="text-gray-600 text-sm mb-6">
-                <strong>Resultado:</strong> Camila disfruta la naturaleza en Pucón mientras Roberto explora Providencia.
-                Ambos sin pagar alojamiento. Ambos con experiencia de local.
+                <strong>Resultado:</strong> Camila disfruta la naturaleza en Pucón mientras Roberto explora Providencia. Ambos sin pagar alojamiento.
               </p>
               <Link href="/auth/register"
                 className="inline-flex items-center gap-2 bg-forest text-white px-8 py-3.5 rounded-xl font-bold hover:bg-forest-dark transition-colors">
@@ -440,14 +412,14 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── BANNER 3 ──────────────────────────────────────────────────────────── */}
+      {/* ── BANNER 3 ─────────────────────────────────────────────────────────── */}
       <section className="py-8" style={{ background: '#F8F4EE' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <AdBanner variant="tertiary" />
         </div>
       </section>
 
-      {/* ── BENEFITS ──────────────────────────────────────────────────────────── */}
+      {/* ── BENEFITS ─────────────────────────────────────────────────────────── */}
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
@@ -466,7 +438,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── CTA FINAL ─────────────────────────────────────────────────────────── */}
+      {/* ── CTA FINAL ────────────────────────────────────────────────────────── */}
       <section className="py-24 bg-white">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <div className="landscape-gradient rounded-3xl p-12 text-white">
