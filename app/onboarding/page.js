@@ -152,7 +152,7 @@ export default function OnboardingPage() {
       },
     })
     setLoading(false)
-    if (!res.success) { setError(res.error || 'Error al guardar. Intenta de nuevo.'); return }
+    if (!res.success) { console.log('Error onboarding:', res.error); setError(res.error || 'Error al guardar. Intenta de nuevo.'); return }
     router.push('/dashboard')
   }
 
