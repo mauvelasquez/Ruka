@@ -132,7 +132,7 @@ export default function DashboardPage() {
         {tab === TAB.WISHES && myWishes.length === 0 && !showWishForm && (
           <div className="bg-gradient-to-br from-andean to-blue-700 rounded-3xl p-8 text-white text-center mb-6 shadow-lg">
             <div className="text-5xl mb-4">🗺️</div>
-            <h2 className="text-2xl font-black mb-2">¿A dónde quieres ir?</h2>
+            <h2 className="text-2xl font-black mb-2">¿Cuándo te gustaría ir de vacaciones?</h2>
             <p className="text-white/80 text-sm mb-6 max-w-md mx-auto">
               Dinos a qué ciudad quieres viajar y el algoritmo Rukka buscará tu match perfecto.
             </p>
@@ -163,7 +163,7 @@ export default function DashboardPage() {
         {tab === TAB.WISHES && (
           <div>
             <div className="flex justify-between items-center mb-4">
-              <h2 className="font-black text-gray-800 text-lg">¿Cuándo y dónde quiero viajar?</h2>
+              <h2 className="font-black text-gray-800 text-lg">¿Cuándo te gustaría ir de vacaciones?</h2>
               <button onClick={() => setShowWishForm(!showWishForm)}
                 className="flex items-center gap-1.5 bg-andean text-white px-4 py-2 rounded-xl font-bold text-sm hover:bg-blue-700 transition-colors">
                 <Plus className="w-4 h-4" /> Nuevo destino

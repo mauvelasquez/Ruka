@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useApp } from '../../lib/store'
 import ChileLocationSelect from '../../components/ChileLocationSelect'
+import DescriptionHints from '../../components/DescriptionHints'
 import { Mountain, User, Home, CheckCircle, ArrowRight, AlertCircle,
          Camera, X, ChevronDown, BedDouble, Bath, Users, Wifi, Car,
          Snowflake, Flame, Tv, Coffee, Utensils, Shirt, Dog, Baby } from 'lucide-react'
@@ -34,7 +35,7 @@ const AMENITIES = [
   { id: 'coffee',  label: 'Cafetera',          icon: Coffee },
   { id: 'kitchen', label: 'Cocina equipada',   icon: Utensils },
   { id: 'washer',  label: 'Lavadora',          icon: Shirt },
-  { id: 'pets',    label: 'Mascotas ok',       icon: Dog },
+  { id: 'pets',    label: 'Mascotas permitidas', icon: Dog },
   { id: 'baby',    label: 'Apto para bebés',   icon: Baby },
 ]
 
@@ -368,7 +369,10 @@ export default function OnboardingPage() {
                   onChange={e => setHomeForm(f => ({ ...f, description: e.target.value }))}
                   placeholder="Describe tu hogar, el barrio, qué lo hace especial..."
                   className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-forest focus:outline-none resize-none" />
-                <p className="text-xs text-gray-400 text-right mt-0.5">{hf.description.length}/600</p>
+                <div className="flex items-start justify-between mt-0.5">
+                  <DescriptionHints />
+                  <p className="text-xs text-gray-400">{hf.description.length}/600</p>
+                </div>
               </div>
 
               {/* Capacidad */}

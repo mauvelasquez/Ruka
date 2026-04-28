@@ -180,21 +180,22 @@ export default function ComoFuncionaPage() {
           </div>
 
           <div className="bg-forest-50 border border-forest-100 rounded-3xl p-8 sm:p-12">
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-10 mb-8">
-              {/* Camila */}
-              <div className="text-center">
-                <div className="w-20 h-20 rounded-2xl overflow-hidden mx-auto mb-3 border-2 border-forest shadow-md">
-                  <img src="https://i.pravatar.cc/150?img=47" alt="Camila" className="w-full h-full object-cover" />
-                </div>
-                <p className="font-black text-gray-900">Camila</p>
-                <p className="text-sm text-gray-500">Santiago 🏙️</p>
-                <div className="mt-3 bg-terra-50 border border-terra/20 rounded-xl px-4 py-2.5">
-                  <p className="text-sm font-black text-terra">Quiere ir a Pucón</p>
-                  <p className="text-xs text-gray-500 mt-0.5">Jul 10–25 · 2 personas</p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-10 mb-8">
+              {/* Card Camila */}
+              <div className="w-64 flex-shrink-0">
+                <div className="relative rounded-2xl overflow-hidden" style={{ height: 140 }}>
+                  <img src="https://images.unsplash.com/photo-1505873242700-f289a29e1724?w=320&h=140&fit=crop"
+                    alt="Hogar Camila" className="w-full h-full object-cover" />
+                  <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0) 55%)' }} />
+                  <img src="https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=80&h=80&fit=crop&crop=face"
+                    alt="Camila" className="absolute top-3 left-3 w-11 h-11 rounded-full object-cover border-2 border-white shadow-md" />
+                  <div className="absolute bottom-3 left-3 text-white">
+                    <p className="font-black text-sm leading-tight">Camila</p>
+                    <p className="text-xs text-white/80">Santiago → Pucón · Jul 10–25</p>
+                  </div>
                 </div>
               </div>
 
-              {/* Match */}
               <div className="flex flex-col items-center gap-3">
                 <div className="bg-forest text-white rounded-full p-4 shadow-lg">
                   <ArrowLeftRight className="w-7 h-7" />
@@ -204,16 +205,18 @@ export default function ComoFuncionaPage() {
                 </span>
               </div>
 
-              {/* Roberto */}
-              <div className="text-center">
-                <div className="w-20 h-20 rounded-2xl overflow-hidden mx-auto mb-3 border-2 border-forest shadow-md">
-                  <img src="https://i.pravatar.cc/150?img=33" alt="Roberto" className="w-full h-full object-cover" />
-                </div>
-                <p className="font-black text-gray-900">Roberto</p>
-                <p className="text-sm text-gray-500">Pucón 🌋</p>
-                <div className="mt-3 bg-terra-50 border border-terra/20 rounded-xl px-4 py-2.5">
-                  <p className="text-sm font-black text-terra">Quiere ir a Santiago</p>
-                  <p className="text-xs text-gray-500 mt-0.5">Jul 10–25 · 2 personas</p>
+              {/* Card Roberto */}
+              <div className="w-64 flex-shrink-0">
+                <div className="relative rounded-2xl overflow-hidden" style={{ height: 140 }}>
+                  <img src="https://images.unsplash.com/photo-1601059381817-9ad55a5a6dc3?w=320&h=140&fit=crop"
+                    alt="Hogar Roberto" className="w-full h-full object-cover" />
+                  <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0) 55%)' }} />
+                  <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=80&h=80&fit=crop&crop=face"
+                    alt="Roberto" className="absolute top-3 left-3 w-11 h-11 rounded-full object-cover border-2 border-white shadow-md" />
+                  <div className="absolute bottom-3 left-3 text-white">
+                    <p className="font-black text-sm leading-tight">Roberto</p>
+                    <p className="text-xs text-white/80">Pucón → Santiago · Jul 10–25</p>
+                  </div>
                 </div>
               </div>
             </div>

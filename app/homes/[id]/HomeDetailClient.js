@@ -1,5 +1,18 @@
 'use client'
 import { useState, useEffect } from 'react'
+
+const AMENITY_LABEL = {
+  wifi:    'WiFi',
+  parking: 'Estacionamiento',
+  ac:      'Aire acondicionado',
+  heating: 'Calefacción',
+  tv:      'Televisor',
+  coffee:  'Cafetera',
+  kitchen: 'Cocina equipada',
+  washer:  'Lavadora',
+  pets:    'Mascotas permitidas',
+  baby:    'Apto para bebés',
+}
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Navbar from '../../../components/Navbar'
@@ -177,7 +190,7 @@ export default function HomeDetailClient({ id }) {
                 <div className="grid grid-cols-2 gap-3">
                   {home.amenities.map((a, i) => (
                     <div key={i} className="flex items-center gap-2 text-sm text-gray-600">
-                      <CheckCircle className="w-4 h-4 text-forest flex-shrink-0" /> {a}
+                      <CheckCircle className="w-4 h-4 text-forest flex-shrink-0" /> {AMENITY_LABEL[a] || a}
                     </div>
                   ))}
                 </div>
