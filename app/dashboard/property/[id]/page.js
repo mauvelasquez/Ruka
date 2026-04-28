@@ -79,10 +79,11 @@ export default function PropertyPage() {
 
   const { currentUser, homes, createHome, updateHome, ready } = useApp()
 
-  const [saving,  setSaving]  = useState(false)
-  const [error,   setError]   = useState('')
-  const [success, setSuccess] = useState(false)
+  const [saving,   setSaving]   = useState(false)
+  const [error,    setError]    = useState('')
+  const [success,  setSuccess]  = useState(false)
   const [geocoding, setGeocoding] = useState(false)
+  const [notFound, setNotFound] = useState(false)
 
   // Form state
   const [category,  setCategory]  = useState('full_home')
@@ -109,9 +110,9 @@ export default function PropertyPage() {
 
   // Load existing home for editing
   useEffect(() => {
-    if (isNew || !ready || !homes.length) return
+    if (isNew || !ready) return
     const home = homes.find(h => h.id === id)
-    if (!home) return
+    if (!home) { setNotFound(true); return }
     setCategory(home.category || 'full_home')
     setSubtype(home.subtype || home.type || '')
     setHomeForm({
@@ -250,13 +251,15 @@ export default function PropertyPage() {
 
     try {
       if (isNew) {
-        await createHome(data)
+        const result = await createHome(data)
+        if (!result) throw new Error('createHome devolvió null')
       } else {
         await updateHome(id, data)
       }
       setSuccess(true)
       setTimeout(() => router.push('/dashboard?tab=homes'), 1200)
-    } catch {
+    } catch (err) {
+      console.log('Error guardando propiedad:', err)
       setError('Error al guardar. Intenta de nuevo.')
     } finally {
       setSaving(false)
@@ -269,6 +272,17 @@ export default function PropertyPage() {
     </div>
   )
   if (!currentUser) return null
+
+  if (notFound) return (
+    <div className="min-h-screen flex items-center justify-center" style={{ background: '#F8F4EE' }}>
+      <div className="text-center">
+        <div className="text-5xl mb-4">🏠</div>
+        <h2 className="text-xl font-black text-gray-900 mb-2">Propiedad no encontrada</h2>
+        <p className="text-gray-500 text-sm mb-6">Este hogar no existe o no tienes acceso.</p>
+        <a href="/dashboard" className="text-forest font-bold hover:text-forest-dark text-sm">← Volver al panel</a>
+      </div>
+    </div>
+  )
 
   const hf = homeForm
 

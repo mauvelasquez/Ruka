@@ -53,7 +53,7 @@ export default function Navbar() {
                   >
                     <img src={user.avatar} alt={user.name}
                       className="w-8 h-8 rounded-full object-cover"
-                      onError={e => { e.target.src = `https://i.pravatar.cc/150?u=${user.email}` }}
+                      onError={e => { e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=2d6a4f&color=fff&size=150` }}
                     />
                     <span className="text-sm font-semibold text-gray-700 max-w-20 truncate">{user.name.split(' ')[0]}</span>
                     <ChevronDown className="w-4 h-4 text-gray-400" />

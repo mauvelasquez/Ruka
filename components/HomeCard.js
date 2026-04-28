@@ -70,7 +70,7 @@ export default function HomeCard({ home, user, compact = false }) {
               <div className="flex items-center gap-2">
                 <img src={user.avatar} alt={user.name}
                   className="w-7 h-7 rounded-full object-cover border-2 border-white shadow-sm"
-                  onError={e => { e.target.src = `https://i.pravatar.cc/150?u=${user.id}` }}
+                  onError={e => { e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=2d6a4f&color=fff&size=150` }}
                 />
                 <div>
                   <p className="text-xs font-semibold text-gray-700">{user.name.split(' ')[0]}</p>

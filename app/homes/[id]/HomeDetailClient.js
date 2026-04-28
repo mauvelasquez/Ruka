@@ -135,7 +135,7 @@ export default function HomeDetailClient({ id }) {
                 <div className="flex items-start gap-4">
                   <Link href={`/profile/${host.id}`} className="relative flex-shrink-0">
                     <img src={host.avatar} alt={host.name} className="w-16 h-16 rounded-2xl object-cover"
-                      onError={e => { e.target.src = `https://i.pravatar.cc/150?u=${host.id}` }} />
+                      onError={e => { e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(host.name || '')}&background=2d6a4f&color=fff&size=150` }} />
                     {host.verified && <div className="absolute -bottom-1 -right-1 bg-forest rounded-full p-1 border-2 border-white"><CheckCircle className="w-3.5 h-3.5 text-white" /></div>}
                   </Link>
                   <div className="flex-1">
@@ -222,7 +222,7 @@ export default function HomeDetailClient({ id }) {
                     <div key={r.id} className="border-b border-gray-50 last:border-0 pb-5 last:pb-0">
                       <div className="flex items-center gap-3 mb-2">
                         <img src={r.userAvatar} alt={r.userName} className="w-10 h-10 rounded-full object-cover"
-                          onError={e => { e.target.src = `https://i.pravatar.cc/150?u=${r.userId}` }} />
+                          onError={e => { e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(r.userName || '')}&background=2d6a4f&color=fff&size=150` }} />
                         <div>
                           <p className="font-semibold text-gray-800 text-sm">{r.userName}</p>
                           <p className="text-gray-400 text-xs">{new Date(r.date).toLocaleDateString('es-CL', { month: 'long', year: 'numeric' })}</p>
