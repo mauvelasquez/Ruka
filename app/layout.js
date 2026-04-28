@@ -4,7 +4,7 @@ import Providers from './providers'
 export const metadata = {
   metadataBase: new URL('https://rukka.cl'),
   title: 'Rukka – Intercambia tu hogar, vive Chile y el mundo',
-  description: 'Rukka conecta viajeros que quieren intercambiar sus hogares. Vive como local en Chile y el mundo sin gastar en alojamiento.',
+  description: 'Mi casa es tu casa. Rukka conecta viajeros que intercambian sus hogares. Vive como local en Chile sin gastar en alojamiento.',
   keywords: 'rukka, intercambio hogar, home exchange, chile, viajes, mapuche',
   openGraph: {
     title: 'Rukka – Intercambia tu hogar, vive Chile y el mundo',

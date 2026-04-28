@@ -243,11 +243,12 @@ export default function HomePage() {
                   <span>{heroBanner.tagline}</span>
                 </div>
               )}
-              <h1 className="text-5xl sm:text-6xl font-black text-white leading-[1.05] mb-5">
+              <h1 className="text-5xl sm:text-6xl font-black text-white leading-[1.05] mb-3">
                 Intercambia<br />
                 <span className="text-sand">tu hogar,</span><br />
                 viaja por Chile.
               </h1>
+              <p className="text-base text-sand/90 font-bold italic mb-4">Mi casa es tu casa.</p>
               <p className="text-lg text-white/80 leading-relaxed mb-4 max-w-lg">
                 {heroBanner?.description}
               </p>
@@ -261,7 +262,7 @@ export default function HomePage() {
                 </div>
               )}
               <div className="flex flex-wrap gap-3 text-white/80 text-sm">
-                {['✓ 100% gratis para siempre', '✓ Solo en Chile', '✓ Matches automáticos'].map(t => (
+                {['✓ 100% gratis', '✓ Solo en Chile', '✓ Matches automáticos'].map(t => (
                   <span key={t} className="bg-white/10 backdrop-blur-sm px-3 py-1.5 rounded-full">{t}</span>
                 ))}
               </div>
@@ -380,7 +381,7 @@ export default function HomePage() {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-10 mb-8">
               {/* Card Camila */}
               <div style={{ position:'relative', borderRadius:16, overflow:'hidden', height:160, width:'100%', maxWidth:280, flexShrink:0 }}>
-                <img src="https://images.unsplash.com/photo-1505873242700-f289a29e1724?w=320&h=160&fit=crop"
+                <img src="https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=600"
                   alt="Hogar Camila"
                   style={{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover' }} />
                 <div style={{ position:'absolute', inset:0, background:'linear-gradient(to top, rgba(0,0,0,0.8), rgba(0,0,0,0.05))' }} />
@@ -402,7 +403,7 @@ export default function HomePage() {
 
               {/* Card Roberto */}
               <div style={{ position:'relative', borderRadius:16, overflow:'hidden', height:160, width:'100%', maxWidth:280, flexShrink:0 }}>
-                <img src="https://images.unsplash.com/photo-1601059381817-9ad55a5a6dc3?w=320&h=160&fit=crop"
+                <img src="https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=600"
                   alt="Hogar Roberto"
                   style={{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover' }} />
                 <div style={{ position:'absolute', inset:0, background:'linear-gradient(to top, rgba(0,0,0,0.8), rgba(0,0,0,0.05))' }} />

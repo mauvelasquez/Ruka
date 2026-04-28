@@ -79,6 +79,7 @@ export default function ComoFuncionaPage() {
             Viaja por Chile sin<br />
             <span className="text-sand">pagar hotel. En serio.</span>
           </h1>
+          <p className="text-base text-sand/90 font-bold italic mb-3">Mi casa es tu casa.</p>
           <p className="text-lg sm:text-xl text-white/80 max-w-2xl mx-auto leading-relaxed mb-8">
             Rukka es la primera plataforma chilena de intercambio de hogares.
             Tú cuidas el hogar de alguien, ellos cuidan el tuyo.
@@ -108,7 +109,7 @@ export default function ComoFuncionaPage() {
               { emoji: '🏠', title: 'Tienes un hogar', desc: 'Puede ser casa, depto, cabaña. Da igual dónde en Chile.' },
               { emoji: '🗺️', title: 'Alguien más tiene otro', desc: 'En Pucón, Valparaíso, Atacama, donde quieras ir.' },
               { emoji: '🤝', title: 'Se ponen de acuerdo', desc: 'Fechas, personas, detalles. Todo dentro de Rukka.' },
-              { emoji: '✈️', title: 'Ambos viajan gratis', desc: 'Sin hoteles, sin Airbnb, sin pagar alojamiento.' },
+              { emoji: '🏖️', title: 'Ambos alojan gratis', desc: 'Sin hoteles, sin Airbnb, sin pagar alojamiento.' },
             ].map((s, i) => (
               <div key={i} className="relative">
                 <div className="bg-white border-2 border-gray-100 rounded-3xl p-6 h-full hover:border-forest/30 hover:shadow-md transition-all text-center">
@@ -183,7 +184,7 @@ export default function ComoFuncionaPage() {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-10 mb-8">
               {/* Card Camila */}
               <div style={{ position:'relative', borderRadius:16, overflow:'hidden', height:160, width:'100%', maxWidth:280, flexShrink:0 }}>
-                <img src="https://images.unsplash.com/photo-1505873242700-f289a29e1724?w=320&h=160&fit=crop"
+                <img src="https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=600"
                   alt="Hogar Camila"
                   style={{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover' }} />
                 <div style={{ position:'absolute', inset:0, background:'linear-gradient(to top, rgba(0,0,0,0.8), rgba(0,0,0,0.05))' }} />
@@ -207,7 +208,7 @@ export default function ComoFuncionaPage() {
 
               {/* Card Roberto */}
               <div style={{ position:'relative', borderRadius:16, overflow:'hidden', height:160, width:'100%', maxWidth:280, flexShrink:0 }}>
-                <img src="https://images.unsplash.com/photo-1601059381817-9ad55a5a6dc3?w=320&h=160&fit=crop"
+                <img src="https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=600"
                   alt="Hogar Roberto"
                   style={{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover' }} />
                 <div style={{ position:'absolute', inset:0, background:'linear-gradient(to top, rgba(0,0,0,0.8), rgba(0,0,0,0.05))' }} />
