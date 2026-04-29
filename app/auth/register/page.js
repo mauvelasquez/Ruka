@@ -102,8 +102,8 @@ export default function RegisterPage() {
           <div className="mt-5 pt-5 border-t border-gray-100 text-center">
             <p className="text-xs text-gray-400">
               Al registrarte aceptas nuestros{' '}
-              <a href="#" className="text-forest hover:underline">Términos</a> y{' '}
-              <a href="#" className="text-forest hover:underline">Política de privacidad</a>
+              <a href="/terminos" className="text-forest hover:underline">Términos</a> y{' '}
+              <a href="/terminos#privacidad" className="text-forest hover:underline">Política de privacidad</a>
             </p>
           </div>
         </div>

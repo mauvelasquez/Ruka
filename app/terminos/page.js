@@ -78,7 +78,7 @@ export default function TerminosPage() {
 
           {/* 6 */}
           <section>
-            <h2 className="text-xl font-black text-gray-900 mb-3">6. Privacidad y datos</h2>
+            <h2 id="privacidad" className="text-xl font-black text-gray-900 mb-3">6. Privacidad y datos</h2>
             <p className="text-sm leading-relaxed">
               Los datos personales de los usuarios son tratados conforme a las disposiciones de la Ley 19.628 sobre Protección de la Vida Privada (Chile). Rukka solo comparte información de contacto entre usuarios que hayan acordado realizar un intercambio. Rukka no vende ni cede datos personales a terceros con fines comerciales.
             </p>
