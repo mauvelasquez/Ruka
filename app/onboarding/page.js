@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useApp } from '../../lib/store'
 import ChileLocationSelect from '../../components/ChileLocationSelect'
@@ -76,7 +76,13 @@ function PhotoUploader({ photos, onChange, max = 8 }) {
 // ── Página principal ──────────────────────────────────────────────────────────
 export default function OnboardingPage() {
   const router = useRouter()
-  const { completeOnboarding } = useApp()
+  const { completeOnboarding, user, ready } = useApp()
+
+  useEffect(() => {
+    if (ready && user?.status === 'confirmed') {
+      router.replace('/dashboard')
+    }
+  }, [ready, user, router])
 
   const [step,    setStep]    = useState(1)
   const [loading, setLoading] = useState(false)
