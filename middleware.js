@@ -31,18 +31,19 @@ export async function middleware(req) {
   }
 
   if (session && (pathname.startsWith('/dashboard') || pathname.startsWith('/onboarding'))) {
-    const { data: profile } = await supabase
+    const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('status')
       .eq('id', session.user.id)
       .single()
 
-    if (pathname.startsWith('/dashboard') && (!profile || profile.status === 'pending')) {
-      return NextResponse.redirect(new URL('/onboarding', req.url))
-    }
-
-    if (pathname.startsWith('/onboarding') && profile?.status === 'confirmed') {
-      return NextResponse.redirect(new URL('/dashboard', req.url))
+    if (!profileError) {
+      if (pathname.startsWith('/dashboard') && (!profile || profile.status === 'pending')) {
+        return NextResponse.redirect(new URL('/onboarding', req.url))
+      }
+      if (pathname.startsWith('/onboarding') && profile?.status === 'confirmed') {
+        return NextResponse.redirect(new URL('/dashboard', req.url))
+      }
     }
   }
 

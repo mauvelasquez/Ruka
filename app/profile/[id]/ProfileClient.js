@@ -59,7 +59,7 @@ export default function ProfileClient({ id }) {
   const initial    = profileUser.name?.[0]?.toUpperCase() || '?'
   const memberYear = profileUser.created_at
     ? new Date(profileUser.created_at).getFullYear()
-    : 2026
+    : new Date().getFullYear()
 
   return (
     <div className="min-h-screen" style={{ background: '#F8F4EE' }}>

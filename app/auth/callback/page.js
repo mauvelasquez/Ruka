@@ -34,13 +34,17 @@ export default function AuthCallbackPage() {
             user.user_metadata?.picture ||
             user.user_metadata?.avatar_url ||
             null
-          await supabase.from('profiles').upsert({
+          const { error: upsertError } = await supabase.from('profiles').upsert({
             id:     user.id,
             name:   user.user_metadata?.name || user.user_metadata?.full_name || 'Usuario',
             email:  user.email || user.user_metadata?.email || '',
             avatar,
             status: 'pending',
           })
+          if (upsertError) {
+            router.push('/auth/login?error=profile_error')
+            return
+          }
           router.push('/onboarding')
         } else if (profile.status === 'confirmed') {
           setStatus('¡Bienvenido de vuelta!')

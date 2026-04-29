@@ -33,7 +33,7 @@ export default function HomeDetailClient({ id }) {
 
   useEffect(() => {
     const h = getHomeById(id)
-    if (h) { setHome(h); setHost(getUserById(h.userId)) }
+    if (h) { setHome(h); setHost(getUserById(h.user_id || h.userId)) }
   }, [id, homes])
 
   if (!home) return (
@@ -48,11 +48,13 @@ export default function HomeDetailClient({ id }) {
     e.preventDefault()
     if (!user) { router.push('/auth/login'); return }
     if (!form.start || !form.end) { setErr('Selecciona las fechas del intercambio'); return }
-    const myHome = null // could look up user's home
+    const myHome = homes.find(h => (h.user_id || h.userId) === user.id)
     sendExchangeRequest({
-      receiverId: home.userId, receiverHomeId: home.id,
-      proposerHomeId: null, dates: { start: form.start, end: form.end },
-      message: form.message, isBilateral: false,
+      receiverId:     home.user_id || home.userId,
+      receiverHomeId: home.id,
+      proposerHomeId: myHome?.id || null,
+      dates:          { start: form.start, end: form.end },
+      message:        form.message,
     })
     setSent(true); setErr('')
   }
@@ -249,7 +251,7 @@ export default function HomeDetailClient({ id }) {
                   </div>
                   <h3 className="text-lg font-bold text-gray-900 mb-2">¡Solicitud enviada!</h3>
                   <p className="text-gray-500 text-sm mb-5">
-                    {host?.name.split(' ')[0]} recibirá tu solicitud. Te responderá pronto.
+                    {host?.name?.split(' ')[0] || 'El anfitrión'} recibirá tu solicitud. Te responderá pronto.
                   </p>
                   <Link href="/dashboard" className="block bg-forest text-white py-3 rounded-xl font-bold text-sm hover:bg-forest-dark transition-colors">
                     Ver en mi panel

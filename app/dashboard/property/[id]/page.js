@@ -113,6 +113,7 @@ export default function PropertyPage() {
     if (isNew || !ready) return
     const home = homes.find(h => h.id === id)
     if (!home) { setNotFound(true); return }
+    if ((home.user_id || home.userId) !== currentUser?.id) { setNotFound(true); return }
     setCategory(home.category || 'full_home')
     setSubtype(home.subtype || home.type || '')
     setHomeForm({

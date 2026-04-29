@@ -165,14 +165,16 @@ function MatchesContent() {
 
   if (!currentUser) return null
 
-  const myHomes = homes.filter(h => h.userId === currentUser.id)
-  const myCity  = currentUser.city || ''
+  const myHomes = homes.filter(h => (h.user_id || h.userId) === currentUser.id)
+  const myCity  = currentUser.city || currentUser.comuna || ''
 
   function datesOverlap(s1, e1, s2, e2) {
     return new Date(s1) <= new Date(e2) && new Date(e1) >= new Date(s2)
   }
   function homeIsAvailable(home, s, e) {
-    return (home.availabilityPeriods || []).some(p => datesOverlap(p.start, p.end, s, e))
+    const periods = home.availability_periods || home.availabilityPeriods || []
+    if (periods.length === 0) return true
+    return periods.some(p => datesOverlap(p.start, p.end, s, e))
   }
 
   const handleSearch = (e) => {
@@ -180,18 +182,18 @@ function MatchesContent() {
     if (!city || !start || !end) return
 
     const candidates = homes.filter(h =>
-      h.userId !== currentUser.id &&
-      h.maxGuests >= guests &&
-      h.city.toLowerCase().includes(city.toLowerCase()) &&
+      (h.user_id || h.userId) !== currentUser.id &&
+      (h.max_guests || h.maxGuests || 0) >= guests &&
+      (h.city || '').toLowerCase().includes(city.toLowerCase()) &&
       homeIsAvailable(h, start, end)
     )
 
     const matched = candidates.map(home => {
-      const owner = users.find(u => u.id === home.userId)
+      const owner = users.find(u => u.id === (home.user_id || home.userId))
       const ownerWishes = wishes.filter(w =>
-        w.userId === home.userId &&
-        w.toCity.toLowerCase().includes(myCity.toLowerCase()) &&
-        datesOverlap(w.startDate, w.endDate, start, end)
+        (w.user_id || w.userId) === (home.user_id || home.userId) &&
+        (w.to_city || w.toCity || '').toLowerCase().includes(myCity.toLowerCase()) &&
+        datesOverlap(w.start_date || w.startDate, w.end_date || w.endDate, start, end)
       )
       return {
         home,

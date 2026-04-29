@@ -15,7 +15,7 @@ function HomesContent() {
   const { homes, users } = useApp()
   const searchParams  = useSearchParams()
   const initialSearch = searchParams.get('search') || searchParams.get('location') || ''
-  const banner        = getRandomBanner()
+  const [banner]      = useState(() => getRandomBanner())
 
   const [search,      setSearch]      = useState(initialSearch)
   const [type,        setType]        = useState('Todos')
