@@ -21,14 +21,15 @@ function AdBanner() {
 }
 
 export default function ProfileClient({ id }) {
-  const { users, homes, wishes, user, updateProfile } = useApp()
+  const { users, homes, wishes, user, updateProfile, ready } = useApp()
   const [uploadingAvatar, setUploadingAvatar] = useState(false)
   const [avatarSaved,     setAvatarSaved]     = useState(false)
 
   const profileUser = users.find(u => u.id === id)
   const uHomes  = homes.filter(h => (h.user_id || h.userId) === id)
   const uWishes = wishes.filter(w => (w.user_id || w.userId) === id)
-  const isOwner = user?.id === id
+  // Solo mostrar controles de dueño cuando auth está resuelto (evita flash post-logout)
+  const isOwner = ready && user?.id === id
 
   const handleAvatarUpload = async (e) => {
     const file = e.target.files[0]
