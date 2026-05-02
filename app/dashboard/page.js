@@ -6,16 +6,13 @@ import { useApp } from '../../lib/store'
 import Navbar from '../../components/Navbar'
 import {
   Home, Heart, ArrowLeftRight, Plus, MapPin, Users, Calendar,
-  CheckCircle, XCircle, Clock, Trash2, Eye, Star, Sparkles
+  CheckCircle, XCircle, Clock, Trash2, Eye, Star, Sparkles, AlertCircle, ScrollText
 } from 'lucide-react'
+import { COMUNAS_RUKKA } from '../../lib/comunas'
 
 const TAB = { WISHES: 'wishes', HOMES: 'homes', RECEIVED: 'received', SENT: 'sent' }
 
-const CHILE_CITIES = [
-  'Santiago', 'Valparaíso', 'Viña del Mar', 'Concepción', 'La Serena',
-  'Antofagasta', 'Temuco', 'Puerto Montt', 'Pucón', 'San Pedro de Atacama',
-  'Iquique', 'Arica', 'Rancagua', 'Talca', 'Chillán', 'Osorno', 'Castro', 'Calama'
-]
+const CHILE_CITIES = COMUNAS_RUKKA
 
 function StatusBadge({ status }) {
   const map = {
@@ -33,24 +30,54 @@ function StatusBadge({ status }) {
 
 export default function DashboardPage() {
   const router = useRouter()
-  const { currentUser, ready, homes, wishes, requests, addWish, removeWish, updateRequest, removeHome } = useApp()
+  const { currentUser, ready, homes, wishes, requests, addWish, removeWish, updateRequest, removeHome, syncSession } = useApp()
   const [tab, setTab] = useState(TAB.WISHES)
   const [wishForm, setWishForm] = useState({ toCity: '', startDate: '', endDate: '', guests: 2 })
   const [showWishForm, setShowWishForm] = useState(false)
+  const [loadingError, setLoadingError] = useState(false)
+  const [showNoHomeAlert, setShowNoHomeAlert] = useState(false)
 
-  // ← FIX: esperar a que el store esté listo antes de redirigir
   useEffect(() => {
-    if (ready && !currentUser) router.push('/auth/login')
+    if (ready) return
+    const timer = setTimeout(() => {
+      setLoadingError(true)
+      syncSession()
+    }, 8000)
+    return () => clearTimeout(timer)
+  }, [ready])
+
+  useEffect(() => {
+    if (!ready) return
+    if (!currentUser) router.push('/auth/login')
+    // status===null significa que el perfil aún está cargando — no redirigir todavía
+    else if (currentUser.status && currentUser.status !== 'confirmed') router.push('/onboarding')
   }, [currentUser, ready])
 
   // Mostrar loading mientras el store inicializa
   if (!ready) return (
     <div className="min-h-screen flex items-center justify-center" style={{ background: '#F8F4EE' }}>
-      <div className="w-8 h-8 border-4 border-forest border-t-transparent rounded-full animate-spin" />
+      {loadingError ? (
+        <div className="text-center px-4">
+          <AlertCircle className="w-10 h-10 text-amber-500 mx-auto mb-3" />
+          <p className="text-gray-700 font-bold mb-1">Error de conexión</p>
+          <p className="text-gray-400 text-sm mb-4">No se pudo cargar la sesión. Verifica tu conexión a internet.</p>
+          <button onClick={() => window.location.reload()}
+            className="bg-forest text-white px-6 py-2.5 rounded-xl font-bold text-sm hover:bg-forest-dark transition-colors">
+            Reintentar
+          </button>
+        </div>
+      ) : (
+        <div className="w-8 h-8 border-4 border-forest border-t-transparent rounded-full animate-spin" />
+      )}
     </div>
   )
 
-  if (!currentUser) return null
+  // Mientras el redirect a login ocurre, mostrar spinner en vez de blank page
+  if (!currentUser) return (
+    <div className="min-h-screen flex items-center justify-center" style={{ background: '#F8F4EE' }}>
+      <div className="w-8 h-8 border-4 border-forest border-t-transparent rounded-full animate-spin" />
+    </div>
+  )
 
   const myHomes  = homes.filter(h => h.user_id === currentUser.id || h.userId === currentUser.id)
   const myWishes = wishes.filter(w => w.user_id === currentUser.id || w.userId === currentUser.id)
@@ -60,6 +87,11 @@ export default function DashboardPage() {
   const handleAddWish = async (e) => {
     e.preventDefault()
     if (!wishForm.toCity || !wishForm.startDate || !wishForm.endDate) return
+    if (myHomes.length === 0) {
+      setShowWishForm(false)
+      setShowNoHomeAlert(true)
+      return
+    }
     await addWish({
       toCity: wishForm.toCity,
       startDate: wishForm.startDate,
@@ -89,10 +121,18 @@ export default function DashboardPage() {
             <h1 className="text-3xl font-black text-gray-900">Mi panel</h1>
             <p className="text-gray-500 mt-1">Bienvenido, {currentUser.name?.split(' ')[0]} 👋</p>
           </div>
-          <Link href="/matches"
-            className="bg-terra text-white px-5 py-2.5 rounded-xl font-bold text-sm hover:bg-terra-dark transition-colors flex items-center gap-2">
-            <Star className="w-4 h-4" /> Buscar match
-          </Link>
+          <div className="flex items-center gap-2">
+            {currentUser.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL && (
+              <Link href="/dashboard/logs"
+                className="bg-gray-800 text-white px-4 py-2.5 rounded-xl font-bold text-sm hover:bg-gray-700 transition-colors flex items-center gap-2">
+                <ScrollText className="w-4 h-4" /> Logs
+              </Link>
+            )}
+            <Link href="/matches"
+              className="bg-terra text-white px-5 py-2.5 rounded-xl font-bold text-sm hover:bg-terra-dark transition-colors flex items-center gap-2">
+              <Star className="w-4 h-4" /> Buscar match
+            </Link>
+          </div>
         </div>
 
         {/* Stats */}
@@ -164,11 +204,25 @@ export default function DashboardPage() {
           <div>
             <div className="flex justify-between items-center mb-4">
               <h2 className="font-black text-gray-800 text-lg">¿Cuándo te gustaría ir de vacaciones?</h2>
-              <button onClick={() => setShowWishForm(!showWishForm)}
+              <button onClick={() => { setShowWishForm(!showWishForm); setShowNoHomeAlert(false) }}
                 className="flex items-center gap-1.5 bg-andean text-white px-4 py-2 rounded-xl font-bold text-sm hover:bg-blue-700 transition-colors">
                 <Plus className="w-4 h-4" /> Nuevo destino
               </button>
             </div>
+
+            {showNoHomeAlert && (
+              <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-start gap-3 mb-4">
+                <AlertCircle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-bold text-amber-900 text-sm mb-1">Necesitas agregar tu propiedad primero</p>
+                  <p className="text-amber-700 text-xs mb-2">Para ingresar un destino de viaje, primero debes publicar tu hogar en Rukka.</p>
+                  <Link href="/dashboard/property/new"
+                    className="inline-flex items-center gap-1.5 bg-forest text-white text-xs font-bold px-3 py-1.5 rounded-lg hover:bg-forest-dark transition-colors">
+                    <Plus className="w-3.5 h-3.5" /> Agregar mi propiedad
+                  </Link>
+                </div>
+              </div>
+            )}
 
             {showWishForm && (
               <form onSubmit={handleAddWish} className="bg-white rounded-2xl p-6 border-2 border-andean/30 shadow-md mb-5">
@@ -180,7 +234,7 @@ export default function DashboardPage() {
                     <label className="block text-xs font-bold text-gray-600 mb-1.5 uppercase tracking-wide">
                       ¿A qué ciudad de Chile quieres ir?
                     </label>
-                    <input list="cities-dash" type="text" placeholder="ej. Pucón, Valparaíso..."
+                    <input list="cities-dash" type="text" placeholder="ej. Pichilemu, Puerto Varas, Zapallar..."
                       value={wishForm.toCity} onChange={e => setWishForm({...wishForm, toCity: e.target.value})}
                       className="w-full border-2 border-gray-200 focus:border-andean rounded-xl px-4 py-3 text-sm outline-none transition-colors" />
                     <datalist id="cities-dash">
@@ -278,7 +332,9 @@ export default function DashboardPage() {
             {myHomes.length === 0 ? (
               <div className="bg-white rounded-2xl p-10 text-center border border-dashed border-gray-200">
                 <Home className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                <p className="text-gray-500 font-medium mb-4">No tienes hogares registrados</p>
+                <p className="text-gray-900 font-black text-base mb-1">Aún no tienes hogares registrados</p>
+                <p className="text-gray-400 text-sm mb-2">¿Tienes una propiedad en Airbnb? Impórtala en un clic e intercámbiala con otros usuarios de Rukka.</p>
+                <p className="text-gray-400 text-xs mb-6">O publica tu hogar manualmente en menos de 5 minutos.</p>
                 <Link href="/dashboard/property/new"
                   className="inline-flex items-center gap-2 bg-forest text-white px-6 py-3 rounded-xl font-bold text-sm hover:bg-forest-dark transition-colors">
                   <Plus className="w-4 h-4" /> Publicar mi primer hogar
