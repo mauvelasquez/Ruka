@@ -1,18 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
-import { CHILE_REGIONS, getComunasByRegion } from '@/lib/chile-locations'
+import { REGIONES_RUKKA, getComunasByRegion } from '../lib/comunas'
 
-/**
- * ChileLocationSelect
- * Componente reutilizable de Región → Comuna para formularios chilenos.
- *
- * Props:
- *   value        – { region, comuna, direccion } (objeto controlado)
- *   onChange     – fn({ region, comuna, direccion })
- *   showDireccion– bool (default true) muestra campo de calle/número
- *   required     – bool
- *   className    – clases extra para el wrapper
- */
 export default function ChileLocationSelect({
   value = {},
   onChange,
@@ -25,25 +14,22 @@ export default function ChileLocationSelect({
   const [direccion, setDir]   = useState(value.direccion || '')
   const [comunas, setComunas] = useState([])
 
-  // Sincronizar si el valor externo cambia (modo controlado)
   useEffect(() => {
-    if (value.region !== undefined)   setRegion(value.region)
-    if (value.comuna !== undefined)   setComuna(value.comuna)
+    if (value.region !== undefined)    setRegion(value.region)
+    if (value.comuna !== undefined)    setComuna(value.comuna)
     if (value.direccion !== undefined) setDir(value.direccion)
   }, [value.region, value.comuna, value.direccion])
 
-  // Actualizar lista de comunas al cambiar región
   useEffect(() => {
-    setComunas(getComunasByRegion(region))
-    if (comuna && !getComunasByRegion(region).includes(comuna)) {
+    const list = getComunasByRegion(region)
+    setComunas(list)
+    if (comuna && !list.includes(comuna)) {
       setComuna('')
       notify({ region, comuna: '', direccion })
     }
   }, [region])
 
-  const notify = (patch) => {
-    onChange?.({ region, comuna, direccion, ...patch })
-  }
+  const notify = (patch) => onChange?.({ region, comuna, direccion, ...patch })
 
   const handleRegion = (e) => {
     const val = e.target.value
@@ -75,15 +61,10 @@ export default function ChileLocationSelect({
           Región {required && <span className="text-red-500">*</span>}
         </label>
         <div className="relative">
-          <select
-            value={region}
-            onChange={handleRegion}
-            required={required}
-            className={selectClass}
-          >
+          <select value={region} onChange={handleRegion} required={required} className={selectClass}>
             <option value="">Selecciona una región</option>
-            {CHILE_REGIONS.map(r => (
-              <option key={r.code} value={r.name}>{r.name}</option>
+            {REGIONES_RUKKA.map(r => (
+              <option key={r.id} value={r.nombre}>{r.nombre}</option>
             ))}
           </select>
           <ChevronIcon />
@@ -96,13 +77,7 @@ export default function ChileLocationSelect({
           Comuna {required && <span className="text-red-500">*</span>}
         </label>
         <div className="relative">
-          <select
-            value={comuna}
-            onChange={handleComuna}
-            disabled={!region}
-            required={required}
-            className={selectClass}
-          >
+          <select value={comuna} onChange={handleComuna} disabled={!region} required={required} className={selectClass}>
             <option value="">{region ? 'Selecciona una comuna' : 'Primero elige una región'}</option>
             {comunas.map(c => (
               <option key={c} value={c}>{c}</option>
@@ -122,7 +97,7 @@ export default function ChileLocationSelect({
             type="text"
             value={direccion}
             onChange={handleDir}
-            placeholder="Ej: Av. Providencia 1234, Depto 5B"
+            placeholder="Ej: Los Boldos 123"
             className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-forest focus:border-transparent"
           />
         </div>

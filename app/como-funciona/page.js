@@ -107,7 +107,7 @@ export default function ComoFuncionaPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
               { emoji: '🏠', title: 'Tienes un hogar', desc: 'Puede ser casa, depto, cabaña. Da igual dónde en Chile.' },
-              { emoji: '🗺️', title: 'Alguien más tiene otro', desc: 'En Pucón, Valparaíso, Atacama, donde quieras ir.' },
+              { emoji: '🗺️', title: 'Alguien más tiene otro', desc: 'En Pichilemu, Puerto Varas, Zapallar, donde quieras ir.' },
               { emoji: '🤝', title: 'Se ponen de acuerdo', desc: 'Fechas, personas, detalles. Todo dentro de Rukka.' },
               { emoji: '🏖️', title: 'Ambos alojan gratis', desc: 'Sin hoteles, sin Airbnb, sin pagar alojamiento.' },
             ].map((s, i) => (
@@ -193,7 +193,7 @@ export default function ComoFuncionaPage() {
                   style={{ position:'absolute', top:12, left:12, width:48, height:48, borderRadius:'50%', border:'2.5px solid white', objectFit:'cover' }} />
                 <div style={{ position:'absolute', bottom:12, left:12 }}>
                   <p style={{ color:'white', fontWeight:600, fontSize:14, margin:0 }}>Camila</p>
-                  <p style={{ color:'#a8dfc0', fontSize:12, margin:0 }}>Santiago → Pucón · Jul 10–25</p>
+                  <p style={{ color:'#a8dfc0', fontSize:12, margin:0 }}>San José de Maipo → Pichilemu · Jul 10–25</p>
                 </div>
               </div>
 
@@ -217,14 +217,14 @@ export default function ComoFuncionaPage() {
                   style={{ position:'absolute', top:12, left:12, width:48, height:48, borderRadius:'50%', border:'2.5px solid white', objectFit:'cover' }} />
                 <div style={{ position:'absolute', bottom:12, left:12 }}>
                   <p style={{ color:'white', fontWeight:600, fontSize:14, margin:0 }}>Roberto</p>
-                  <p style={{ color:'#a8dfc0', fontSize:12, margin:0 }}>Pucón → Santiago · Jul 10–25</p>
+                  <p style={{ color:'#a8dfc0', fontSize:12, margin:0 }}>Pichilemu → San José de Maipo · Jul 10–25</p>
                 </div>
               </div>
             </div>
 
             <div className="text-center border-t border-forest-100 pt-8">
               <p className="text-gray-700 mb-2">
-                <strong>Resultado:</strong> Camila disfruta la naturaleza en Pucón mientras Roberto explora Providencia.
+                <strong>Resultado:</strong> Camila disfruta el surf en Pichilemu mientras Roberto camina los cajones del Maipo.
               </p>
               <p className="text-forest font-bold">Ambos sin pagar alojamiento. 🎉</p>
             </div>

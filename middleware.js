@@ -1,53 +1,50 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
 
-const PROTECTED  = ['/dashboard', '/matches', '/onboarding']
-const AUTH_ONLY  = ['/auth/login', '/auth/register']
+const PROTECTED = ['/dashboard', '/matches', '/onboarding']
+const AUTH_ONLY = ['/auth/login', '/auth/register']
 
 export async function middleware(req) {
-  const res = NextResponse.next()
+  let response = NextResponse.next({ request: req })
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
     {
       cookies: {
-        get:    (name)         => req.cookies.get(name)?.value,
-        set:    (name, value, options) => res.cookies.set({ name, value, ...options }),
-        remove: (name, options)        => res.cookies.set({ name, value: '', ...options }),
+        getAll: () => req.cookies.getAll(),
+        setAll: (cookiesToSet) => {
+          cookiesToSet.forEach(({ name, value }) => req.cookies.set(name, value))
+          response = NextResponse.next({ request: req })
+          cookiesToSet.forEach(({ name, value, options }) =>
+            response.cookies.set(name, value, options)
+          )
+        },
       },
     }
   )
 
-  const { data: { session } } = await supabase.auth.getSession()
+  // getUser() valida el JWT con Supabase server — más seguro que getSession()
+  // try/catch previene que un error de red en Supabase genere un loop de redirecciones
+  let user = null
+  try {
+    const { data } = await supabase.auth.getUser()
+    user = data?.user ?? null
+  } catch (err) {
+    console.error('[middleware] getUser falló:', err?.message)
+    return response // dejar pasar la request sin redirigir
+  }
   const { pathname } = req.nextUrl
 
-  if (PROTECTED.some(p => pathname.startsWith(p)) && !session) {
+  if (PROTECTED.some(p => pathname.startsWith(p)) && !user) {
     return NextResponse.redirect(new URL('/auth/login', req.url))
   }
 
-  if (AUTH_ONLY.some(p => pathname.startsWith(p)) && session) {
+  if (AUTH_ONLY.some(p => pathname.startsWith(p)) && user) {
     return NextResponse.redirect(new URL('/dashboard', req.url))
   }
 
-  if (session && (pathname.startsWith('/dashboard') || pathname.startsWith('/onboarding'))) {
-    const { data: profile, error: profileError } = await supabase
-      .from('profiles')
-      .select('status')
-      .eq('id', session.user.id)
-      .single()
-
-    if (!profileError) {
-      if (pathname.startsWith('/dashboard') && (!profile || profile.status === 'pending')) {
-        return NextResponse.redirect(new URL('/onboarding', req.url))
-      }
-      if (pathname.startsWith('/onboarding') && profile?.status === 'confirmed') {
-        return NextResponse.redirect(new URL('/dashboard', req.url))
-      }
-    }
-  }
-
-  return res
+  return response
 }
 
 export const config = {

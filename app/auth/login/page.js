@@ -3,8 +3,9 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useApp } from '../../../lib/store'
-import { Mountain, Eye, EyeOff, ArrowRight } from 'lucide-react'
+import { Eye, EyeOff, ArrowRight } from 'lucide-react'
 import { getRandomBanner } from '../../../lib/chile-banners'
+import RukkaLogo from '../../../components/RukkaLogo'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -44,8 +45,7 @@ export default function LoginPage() {
             </div>
             <div className="relative z-10 flex flex-col justify-between p-12 w-full">
               <Link href="/" className="flex items-center gap-3">
-                <Mountain className="w-8 h-8 text-white" />
-                <span className="text-2xl font-black text-white tracking-tight">Rukka</span>
+                <RukkaLogo height={56} />
               </Link>
 
               <div>
@@ -81,14 +81,13 @@ export default function LoginPage() {
       {/* Right panel */}
       <div className="flex-1 flex items-center justify-center p-6">
         <div className="w-full max-w-md">
-          <Link href="/" className="flex items-center gap-2 mb-10 lg:hidden">
-            <Mountain className="w-6 h-6 text-forest" />
-            <span className="text-xl font-black text-forest">Rukka</span>
+          <Link href="/" className="flex items-center gap-2 mb-6 lg:hidden">
+            <RukkaLogo height={44} />
           </Link>
 
-          <div className="mb-8">
-            <h1 className="text-3xl font-black text-gray-900 mb-2">Bienvenido de vuelta</h1>
-            <p className="text-gray-500">Inicia sesión para ver tus matches en Chile</p>
+          <div className="mb-6">
+            <h1 className="text-2xl sm:text-3xl font-black text-gray-900 mb-2">Bienvenido de vuelta</h1>
+            <p className="text-gray-500 text-sm">Inicia sesión para ver tus matches en Chile</p>
           </div>
 
           {error && (
@@ -98,7 +97,7 @@ export default function LoginPage() {
           )}
 
           <button type="button" onClick={loginWithGoogle}
-            className="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors shadow-sm mb-5">
+            className="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors shadow-sm mb-2">
             <svg viewBox="0 0 24 24" className="w-5 h-5 flex-shrink-0">
               <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
               <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
@@ -107,6 +106,11 @@ export default function LoginPage() {
             </svg>
             Continuar con Google
           </button>
+          <p className="text-center text-xs text-gray-400 mb-5">
+            Al continuar, aceptas nuestros{' '}
+            <a href="/terminos#terminos" className="text-forest hover:underline">Términos</a> y{' '}
+            <a href="/terminos#privacidad" className="text-forest hover:underline">Política de Privacidad</a>
+          </p>
 
           <div className="flex items-center gap-3 mb-5">
             <div className="flex-1 h-px bg-gray-200" />
@@ -119,17 +123,19 @@ export default function LoginPage() {
               <label className="block text-sm font-bold text-gray-700 mb-1.5">Email</label>
               <input type="email" value={email} onChange={e => setEmail(e.target.value)}
                 placeholder="tu@email.com" required
-                className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-forest bg-white" />
+                autoComplete="email" inputMode="email" enterKeyHint="next"
+                className="w-full border border-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-forest bg-white" />
             </div>
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-1.5">Contraseña</label>
               <div className="relative">
                 <input type={showPw ? 'text' : 'password'} value={password}
                   onChange={e => setPassword(e.target.value)} placeholder="••••••••" required
-                  className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-forest bg-white pr-11" />
+                  autoComplete="current-password" enterKeyHint="go"
+                  className="w-full border border-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-forest bg-white pr-12" />
                 <button type="button" onClick={() => setShowPw(!showPw)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                  {showPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  className="absolute right-0 top-0 h-full w-12 flex items-center justify-center text-gray-400 hover:text-gray-600">
+                  {showPw ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
               </div>
             </div>

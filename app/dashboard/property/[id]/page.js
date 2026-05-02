@@ -1,15 +1,45 @@
 'use client'
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter, useParams } from 'next/navigation'
+import dynamic from 'next/dynamic'
 import { useApp } from '../../../../lib/store'
 import ChileLocationSelect from '../../../../components/ChileLocationSelect'
 import DescriptionHints from '../../../../components/DescriptionHints'
 import Link from 'next/link'
+
+// Importación lazy/dinámica — aísla errores del importador Airbnb
+// de la carga principal del formulario de propiedad
+const AirbnbImport = dynamic(
+  () => import('../../../../components/AirbnbImport'),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="bg-white rounded-2xl border border-gray-100 p-5 flex items-center justify-center gap-2 text-gray-400 text-sm mb-6">
+        <div className="w-4 h-4 border-2 border-gray-300 border-t-forest rounded-full animate-spin" />
+        Cargando importador de Airbnb...
+      </div>
+    ),
+  }
+)
 import {
   ArrowLeft, Save, Camera, X, ChevronDown, MapPin,
   AlertCircle, CheckCircle, Wifi, Car, Snowflake, Flame,
   Tv, Coffee, Utensils, Shirt, Dog, Baby, Bath
 } from 'lucide-react'
+
+// ── Mapeo amenities Airbnb → IDs Rukka ────────────────────────────────────────
+const AMENITY_KEYWORDS = {
+  wifi:    ['wifi', 'wi-fi', 'wireless internet'],
+  parking: ['parking', 'estacionamiento', 'garage'],
+  ac:      ['air conditioning', 'aire acondicionado', 'a/c'],
+  heating: ['heating', 'calefacción', 'calefaccion', 'heat'],
+  tv:      ['tv', 'television', 'televisor', 'cable tv', 'hdtv'],
+  coffee:  ['coffee maker', 'cafetera', 'coffee machine', 'nespresso'],
+  kitchen: ['kitchen', 'cocina', 'full kitchen', 'kitchenette'],
+  washer:  ['washer', 'washing machine', 'lavadora', 'laundry'],
+  pets:    ['pets allowed', 'mascotas', 'pet-friendly'],
+  baby:    ['crib', 'baby', 'bebé', 'bebe', 'high chair'],
+}
 
 // ── Constantes ────────────────────────────────────────────────────────────────
 const CATEGORY_OPTIONS = [
@@ -79,11 +109,13 @@ export default function PropertyPage() {
 
   const { currentUser, homes, createHome, updateHome, ready } = useApp()
 
-  const [saving,   setSaving]   = useState(false)
-  const [error,    setError]    = useState('')
-  const [success,  setSuccess]  = useState(false)
-  const [geocoding, setGeocoding] = useState(false)
-  const [notFound, setNotFound] = useState(false)
+  const [saving,      setSaving]      = useState(false)
+  const [error,       setError]       = useState('')
+  const [success,     setSuccess]     = useState(false)
+  const [geocoding,   setGeocoding]   = useState(false)
+  const [geocodeError,setGeocodeError]= useState('')
+  const [leafletError,setLeafletError]= useState(false)
+  const [notFound,    setNotFound]    = useState(false)
 
   // Form state
   const [category,  setCategory]  = useState('full_home')
@@ -160,6 +192,8 @@ export default function PropertyPage() {
   useEffect(() => {
     if (typeof window === 'undefined') return
 
+    let leafletTimeout = null
+
     const loadLeaflet = () => {
       if (!document.getElementById('leaflet-css')) {
         const link = document.createElement('link')
@@ -174,8 +208,11 @@ export default function PropertyPage() {
         const script = document.createElement('script')
         script.id = 'leaflet-js'
         script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'
-        script.onload = initMap
+        script.onload = () => { clearTimeout(leafletTimeout); initMap() }
+        script.onerror = () => { clearTimeout(leafletTimeout); setLeafletError(true) }
         document.body.appendChild(script)
+        // Show fallback if Leaflet doesn't load within 5 seconds
+        leafletTimeout = setTimeout(() => { if (!window.L) setLeafletError(true) }, 5000)
       }
     }
 
@@ -183,6 +220,7 @@ export default function PropertyPage() {
     const t = setTimeout(loadLeaflet, 100)
     return () => {
       clearTimeout(t)
+      clearTimeout(leafletTimeout)
       if (mapInstanceRef.current) {
         mapInstanceRef.current.remove()
         mapInstanceRef.current = null
@@ -202,14 +240,40 @@ export default function PropertyPage() {
     const q = [location.direccion, location.comuna, location.region, 'Chile'].filter(Boolean).join(', ')
     if (!q.trim()) return
     setGeocoding(true)
+    setGeocodeError('')
     try {
-      const res = await fetch(
-        `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&limit=1`,
-        { headers: { 'Accept-Language': 'es' } }
-      )
-      const data = await res.json()
-      if (data.length > 0) setCoords({ lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) })
-    } catch {}
+      const controller = new AbortController()
+      const timeoutId  = setTimeout(() => controller.abort(), 7000)
+      let res
+      try {
+        res = await fetch(
+          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&limit=1`,
+          { headers: { 'Accept-Language': 'es' }, signal: controller.signal }
+        )
+      } finally {
+        clearTimeout(timeoutId)
+      }
+      if (res.status === 429) {
+        setGeocodeError('Demasiadas solicitudes al servicio de mapas. Espera un momento e intenta de nuevo.')
+      } else if (res.status === 403) {
+        setGeocodeError('El servicio de mapas bloqueó la solicitud. Intenta de nuevo más tarde.')
+      } else if (!res.ok) {
+        setGeocodeError(`No se pudo obtener la ubicación (error ${res.status}). Intenta de nuevo.`)
+      } else {
+        const data = await res.json()
+        if (data.length > 0) {
+          setCoords({ lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) })
+        } else {
+          setGeocodeError('No se encontró la dirección. Prueba con menos detalles o solo la comuna.')
+        }
+      }
+    } catch (err) {
+      if (err.name === 'AbortError') {
+        setGeocodeError('La búsqueda tardó demasiado. Intenta de nuevo.')
+      } else {
+        setGeocodeError('No se pudo conectar con el servicio de mapas. Verifica tu conexión.')
+      }
+    }
     setGeocoding(false)
   }
 
@@ -219,6 +283,55 @@ export default function PropertyPage() {
       ? f.amenities.filter(a => a !== aid)
       : [...f.amenities, aid]
   }))
+
+  const handleAirbnbImport = (propiedad) => {
+    try {
+      // Mapear amenities
+      const airbnbList = (propiedad?.amenities || []).map(a => String(a).toLowerCase())
+      const mapped = Object.entries(AMENITY_KEYWORDS)
+        .filter(([, kws]) => airbnbList.some(a => kws.some(k => a.includes(k))))
+        .map(([id]) => id)
+
+      // Mapear tipo / subtipo
+      const tipo = (propiedad?.tipo || '').toLowerCase()
+      let cat = 'full_home', sub = 'Casa'
+      if (tipo.includes('condo') || tipo.includes('apartment') || tipo.includes('flat')) sub = 'Departamento'
+      else if (tipo.includes('cabin') || tipo.includes('cabaña')) sub = 'Cabaña'
+      else if (tipo.includes('villa')) sub = 'Villa'
+      else if (tipo.includes('studio') || tipo.includes('estudio')) sub = 'Estudio'
+      else if (tipo.includes('bungalow')) sub = 'Bungalow'
+      if (tipo.includes('private room') || tipo.includes('shared room')) {
+        cat = 'room'; sub = 'Habitación estándar'
+      }
+
+      // Limpiar y validar fotos: solo URLs http(s) válidas, máx 20
+      const fotosLimpias = (propiedad?.fotos || [])
+        .filter(f => typeof f === 'string' && /^https?:\/\/.+/.test(f))
+        .slice(0, 20)
+
+      // Validar coordenadas: deben ser números finitos y no cero
+      const lat = Number(propiedad?.latitud)
+      const lng = Number(propiedad?.longitud)
+      const coordsValidas = isFinite(lat) && isFinite(lng) && (lat !== 0 || lng !== 0)
+
+      setCategory(cat)
+      setSubtype(sub)
+      setHomeForm(f => ({
+        ...f,
+        title:       propiedad?.titulo       || f.title,
+        description: propiedad?.descripcion  || f.description,
+        maxGuests:   propiedad?.capacidad    || f.maxGuests,
+        bedrooms:    propiedad?.habitaciones || f.bedrooms,
+        bathrooms:   propiedad?.banos        || f.bathrooms,
+        amenities:   mapped,
+      }))
+      setPhotos(fotosLimpias)
+      if (coordsValidas) setCoords({ lat, lng })
+    } catch (err) {
+      console.error('handleAirbnbImport error:', err)
+      setError('Error al importar los datos de Airbnb. Intenta de nuevo o ingresa los datos manualmente.')
+    }
+  }
 
   const handleSubmit = async (e) => {
     e?.preventDefault()
@@ -317,6 +430,16 @@ export default function PropertyPage() {
           <div className="flex items-center gap-2 bg-red-50 border border-red-100 text-red-600 text-sm px-4 py-3 rounded-xl">
             <AlertCircle className="w-4 h-4 flex-shrink-0" /> {error}
           </div>
+        )}
+
+        {/* ── Airbnb import (solo en creación) ── */}
+        {isNew && (
+          <>
+            <div className="text-center pb-1">
+              <p className="text-gray-400 text-sm">¿Ya tienes la propiedad en Airbnb? Importa los datos automáticamente ↓</p>
+            </div>
+            <AirbnbImport onImport={handleAirbnbImport} />
+          </>
         )}
 
         {/* ── Tipo ── */}
@@ -464,8 +587,21 @@ export default function PropertyPage() {
             <MapPin className="w-4 h-4" />
             {geocoding ? 'Buscando...' : 'Buscar en mapa'}
           </button>
+          {geocodeError && (
+            <p className="text-xs text-amber-600 mt-1.5 flex items-center gap-1">
+              <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" /> {geocodeError}
+            </p>
+          )}
 
-          <div ref={mapRef} className="mt-4 rounded-2xl overflow-hidden border border-gray-200" style={{ height: 280 }} />
+          {leafletError ? (
+            <div className="mt-4 rounded-2xl border border-gray-200 bg-gray-50 flex flex-col items-center justify-center gap-2 text-gray-400 text-sm" style={{ height: 280 }}>
+              <MapPin className="w-6 h-6" />
+              <p className="font-medium">No se pudo cargar el mapa</p>
+              <p className="text-xs text-center px-6">Puedes guardar la propiedad sin coordenadas y agregarlas más tarde.</p>
+            </div>
+          ) : (
+            <div ref={mapRef} className="mt-4 rounded-2xl overflow-hidden border border-gray-200" style={{ height: 280 }} />
+          )}
 
           {coords && (
             <p className="text-xs text-gray-400 mt-2 flex items-center gap-1">

@@ -1,5 +1,11 @@
 'use client'
 import { AppProvider } from '../lib/store'
+import ErrorBoundary from '../components/ErrorBoundary'
+
 export default function Providers({ children }) {
-  return <AppProvider>{children}</AppProvider>
+  return (
+    <ErrorBoundary>
+      <AppProvider>{children}</AppProvider>
+    </ErrorBoundary>
+  )
 }

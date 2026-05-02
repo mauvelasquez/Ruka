@@ -3,7 +3,8 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useApp } from '../../../lib/store'
-import { Mountain, Eye, EyeOff, ArrowRight, AlertCircle } from 'lucide-react'
+import { Eye, EyeOff, ArrowRight, AlertCircle } from 'lucide-react'
+import RukkaLogo from '../../../components/RukkaLogo'
 
 export default function RegisterPage() {
   const { register, loginWithGoogle } = useApp()
@@ -22,24 +23,22 @@ export default function RegisterPage() {
     const res = await register(form)
     setLoading(false)
     if (!res.success) { setError(res.error || 'Error al crear la cuenta'); return }
-    router.push('/auth/confirm')
+    // Si Supabase no requiere confirmación de email, la sesión ya existe → ir directo al onboarding
+    router.push(res.confirmRequired ? '/auth/confirm' : '/onboarding')
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 py-12" style={{ background: '#F8F4EE' }}>
+    <div className="min-h-screen flex items-start justify-center p-4 py-8 overflow-y-auto" style={{ background: '#F8F4EE' }}>
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-2.5 justify-center mb-4">
-            <div className="w-12 h-12 landscape-gradient rounded-2xl flex items-center justify-center shadow-lg">
-              <Mountain className="w-6 h-6 text-white" />
-            </div>
-            <span className="text-2xl font-black text-forest-dark">Rukka</span>
+            <RukkaLogo height={56} />
           </Link>
           <h1 className="text-2xl font-extrabold text-gray-900">Crea tu cuenta</h1>
           <p className="text-gray-500 mt-1 text-sm">Gratis, sin letra chica, solo para Chile 🇨🇱</p>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8">
+        <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6 sm:p-8">
           <button type="button" onClick={loginWithGoogle}
             className="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors shadow-sm mb-5">
             <svg viewBox="0 0 24 24" className="w-5 h-5 flex-shrink-0">
@@ -62,13 +61,15 @@ export default function RegisterPage() {
               <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Nombre completo</label>
               <input type="text" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })}
                 placeholder="Tu nombre" required
-                className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-forest transition-all" />
+                autoComplete="name" enterKeyHint="next"
+                className="w-full border border-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-forest transition-all" />
             </div>
             <div>
               <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Email</label>
               <input type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })}
                 placeholder="tu@email.com" required
-                className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-forest transition-all" />
+                autoComplete="email" inputMode="email" enterKeyHint="next"
+                className="w-full border border-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-forest transition-all" />
             </div>
             <div>
               <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Contraseña</label>
@@ -76,10 +77,11 @@ export default function RegisterPage() {
                 <input type={showPwd ? 'text' : 'password'} value={form.password}
                   onChange={e => setForm({ ...form, password: e.target.value })}
                   placeholder="Mínimo 6 caracteres" required
-                  className="w-full border border-gray-200 rounded-xl px-4 py-3 pr-11 text-sm focus:outline-none focus:ring-2 focus:ring-forest" />
+                  autoComplete="new-password" enterKeyHint="go"
+                  className="w-full border border-gray-200 rounded-xl px-4 py-3 pr-12 text-base focus:outline-none focus:ring-2 focus:ring-forest" />
                 <button type="button" onClick={() => setShowPwd(!showPwd)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
-                  {showPwd ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  className="absolute right-0 top-0 h-full w-12 flex items-center justify-center text-gray-400">
+                  {showPwd ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
               </div>
             </div>

@@ -1,16 +1,14 @@
 'use client'
 import Link from 'next/link'
-import { Mountain, Mail, ArrowRight } from 'lucide-react'
+import { Mail, ArrowRight } from 'lucide-react'
+import RukkaLogo from '../../../components/RukkaLogo'
 
 export default function ConfirmPage() {
   return (
     <div className="min-h-screen flex items-center justify-center p-4" style={{ background: '#F8F4EE' }}>
       <div className="w-full max-w-md text-center">
         <Link href="/" className="inline-flex items-center gap-2.5 justify-center mb-8">
-          <div className="w-12 h-12 landscape-gradient rounded-2xl flex items-center justify-center shadow-lg">
-            <Mountain className="w-6 h-6 text-white" />
-          </div>
-          <span className="text-2xl font-black text-forest-dark">Rukka</span>
+          <RukkaLogo height={56} />
         </Link>
         <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-10">
           <div className="w-20 h-20 bg-forest-50 rounded-full flex items-center justify-center mx-auto mb-6">

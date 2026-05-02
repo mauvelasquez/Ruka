@@ -1,9 +1,13 @@
+'use client'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Mountain, Heart, Mail } from 'lucide-react'
+import { Heart, Mail } from 'lucide-react'
 import { getRandomBanners } from '../lib/chile-banners'
+import RukkaLogo from './RukkaLogo'
 
 export default function Footer() {
-  const destinations = getRandomBanners(5)
+  const [destinations, setDestinations] = useState([])
+  useEffect(() => { setDestinations(getRandomBanners(5)) }, [])
 
   return (
     <footer className="bg-rukka-dark text-gray-400">
@@ -11,10 +15,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
           <div className="md:col-span-1">
             <div className="flex items-center gap-2.5 mb-4">
-              <div className="w-9 h-9 landscape-gradient rounded-xl flex items-center justify-center">
-                <Mountain className="w-5 h-5 text-white" />
-              </div>
-              <span className="text-xl font-black text-white">Rukka</span>
+              <RukkaLogo height={44} />
             </div>
             <p className="text-sm leading-relaxed mb-4 text-gray-400">
               <em>Rukka</em> significa "hogar" en Mapudungun, la lengua del pueblo Mapuche. Conectamos viajeros que creen que la mejor forma de conocer Chile es desde adentro.
@@ -40,7 +41,7 @@ export default function Footer() {
             <h3 className="text-white font-bold mb-4 text-sm uppercase tracking-wider">Comunidad</h3>
             <ul className="space-y-2.5 text-sm">
               {[
-                ['Cómo funciona', '/homes'],
+                ['Cómo funciona', '/como-funciona'],
                 ['Registrarse gratis', '/auth/register'],
                 ['Buscar match', '/matches'],
                 ['Explorar hogares', '/homes'],
@@ -49,6 +50,11 @@ export default function Footer() {
                   <Link href={href} className="hover:text-forest-light transition-colors">{label}</Link>
                 </li>
               ))}
+              <li>
+                <Link href="/anfitriones-airbnb" className="hover:text-[#ff5a5f] transition-colors text-[#ff5a5f]/70 font-semibold">
+                  🏠 Para anfitriones Airbnb
+                </Link>
+              </li>
             </ul>
           </div>
 

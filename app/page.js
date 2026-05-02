@@ -5,13 +5,14 @@ import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import HomeCard from '../components/HomeCard'
 import { useApp } from '../lib/store'
-import { CHILE_BANNERS, getRandomBanners } from '../lib/chile-banners'
-import { Mountain, ArrowRight, MapPin, Calendar, Users, Sparkles, Shield, Lock, ArrowLeftRight, Gift, Zap, Heart } from 'lucide-react'
+import { CHILE_BANNERS } from '../lib/chile-banners'
+import { DESTINOS_RUKKA, getAllComunas } from '../lib/comunas'
+import { ArrowRight, MapPin, Calendar, Users, Sparkles, Shield, Lock, ArrowLeftRight, Gift, Zap, Heart } from 'lucide-react'
 
-const CHILE_CITIES = CHILE_BANNERS.map(b => b.city)
+const CHILE_CITIES = getAllComunas()
 
 const STEPS = [
-  { n: '01', icon: '🏔️', title: 'Publica tu rukka', desc: 'Crea tu perfil y registra tu hogar con fotos y descripción.' },
+  { n: '01', icon: '🏔️', title: 'Publica tu rukka', desc: 'Crea tu perfil y registra tu hogar. ¿Ya estás en Airbnb? Impórtalo en segundos y empieza a recibir solicitudes de intercambio.' },
   { n: '02', icon: '🗺️', title: 'Elige tu destino', desc: 'Busca hogares en tu ciudad soñada dentro de Chile.' },
   { n: '03', icon: '✦', title: 'El algoritmo trabaja', desc: 'Rukka detecta matches perfectos entre viajeros con fechas compatibles.' },
   { n: '04', icon: '🤝', title: 'Intercambia y viaja', desc: 'Confirmen el intercambio y vivan como locales en la ciudad del otro.' },
@@ -22,6 +23,7 @@ const BENEFITS = [
   { icon: '💸', title: '100% gratis', desc: 'Sin hoteles, sin Airbnb, sin comisiones. Tu hogar como moneda de cambio.' },
   { icon: '🔁', title: 'Match bilateral', desc: 'El sistema detecta cuándo dos viajeros quieren visitarse en fechas compatibles.' },
   { icon: '🔒', title: 'Comunidad verificada', desc: 'Verificación de email obligatoria y perfil completo para todos los miembros.' },
+  { icon: '✈️', title: 'Importa tu Airbnb al instante', desc: 'Si ya tienes tu propiedad en Airbnb, pega el link y traemos fotos, descripción y características automáticamente. Sin repetir trabajo.' },
 ]
 
 // ── AD BANNER ─────────────────────────────────────────────────────────────────
@@ -48,7 +50,7 @@ function AdBanner({ variant = 'primary', className = '', heroBanner = null }) {
     tertiary: {
       bg: 'bg-gradient-to-r from-andean to-blue-700',
       badge: '🇨🇱 SOLO CHILE',
-      title: 'Pucón · Atacama · Valparaíso · Chiloé · Patagonia',
+      title: 'Pichilemu · Puerto Varas · Zapallar · Frutillar · Panguipulli',
       desc: 'Hogares disponibles en todo Chile. Regístrate gratis y empieza a intercambiar hoy.',
       cta: 'Ver hogares disponibles',
       href: '/homes',
@@ -108,7 +110,7 @@ function SearchWizard({ homes, users }) {
           </label>
           <div className="relative">
             <input list="cities-list" value={dest} onChange={e => setDest(e.target.value)}
-              placeholder="ej. Pucón, Valparaíso, Atacama..."
+              placeholder="ej. Pichilemu, Puerto Varas, Zapallar..."
               className="w-full border-2 border-gray-200 focus:border-forest rounded-xl px-4 py-3 text-sm outline-none transition-colors" />
             <datalist id="cities-list">
               {CHILE_CITIES.map(c => <option key={c} value={c} />)}
@@ -213,12 +215,10 @@ export default function HomePage() {
   const { homes, users } = useApp()
   const featured = homes.filter(h => h.featured).slice(0, 3)
 
-  const [heroBanner,     setHeroBanner]     = useState(null)
-  const [destinoBanners, setDestinoBanners] = useState([])
+  const [heroBanner, setHeroBanner] = useState(null)
 
   useEffect(() => {
     setHeroBanner(CHILE_BANNERS[Math.floor(Math.random() * CHILE_BANNERS.length)])
-    setDestinoBanners(getRandomBanners(6))
   }, [])
 
   return (
@@ -281,7 +281,65 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── DESTINOS CHILE — banners dinámicos ───────────────────────────────── */}
+      {/* ── SEGUNDA VIVIENDA ─────────────────────────────────────────────────── */}
+      <section className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <p className="text-xs font-bold uppercase tracking-widest text-forest mb-3">🏡 Para propietarios</p>
+            <h2 className="text-3xl sm:text-4xl font-black text-gray-900 mb-4 leading-tight">
+              Tu segunda casa,<br className="sm:hidden" /> el primer destino<br className="sm:inline hidden" /> de alguien más
+            </h2>
+            <p className="text-base sm:text-lg text-gray-500 max-w-2xl mx-auto leading-relaxed">
+              No necesitas prestar donde vives. Comparte tu casa de veraneo y accede a la de otros.
+              Tú eliges cuándo, con quién y por cuánto tiempo.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-12">
+            {[
+              {
+                emoji: '🏖️',
+                title: 'Tu casa en la playa',
+                desc: 'alguien la disfruta en invierno',
+                bg: 'bg-blue-50',
+                border: 'border-blue-100',
+              },
+              {
+                emoji: '🌲',
+                title: 'Tu cabaña en el bosque',
+                desc: 'otro la cuida en verano',
+                bg: 'bg-green-50',
+                border: 'border-green-100',
+              },
+              {
+                emoji: '🏔️',
+                title: 'Tu refugio en la montaña',
+                desc: 'una familia lo convierte en hogar',
+                bg: 'bg-stone-50',
+                border: 'border-stone-200',
+              },
+            ].map(({ emoji, title, desc, bg, border }) => (
+              <div key={title}
+                className={`${bg} border ${border} rounded-2xl p-7 text-center flex flex-col items-center gap-3`}>
+                <span className="text-5xl">{emoji}</span>
+                <div>
+                  <h3 className="font-black text-gray-900 text-base mb-1">{title}</h3>
+                  <p className="text-gray-500 text-sm">→ {desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="text-center">
+            <Link href="/onboarding"
+              className="inline-flex items-center gap-2.5 bg-forest text-white px-8 py-4 rounded-full font-black text-base hover:bg-forest-dark transition-colors shadow-lg">
+              Publicar mi segunda vivienda <ArrowRight className="w-5 h-5" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ── DESTINOS CHILE ───────────────────────────────────────────────────── */}
       <section className="py-16" style={{ background: '#F8F4EE' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between mb-8">
@@ -293,16 +351,17 @@ export default function HomePage() {
               Ver todos <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-            {destinoBanners.map(b => (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+            {DESTINOS_RUKKA.map(b => (
               <Link key={b.id} href={`/homes?search=${encodeURIComponent(b.city)}`}
                 className="group relative rounded-2xl overflow-hidden h-32 block shadow-sm hover:shadow-md transition-shadow">
-                <img src={b.image} alt={b.city}
+                <img src={b.image} alt={b.city} loading="lazy"
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
                 <div className="absolute bottom-0 left-0 right-0 p-3">
                   <p className="text-lg mb-0.5">{b.emoji}</p>
                   <p className="text-white font-bold text-xs leading-tight">{b.city}</p>
+                  <p className="text-white/60 text-[10px] leading-tight">{b.tipo}</p>
                 </div>
               </Link>
             ))}
@@ -390,7 +449,7 @@ export default function HomePage() {
                   style={{ position:'absolute', top:12, left:12, width:48, height:48, borderRadius:'50%', border:'2.5px solid white', objectFit:'cover' }} />
                 <div style={{ position:'absolute', bottom:12, left:12 }}>
                   <p style={{ color:'white', fontWeight:600, fontSize:14, margin:0 }}>Camila</p>
-                  <p style={{ color:'#a8dfc0', fontSize:12, margin:0 }}>Santiago → Pucón · Jul 10–25</p>
+                  <p style={{ color:'#a8dfc0', fontSize:12, margin:0 }}>San José de Maipo → Pichilemu · Jul 10–25</p>
                 </div>
               </div>
 
@@ -412,13 +471,13 @@ export default function HomePage() {
                   style={{ position:'absolute', top:12, left:12, width:48, height:48, borderRadius:'50%', border:'2.5px solid white', objectFit:'cover' }} />
                 <div style={{ position:'absolute', bottom:12, left:12 }}>
                   <p style={{ color:'white', fontWeight:600, fontSize:14, margin:0 }}>Roberto</p>
-                  <p style={{ color:'#a8dfc0', fontSize:12, margin:0 }}>Pucón → Santiago · Jul 10–25</p>
+                  <p style={{ color:'#a8dfc0', fontSize:12, margin:0 }}>Pichilemu → San José de Maipo · Jul 10–25</p>
                 </div>
               </div>
             </div>
             <div className="text-center">
               <p className="text-gray-600 text-sm mb-6">
-                <strong>Resultado:</strong> Camila disfruta la naturaleza en Pucón mientras Roberto explora Providencia. Ambos sin pagar alojamiento.
+                <strong>Resultado:</strong> Camila disfruta el surf en Pichilemu mientras Roberto camina los cajones del Maipo. Ambos sin pagar alojamiento.
               </p>
               <Link href="/auth/register"
                 className="inline-flex items-center gap-2 bg-forest text-white px-8 py-3.5 rounded-xl font-bold hover:bg-forest-dark transition-colors">
@@ -443,9 +502,9 @@ export default function HomePage() {
             <p className="text-xs font-bold uppercase tracking-widest text-terra mb-3">Por qué Rukka</p>
             <h2 className="text-3xl font-extrabold text-gray-900">Viajar diferente, en Chile</h2>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
             {BENEFITS.map((b, i) => (
-              <div key={i} className="bg-white rounded-2xl p-6 border border-stone-200/60 shadow-sm hover:shadow-md transition-shadow">
+              <div key={i} className={`bg-white rounded-2xl p-6 border shadow-sm hover:shadow-md transition-shadow ${i === 4 ? 'border-[#ff5a5f]/20 bg-[#ff5a5f]/3' : 'border-stone-200/60'}`}>
                 <div className="text-4xl mb-4">{b.icon}</div>
                 <h3 className="font-bold text-gray-900 mb-2">{b.title}</h3>
                 <p className="text-gray-500 text-sm leading-relaxed">{b.desc}</p>

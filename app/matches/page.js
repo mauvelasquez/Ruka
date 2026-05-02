@@ -4,7 +4,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { useApp } from '../../lib/store'
 import Navbar from '../../components/Navbar'
-import { Search, Star, MapPin, Users, Calendar, ArrowLeftRight, Home, Zap, Info } from 'lucide-react'
+import { Search, Star, MapPin, Users, Calendar, ArrowLeftRight, Home, Zap, Info, AlertCircle } from 'lucide-react'
 
 function MatchCard({ result, myHomes, onRequest }) {
   const { home, owner, isPerfectMatch, ownerWish } = result
@@ -87,7 +87,17 @@ function MatchCard({ result, myHomes, onRequest }) {
 
         {/* Action */}
         <div className="mt-4 pt-4 border-t border-gray-100">
-          {sent ? (
+          {myHomes.length === 0 ? (
+            <div className="flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-xl p-3">
+              <AlertCircle className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="text-sm font-bold text-amber-800 mb-0.5">Para solicitar un intercambio, primero debes agregar tu propiedad</p>
+                <Link href="/dashboard/property/new" className="text-forest font-bold text-xs hover:text-forest-dark">
+                  Agregar mi propiedad →
+                </Link>
+              </div>
+            </div>
+          ) : sent ? (
             <div className="flex items-center gap-2 text-green-600 font-bold text-sm">
               <Star className="w-4 h-4" /> ¡Solicitud enviada!
             </div>
@@ -228,7 +238,7 @@ function MatchesContent() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="lg:col-span-1">
               <label className="block text-xs font-black text-gray-600 mb-1.5 uppercase tracking-wide">Ciudad destino</label>
-              <input type="text" placeholder="Ej: Tokio, Pucón..." value={city}
+              <input type="text" placeholder="ej. Pichilemu, Puerto Varas, Zapallar..." value={city}
                 onChange={e => setCity(e.target.value)}
                 className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-forest" />
             </div>

@@ -6,7 +6,7 @@ import Footer from '../../components/Footer'
 import HomeCard from '../../components/HomeCard'
 import { useApp } from '../../lib/store'
 import { SlidersHorizontal, X, ChevronDown, MapPin } from 'lucide-react'
-import { CHILE_REGIONS } from '../../lib/chile-locations'
+import { REGIONES_RUKKA } from '../../lib/comunas'
 import { getRandomBanner } from '../../lib/chile-banners'
 
 const TYPES = ['Todos', 'Casa', 'Departamento', 'Cabaña', 'Estudio', 'Loft', 'Villa', 'Habitación']
@@ -124,7 +124,7 @@ function HomesContent() {
                   <select value={region} onChange={e => setRegion(e.target.value)}
                     className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-forest bg-gray-50 appearance-none">
                     <option>Todas</option>
-                    {CHILE_REGIONS.map(r => <option key={r.code} value={r.name}>{r.name}</option>)}
+                    {REGIONES_RUKKA.map(r => <option key={r.id} value={r.nombre}>{r.nombre}</option>)}
                   </select>
                   <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center">
                     <ChevronDown className="w-4 h-4 text-gray-400" />
