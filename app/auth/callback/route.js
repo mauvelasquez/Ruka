@@ -54,27 +54,35 @@ export async function GET(request) {
 
     const user = data.session.user
 
-    // Determinar destino según estado del perfil
-    let path = '/onboarding'
+    // Determinar destino según estado del perfil.
+    // Si la query falla o hace timeout → ir a /dashboard de forma optimista:
+    // el store se encarga de redirigir a /onboarding si corresponde.
+    let path = '/dashboard'
 
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('status')
-      .eq('id', user.id)
-      .single()
+    const { data: profile, error: profileError } = await Promise.race([
+      supabase.from('profiles').select('status').eq('id', user.id).single(),
+      new Promise(resolve =>
+        setTimeout(() => resolve({ data: null, error: new Error('profile_timeout') }), 5000)
+      ),
+    ])
 
-    if (!profile) {
-      // Primer login con Google — crear perfil inicial
+    if (!profile && !profileError) {
+      // Definitivamente nuevo usuario (query OK pero sin fila) — insertar perfil inicial.
+      // ignoreDuplicates: true evita sobrescribir el status de usuarios existentes
+      // en caso de race condition o error previo de lectura.
       await supabase.from('profiles').upsert({
         id:     user.id,
         name:   user.user_metadata?.name || user.user_metadata?.full_name || 'Usuario',
         email:  user.email || user.user_metadata?.email || '',
         avatar: user.user_metadata?.picture || user.user_metadata?.avatar_url || null,
         status: 'pending',
-      })
-    } else if (profile.status === 'confirmed') {
-      path = '/dashboard'
+      }, { ignoreDuplicates: true })
+      path = '/onboarding'
+    } else if (profile?.status && profile.status !== 'confirmed') {
+      // Perfil existe pero no está confirmado → completar onboarding
+      path = '/onboarding'
     }
+    // profile.status === 'confirmed' O query falló → /dashboard (ya es el default)
 
     // Crear el redirect y adjuntar EXPLÍCITAMENTE las cookies de sesión
     const response = NextResponse.redirect(`${base}${path}`)

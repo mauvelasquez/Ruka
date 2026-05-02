@@ -24,15 +24,17 @@ export async function middleware(req) {
     }
   )
 
-  // getUser() valida el JWT con Supabase server — más seguro que getSession()
-  // try/catch previene que un error de red en Supabase genere un loop de redirecciones
+  // getSession() lee de cookies sin llamada de red — confiable aunque Supabase sea lento.
+  // getUser() (que valida el JWT con red) se reserva para server actions y route handlers
+  // donde la seguridad es crítica. En middleware, la latencia de red causaba que usuarios
+  // autenticados fueran redirigidos a /login cuando Supabase tardaba en responder.
   let user = null
   try {
-    const { data } = await supabase.auth.getUser()
-    user = data?.user ?? null
+    const { data } = await supabase.auth.getSession()
+    user = data?.session?.user ?? null
   } catch (err) {
-    console.error('[middleware] getUser falló:', err?.message)
-    return response // dejar pasar la request sin redirigir
+    console.error('[middleware] getSession falló:', err?.message)
+    return response // dejar pasar sin redirigir ante error de red
   }
   const { pathname } = req.nextUrl
 
