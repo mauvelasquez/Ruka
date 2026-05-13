@@ -1,140 +1,114 @@
-/**
- * app/api/import-airbnb/route.js
- * API Route de Next.js (App Router) para importar listings de Airbnb.
- *
- * Uso:
- *   POST /api/import-airbnb
- *   Body: { "url": "https://www.airbnb.com/rooms/12345678", "userId": "user_abc123" }
- */
+// app/api/import-airbnb/route.js
+// Next.js App Router API — usa Claude Vision para extraer datos de pantallazos Airbnb
 
-import { NextResponse } from "next/server";
-import { importFromAirbnbUrl } from "@/services/airbnbImporter";
+import { NextResponse } from 'next/server'
+import Anthropic from '@anthropic-ai/sdk'
 
-export const maxDuration = 90;
+export const runtime = 'nodejs'        // edge no soporta formData bien
+export const maxDuration = 60          // Vercel pro; en hobby usa 10
 
-// ─── Rate Limiting en memoria ─────────────────────────────────────────────────
-// Simple rate limit: máximo 3 imports por usuario cada 60 segundos.
-// Si usas Redis o Upstash en producción, reemplaza este Map por eso.
+const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
-const rateLimitMap = new Map(); // key: userId, value: { count, resetAt }
+const SYSTEM_PROMPT = `Eres un extractor de datos de propiedades para la plataforma de intercambio de hogares Rukka.cl.
+El usuario te enviará uno o más pantallazos de un anuncio de Airbnb.
+Tu tarea es extraer TODA la información disponible y devolver ÚNICAMENTE un JSON válido con esta estructura exacta (sin markdown, sin comillas extras, solo el JSON):
 
-const RATE_LIMIT_MAX = 3;
-const RATE_LIMIT_WINDOW_MS = 60_000; // 1 minuto
-
-function checkRateLimit(userId) {
-  const now = Date.now();
-  const entry = rateLimitMap.get(userId);
-
-  if (!entry || now > entry.resetAt) {
-    // Primera request o ventana expirada: resetear
-    rateLimitMap.set(userId, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
-    return { allowed: true, remaining: RATE_LIMIT_MAX - 1 };
-  }
-
-  if (entry.count >= RATE_LIMIT_MAX) {
-    const retryAfterSeconds = Math.ceil((entry.resetAt - now) / 1000);
-    return { allowed: false, retryAfterSeconds };
-  }
-
-  entry.count += 1;
-  return { allowed: true, remaining: RATE_LIMIT_MAX - entry.count };
+{
+  "title": "string",
+  "description": "string",
+  "location": "string (dirección o zona)",
+  "city": "string",
+  "region": "string (ej: Región Metropolitana)",
+  "country": "Chile",
+  "type": "string (Casa|Departamento|Cabaña|Estudio|Loft|Villa|Habitación)",
+  "subtype": "string|null",
+  "bedrooms": number,
+  "bathrooms": number,
+  "maxGuests": number,
+  "size": number|null,
+  "amenities": ["string"],
+  "rating": number,
+  "reviewCount": number,
+  "nearbyAttractions": ["string"],
+  "images": [],
+  "source": "airbnb"
 }
 
-// Limpiar entradas viejas del Map cada 5 minutos para evitar memory leaks
-if (typeof setInterval !== "undefined") {
-  setInterval(() => {
-    const now = Date.now();
-    for (const [key, value] of rateLimitMap.entries()) {
-      if (now > value.resetAt) rateLimitMap.delete(key);
-    }
-  }, 5 * 60_000);
-}
+Reglas:
+- Si no encuentras un valor, usa null o 0 según corresponda.
+- amenities: extrae solo las claves conocidas si corresponden: wifi, parking, ac, heating, tv, coffee, kitchen, washer, pets, baby. Si hay otras, agrégalas como string.
+- type: infiere el tipo más cercano de la lista.
+- rating: como número decimal (ej: 4.85).
+- reviewCount: como entero.
+- size: en m², si aparece. Null si no.
+- NO inventes datos que no estén visibles en las imágenes.
+- Devuelve SOLO el JSON, sin texto adicional.`
 
-// ─── Handler principal ────────────────────────────────────────────────────────
-
-export async function POST(request) {
+export async function POST(req) {
   try {
-    const body = await request.json();
-    const { url, userId } = body;
+    const formData = await req.formData()
 
-    // 1. Validar que venga la URL
-    if (!url || typeof url !== "string") {
+    // Recolectar todas las imágenes enviadas
+    const imageContent = []
+    let idx = 0
+    while (formData.has(`image_${idx}`)) {
+      const file   = formData.get(`image_${idx}`)
+      const buffer = Buffer.from(await file.arrayBuffer())
+      const base64 = buffer.toString('base64')
+
+      // Determinar media_type
+      let mediaType = file.type || 'image/jpeg'
+      if (!['image/jpeg','image/png','image/gif','image/webp'].includes(mediaType)) {
+        mediaType = 'image/jpeg'
+      }
+
+      imageContent.push({
+        type: 'image',
+        source: { type: 'base64', media_type: mediaType, data: base64 },
+      })
+      idx++
+    }
+
+    if (!imageContent.length) {
+      return NextResponse.json({ error: 'No se enviaron imágenes' }, { status: 400 })
+    }
+
+    // Añadir instrucción de texto al final del array de contenido
+    imageContent.push({
+      type: 'text',
+      text: 'Extrae todos los datos visibles de este/estos pantallazo(s) de Airbnb y devuelve el JSON según las instrucciones.',
+    })
+
+    const message = await client.messages.create({
+      model:      'claude-opus-4-5',
+      max_tokens: 1024,
+      system:     SYSTEM_PROMPT,
+      messages: [{ role: 'user', content: imageContent }],
+    })
+
+    const raw = message.content[0]?.text || ''
+
+    // Limpiar posibles ```json ... ``` que el modelo pudiera agregar
+    const clean = raw.replace(/```json|```/g, '').trim()
+
+    let parsed
+    try {
+      parsed = JSON.parse(clean)
+    } catch {
+      // Si no es JSON válido, devolver el texto crudo con error descriptivo
       return NextResponse.json(
-        {
-          success: false,
-          error: "URL_REQUERIDA",
-          message: "Debes proporcionar una URL de Airbnb.",
-        },
-        { status: 400 }
-      );
+        { error: 'No se pudo parsear la respuesta de la IA', raw },
+        { status: 422 }
+      )
     }
 
-    // 2. Validar que venga el userId
-    if (!userId || typeof userId !== "string") {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "USER_REQUERIDO",
-          message: "Se requiere identificación de usuario.",
-        },
-        { status: 400 }
-      );
-    }
+    return NextResponse.json(parsed, { status: 200 })
 
-    // 3. Verificar rate limit
-    const rateLimit = checkRateLimit(userId);
-    if (!rateLimit.allowed) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "RATE_LIMIT",
-          message: `Demasiadas importaciones seguidas. Espera ${rateLimit.retryAfterSeconds} segundos e intenta nuevamente.`,
-        },
-        {
-          status: 429,
-          headers: {
-            "Retry-After": String(rateLimit.retryAfterSeconds),
-          },
-        }
-      );
-    }
-
-    // 4. Importar desde Airbnb
-    const result = await importFromAirbnbUrl(url.trim());
-
-    if (!result.success) {
-      // El servicio ya construyó el mensaje de error apropiado
-      const statusCode =
-        result.error === "URL_INVALIDA" ? 400
-        : result.error === "LISTING_NO_ENCONTRADO" ? 404
-        : result.error === "TIMEOUT" ? 504
-        : 502;
-
-      return NextResponse.json(result, { status: statusCode });
-    }
-
-    // 5. Éxito
+  } catch (err) {
+    console.error('[import-airbnb]', err)
     return NextResponse.json(
-      {
-        success: true,
-        data: result.data,
-      },
-      { status: 200 }
-    );
-  } catch (error) {
-    console.error("[/api/import-airbnb] Error inesperado:", error);
-    return NextResponse.json(
-      {
-        success: false,
-        error: "ERROR_INTERNO",
-        message: "Error interno del servidor. Intenta nuevamente.",
-      },
+      { error: err.message || 'Error interno del servidor' },
       { status: 500 }
-    );
+    )
   }
-}
-
-// Solo aceptar POST
-export async function GET() {
-  return NextResponse.json({ error: "Método no permitido" }, { status: 405 });
 }
