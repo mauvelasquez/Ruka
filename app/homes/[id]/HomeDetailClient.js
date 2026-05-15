@@ -33,7 +33,7 @@ export default function HomeDetailClient({ id }) {
 
   useEffect(() => {
     const h = getHomeById(id)
-    if (h) { setHome(h); setHost(getUserById(h.user_id || h.userId)) }
+    if (h) { setHome(h); setHost(getUserById(h.userId)) }
   }, [id, homes])
 
   if (!home) return (
@@ -48,9 +48,9 @@ export default function HomeDetailClient({ id }) {
     e.preventDefault()
     if (!user) { router.push('/auth/login'); return }
     if (!form.start || !form.end) { setErr('Selecciona las fechas del intercambio'); return }
-    const myHome = homes.find(h => (h.user_id || h.userId) === user.id)
+    const myHome = homes.find(h => h.userId === user.id)
     sendExchangeRequest({
-      receiverId:     home.user_id || home.userId,
+      receiverId:     home.userId,
       receiverHomeId: home.id,
       proposerHomeId: myHome?.id || null,
       dates:          { start: form.start, end: form.end },

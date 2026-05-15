@@ -1,18 +1,30 @@
 'use client'
-import { useState, Suspense } from 'react'
+import { useState, useEffect, useCallback, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Navbar from '../../components/Navbar'
 import Footer from '../../components/Footer'
 import HomeCard from '../../components/HomeCard'
-import { useApp } from '../../lib/store'
-import { SlidersHorizontal, X, ChevronDown, MapPin } from 'lucide-react'
+import { SlidersHorizontal, X, ChevronDown, MapPin, ChevronLeft, ChevronRight } from 'lucide-react'
 import { REGIONES_RUKKA } from '../../lib/comunas'
 import { getRandomBanner } from '../../lib/chile-banners'
 
 const TYPES = ['Todos', 'Casa', 'Departamento', 'Cabaña', 'Estudio', 'Loft', 'Villa', 'Habitación']
+const LIMIT = 24
+
+function SkeletonCard() {
+  return (
+    <div className="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm animate-pulse">
+      <div className="h-48 bg-forest-50" />
+      <div className="p-4 space-y-3">
+        <div className="h-4 bg-forest-50 rounded w-3/4" />
+        <div className="h-3 bg-forest-50 rounded w-1/2" />
+        <div className="h-3 bg-forest-50 rounded w-1/3" />
+      </div>
+    </div>
+  )
+}
 
 function HomesContent() {
-  const { homes, users } = useApp()
   const searchParams  = useSearchParams()
   const initialSearch = searchParams.get('search') || searchParams.get('location') || ''
   const [banner]      = useState(() => getRandomBanner())
@@ -25,28 +37,61 @@ function HomesContent() {
   const [sort,        setSort]        = useState('rating')
   const [showSort,    setShowSort]    = useState(false)
 
-  const filtered = homes.filter(h => {
-    const q = search.toLowerCase()
-    const matchSearch = !search ||
-      (h.title  || '').toLowerCase().includes(q) ||
-      (h.location || '').toLowerCase().includes(q) ||
-      (h.city   || '').toLowerCase().includes(q) ||
-      (h.comuna || '').toLowerCase().includes(q) ||
-      (h.region || '').toLowerCase().includes(q)
-    const matchType   = type === 'Todos' || h.type === type || h.subtype === type
-    const matchRegion = region === 'Todas' || h.region === region
-    const matchBeds   = (h.bedrooms || 0) >= minBeds
-    return matchSearch && matchType && matchRegion && matchBeds
-  })
+  const [homes,       setHomes]       = useState([])
+  const [total,       setTotal]       = useState(0)
+  const [page,        setPage]        = useState(1)
+  const [totalPages,  setTotalPages]  = useState(1)
+  const [loading,     setLoading]     = useState(true)
 
-  const sorted = [...filtered].sort((a, b) =>
-    sort === 'rating'  ? (b.rating || 0) - (a.rating || 0) :
-    sort === 'reviews' ? (b.review_count || b.reviewCount || 0) - (a.review_count || a.reviewCount || 0) : 0
-  )
+  const fetchHomes = useCallback(async (currentPage = 1) => {
+    setLoading(true)
+    try {
+      const params = new URLSearchParams({
+        page:    String(currentPage),
+        limit:   String(LIMIT),
+        sort,
+        ...(search    && { search }),
+        ...(type !== 'Todos'  && { type }),
+        ...(region !== 'Todas' && { region }),
+        ...(minBeds > 0 && { minBeds: String(minBeds) }),
+      })
+      const res  = await fetch(`/api/homes?${params}`)
+      const json = await res.json()
+      setHomes(json.data || [])
+      setTotal(json.total || 0)
+      setTotalPages(json.totalPages || 1)
+      setPage(json.page || 1)
+    } catch (err) {
+      console.error('fetchHomes error:', err)
+    } finally {
+      setLoading(false)
+    }
+  }, [search, type, region, minBeds, sort])
 
-  const clear = () => { setSearch(''); setType('Todos'); setRegion('Todas'); setMinBeds(0) }
+  // Debounce para el campo de búsqueda
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setPage(1)
+      fetchHomes(1)
+    }, 300)
+    return () => clearTimeout(timer)
+  }, [search, type, region, minBeds, sort])
+
+  const clear = () => {
+    setSearch('')
+    setType('Todos')
+    setRegion('Todas')
+    setMinBeds(0)
+    setPage(1)
+  }
   const hasFilters = search || type !== 'Todos' || region !== 'Todas' || minBeds > 0
   const sortLabels = { rating: 'Mejor valorados', reviews: 'Más reseñas', newest: 'Más recientes' }
+
+  const goToPage = (p) => {
+    setPage(p)
+    fetchHomes(p)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
 
   return (
     <div className="min-h-screen" style={{ background: '#F8F4EE' }}>
@@ -157,16 +202,43 @@ function HomesContent() {
 
         <div className="flex items-center justify-between mb-5">
           <p className="text-gray-600 text-sm">
-            <span className="font-extrabold text-gray-900">{sorted.length}</span> hogares encontrados
+            <span className="font-extrabold text-gray-900">{loading ? '…' : total}</span> hogares encontrados
             {search && <span className="text-terra"> para "{search}"</span>}
           </p>
           {hasFilters && <button onClick={clear} className="text-sm text-terra font-semibold flex items-center gap-1 hover:text-terra-dark"><X className="w-3.5 h-3.5" /> Limpiar</button>}
         </div>
 
-        {sorted.length > 0 ? (
+        {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-            {sorted.map(h => <HomeCard key={h.id} home={h} user={users.find(u => u.id === (h.user_id || h.userId))} />)}
+            {Array.from({ length: 8 }).map((_, i) => <SkeletonCard key={i} />)}
           </div>
+        ) : homes.length > 0 ? (
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+              {homes.map(h => <HomeCard key={h.id} home={h} />)}
+            </div>
+
+            {/* Paginación */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-center gap-4 mt-10">
+                <button
+                  onClick={() => goToPage(page - 1)}
+                  disabled={page <= 1}
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-xl border border-gray-200 bg-white text-sm font-semibold text-gray-700 hover:border-forest hover:text-forest disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+                  <ChevronLeft className="w-4 h-4" /> Anterior
+                </button>
+                <span className="text-sm text-gray-500 font-medium">
+                  Página <span className="font-extrabold text-gray-900">{page}</span> de <span className="font-extrabold text-gray-900">{totalPages}</span>
+                </span>
+                <button
+                  onClick={() => goToPage(page + 1)}
+                  disabled={page >= totalPages}
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-xl border border-gray-200 bg-white text-sm font-semibold text-gray-700 hover:border-forest hover:text-forest disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+                  Siguiente <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            )}
+          </>
         ) : (
           <div className="text-center py-20 bg-white rounded-2xl border border-gray-100">
             <div className="text-6xl mb-4">🔍</div>

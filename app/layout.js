@@ -1,5 +1,8 @@
 import './globals.css'
 import Providers from './providers'
+import FresiaWidget from '../components/fresia/FresiaWidget'
+
+export const dynamic = 'force-dynamic'
 
 export const metadata = {
   metadataBase: new URL('https://rukka.cl'),
@@ -36,7 +39,10 @@ export default function RootLayout({ children }) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </head>
       <body suppressHydrationWarning>
-        <Providers>{children}</Providers>
+        <Providers>
+          {children}
+          <FresiaWidget />
+        </Providers>
       </body>
     </html>
   )

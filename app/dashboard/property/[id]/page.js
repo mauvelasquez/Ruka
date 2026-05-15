@@ -9,8 +9,8 @@ import Link from 'next/link'
 
 // Importación lazy/dinámica — aísla errores del importador Airbnb
 // de la carga principal del formulario de propiedad
-const AirbnbImport = dynamic(
-  () => import('../../../../components/AirbnbImport'),
+const ImportFromAirbnb = dynamic(
+  () => import('../../../../components/ImportFromAirbnb'),
   {
     ssr: false,
     loading: () => (
@@ -26,20 +26,6 @@ import {
   AlertCircle, CheckCircle, Wifi, Car, Snowflake, Flame,
   Tv, Coffee, Utensils, Shirt, Dog, Baby, Bath
 } from 'lucide-react'
-
-// ── Mapeo amenities Airbnb → IDs Rukka ────────────────────────────────────────
-const AMENITY_KEYWORDS = {
-  wifi:    ['wifi', 'wi-fi', 'wireless internet'],
-  parking: ['parking', 'estacionamiento', 'garage'],
-  ac:      ['air conditioning', 'aire acondicionado', 'a/c'],
-  heating: ['heating', 'calefacción', 'calefaccion', 'heat'],
-  tv:      ['tv', 'television', 'televisor', 'cable tv', 'hdtv'],
-  coffee:  ['coffee maker', 'cafetera', 'coffee machine', 'nespresso'],
-  kitchen: ['kitchen', 'cocina', 'full kitchen', 'kitchenette'],
-  washer:  ['washer', 'washing machine', 'lavadora', 'laundry'],
-  pets:    ['pets allowed', 'mascotas', 'pet-friendly'],
-  baby:    ['crib', 'baby', 'bebé', 'bebe', 'high chair'],
-}
 
 // ── Constantes ────────────────────────────────────────────────────────────────
 const CATEGORY_OPTIONS = [
@@ -109,13 +95,14 @@ export default function PropertyPage() {
 
   const { currentUser, homes, createHome, updateHome, ready } = useApp()
 
-  const [saving,      setSaving]      = useState(false)
-  const [error,       setError]       = useState('')
-  const [success,     setSuccess]     = useState(false)
-  const [geocoding,   setGeocoding]   = useState(false)
-  const [geocodeError,setGeocodeError]= useState('')
-  const [leafletError,setLeafletError]= useState(false)
-  const [notFound,    setNotFound]    = useState(false)
+  const [saving,          setSaving]          = useState(false)
+  const [error,           setError]           = useState('')
+  const [success,         setSuccess]         = useState(false)
+  const [geocoding,       setGeocoding]       = useState(false)
+  const [geocodeError,    setGeocodeError]    = useState('')
+  const [leafletError,    setLeafletError]    = useState(false)
+  const [notFound,        setNotFound]        = useState(false)
+  const [showAirbnbModal, setShowAirbnbModal] = useState(false)
 
   // Form state
   const [category,  setCategory]  = useState('full_home')
@@ -145,7 +132,7 @@ export default function PropertyPage() {
     if (isNew || !ready) return
     const home = homes.find(h => h.id === id)
     if (!home) { setNotFound(true); return }
-    if ((home.user_id || home.userId) !== currentUser?.id) { setNotFound(true); return }
+    if (home.userId !== currentUser?.id) { setNotFound(true); return }
     setCategory(home.category || 'full_home')
     setSubtype(home.subtype || home.type || '')
     setHomeForm({
@@ -153,7 +140,7 @@ export default function PropertyPage() {
       description:      home.description || '',
       bedrooms:         home.bedrooms || 1,
       bathrooms:        home.bathrooms || 1,
-      maxGuests:        home.max_guests || home.maxGuests || 2,
+      maxGuests:        home.maxGuests || 2,
       private_bathroom: home.private_bathroom || false,
       bed_type:         home.bed_type || '',
       shared_with:      home.shared_with || 1,
@@ -284,49 +271,36 @@ export default function PropertyPage() {
       : [...f.amenities, aid]
   }))
 
-  const handleAirbnbImport = (propiedad) => {
+  const handleAirbnbImport = (data) => {
     try {
-      // Mapear amenities
-      const airbnbList = (propiedad?.amenities || []).map(a => String(a).toLowerCase())
-      const mapped = Object.entries(AMENITY_KEYWORDS)
-        .filter(([, kws]) => airbnbList.some(a => kws.some(k => a.includes(k))))
-        .map(([id]) => id)
+      // Claude Vision devuelve amenities ya como IDs conocidos (wifi, parking, ac...)
+      const knownIds = AMENITIES.map(a => a.id)
+      const mapped = (data?.amenities || []).filter(a => knownIds.includes(a))
 
-      // Mapear tipo / subtipo
-      const tipo = (propiedad?.tipo || '').toLowerCase()
+      // Mapear tipo (campo 'type' de Claude Vision) a categoría y subtipo de Rukka
+      const tipo = (data?.type || '').toLowerCase()
       let cat = 'full_home', sub = 'Casa'
-      if (tipo.includes('condo') || tipo.includes('apartment') || tipo.includes('flat')) sub = 'Departamento'
-      else if (tipo.includes('cabin') || tipo.includes('cabaña')) sub = 'Cabaña'
+      if (tipo.includes('departamento')) sub = 'Departamento'
+      else if (tipo.includes('cabaña')) sub = 'Cabaña'
       else if (tipo.includes('villa')) sub = 'Villa'
-      else if (tipo.includes('studio') || tipo.includes('estudio')) sub = 'Estudio'
+      else if (tipo.includes('estudio')) sub = 'Estudio'
+      else if (tipo.includes('loft')) sub = 'Loft'
       else if (tipo.includes('bungalow')) sub = 'Bungalow'
-      if (tipo.includes('private room') || tipo.includes('shared room')) {
+      if (tipo.includes('habitación') || tipo.includes('habitacion')) {
         cat = 'room'; sub = 'Habitación estándar'
       }
-
-      // Limpiar y validar fotos: solo URLs http(s) válidas, máx 20
-      const fotosLimpias = (propiedad?.fotos || [])
-        .filter(f => typeof f === 'string' && /^https?:\/\/.+/.test(f))
-        .slice(0, 20)
-
-      // Validar coordenadas: deben ser números finitos y no cero
-      const lat = Number(propiedad?.latitud)
-      const lng = Number(propiedad?.longitud)
-      const coordsValidas = isFinite(lat) && isFinite(lng) && (lat !== 0 || lng !== 0)
 
       setCategory(cat)
       setSubtype(sub)
       setHomeForm(f => ({
         ...f,
-        title:       propiedad?.titulo       || f.title,
-        description: propiedad?.descripcion  || f.description,
-        maxGuests:   propiedad?.capacidad    || f.maxGuests,
-        bedrooms:    propiedad?.habitaciones || f.bedrooms,
-        bathrooms:   propiedad?.banos        || f.bathrooms,
+        title:       data?.title       || f.title,
+        description: data?.description || f.description,
+        maxGuests:   data?.maxGuests   || f.maxGuests,
+        bedrooms:    data?.bedrooms    || f.bedrooms,
+        bathrooms:   data?.bathrooms   || f.bathrooms,
         amenities:   mapped,
       }))
-      setPhotos(fotosLimpias)
-      if (coordsValidas) setCoords({ lat, lng })
     } catch (err) {
       console.error('handleAirbnbImport error:', err)
       setError('Error al importar los datos de Airbnb. Intenta de nuevo o ingresa los datos manualmente.')
@@ -435,10 +409,28 @@ export default function PropertyPage() {
         {/* ── Airbnb import (solo en creación) ── */}
         {isNew && (
           <>
-            <div className="text-center pb-1">
-              <p className="text-gray-400 text-sm">¿Ya tienes la propiedad en Airbnb? Importa los datos automáticamente ↓</p>
+            <div className="bg-gradient-to-br from-[#FF5A5F]/8 to-[#FF5A5F]/4 border border-[#FF5A5F]/20 rounded-2xl p-5">
+              <div className="flex items-start gap-3 mb-3">
+                <span className="text-xl">📸</span>
+                <div>
+                  <p className="font-black text-gray-900 text-base">¿Tu propiedad está en Airbnb?</p>
+                  <p className="text-gray-500 text-sm">Sube pantallazos del anuncio y la IA extrae título, descripción, capacidad y comodidades automáticamente.</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowAirbnbModal(true)}
+                className="flex items-center gap-2 bg-[#FF5A5F] text-white px-4 py-2.5 rounded-xl font-bold text-sm hover:bg-[#e04e53] transition-colors"
+              >
+                <Camera className="w-4 h-4" /> Importar con pantallazos
+              </button>
             </div>
-            <AirbnbImport onImport={handleAirbnbImport} />
+            {showAirbnbModal && (
+              <ImportFromAirbnb
+                onClose={() => setShowAirbnbModal(false)}
+                onImport={(data) => { handleAirbnbImport(data); setShowAirbnbModal(false); }}
+              />
+            )}
           </>
         )}
 

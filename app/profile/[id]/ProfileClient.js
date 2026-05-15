@@ -26,8 +26,8 @@ export default function ProfileClient({ id }) {
   const [avatarSaved,     setAvatarSaved]     = useState(false)
 
   const profileUser = users.find(u => u.id === id)
-  const uHomes  = homes.filter(h => (h.user_id || h.userId) === id)
-  const uWishes = wishes.filter(w => (w.user_id || w.userId) === id)
+  const uHomes  = homes.filter(h => h.userId === id)
+  const uWishes = wishes.filter(w => w.userId === id)
   // Solo mostrar controles de dueño cuando auth está resuelto (evita flash post-logout)
   const isOwner = ready && user?.id === id
 
@@ -185,9 +185,9 @@ export default function ProfileClient({ id }) {
                     <MapPin className="w-4 h-4 text-terra" />
                   </div>
                   <div>
-                    <p className="font-bold text-gray-900 text-sm">{w.to_city || w.toCity}</p>
+                    <p className="font-bold text-gray-900 text-sm">{w.toCity}</p>
                     <p className="text-xs text-gray-500">
-                      {w.start_date || w.startDate} → {w.end_date || w.endDate}
+                      {w.startDate} → {w.endDate}
                     </p>
                   </div>
                 </div>

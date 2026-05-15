@@ -4,12 +4,11 @@ import Link from 'next/link'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import HomeCard from '../components/HomeCard'
+import FresiaSearchModule from '../components/FresiaSearchModule'
 import { useApp } from '../lib/store'
 import { CHILE_BANNERS } from '../lib/chile-banners'
-import { DESTINOS_RUKKA, getAllComunas } from '../lib/comunas'
-import { ArrowRight, MapPin, Calendar, Users, Sparkles, Shield, Lock, ArrowLeftRight, Gift, Zap, Heart } from 'lucide-react'
-
-const CHILE_CITIES = getAllComunas()
+import { DESTINOS_RUKKA } from '../lib/comunas'
+import { ArrowRight, Sparkles, Shield, ArrowLeftRight, Gift, Zap, Heart } from 'lucide-react'
 
 const STEPS = [
   { n: '01', icon: '🏔️', title: 'Publica tu rukka', desc: 'Crea tu perfil y registra tu hogar. ¿Ya estás en Airbnb? Impórtalo en segundos y empieza a recibir solicitudes de intercambio.' },
@@ -75,141 +74,6 @@ function AdBanner({ variant = 'primary', className = '', heroBanner = null }) {
   )
 }
 
-// ── SEARCH WIZARD ─────────────────────────────────────────────────────────────
-function SearchWizard({ homes, users }) {
-  const [dest, setDest] = useState('')
-  const [startDate, setStartDate] = useState('')
-  const [endDate, setEndDate] = useState('')
-  const [guests, setGuests] = useState(2)
-  const [results, setResults] = useState(null)
-  const [showGate, setShowGate] = useState(false)
-
-  const handleSearch = e => {
-    e.preventDefault()
-    if (!dest) return
-    const matches = homes.filter(h =>
-      h.city?.toLowerCase().includes(dest.toLowerCase()) ||
-      h.comuna?.toLowerCase().includes(dest.toLowerCase()) ||
-      h.location?.toLowerCase().includes(dest.toLowerCase())
-    )
-    setResults(matches)
-    setShowGate(false)
-  }
-
-  return (
-    <div className="bg-white rounded-3xl shadow-2xl p-6 sm:p-8 max-w-2xl w-full mx-auto">
-      <div className="text-center mb-6">
-        <h2 className="text-2xl font-black text-gray-900">¿A dónde quieres ir?</h2>
-        <p className="text-gray-500 text-sm mt-1">Descubre hogares disponibles en Chile — gratis</p>
-      </div>
-
-      <form onSubmit={handleSearch} className="space-y-4">
-        <div>
-          <label className="block text-xs font-bold text-gray-600 mb-1.5 uppercase tracking-wide">
-            <MapPin className="w-3.5 h-3.5 text-terra inline mr-1" /> ¿A qué ciudad de Chile quieres ir?
-          </label>
-          <div className="relative">
-            <input list="cities-list" value={dest} onChange={e => setDest(e.target.value)}
-              placeholder="ej. Pichilemu, Puerto Varas, Zapallar..."
-              className="w-full border-2 border-gray-200 focus:border-forest rounded-xl px-4 py-3 text-sm outline-none transition-colors" />
-            <datalist id="cities-list">
-              {CHILE_CITIES.map(c => <option key={c} value={c} />)}
-            </datalist>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <label className="block text-xs font-bold text-gray-600 mb-1.5 uppercase tracking-wide">
-              <Calendar className="w-3.5 h-3.5 text-terra inline mr-1" /> Desde
-            </label>
-            <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)}
-              min={new Date().toISOString().split('T')[0]}
-              className="w-full border-2 border-gray-200 focus:border-forest rounded-xl px-4 py-3 text-sm outline-none transition-colors" />
-          </div>
-          <div>
-            <label className="block text-xs font-bold text-gray-600 mb-1.5 uppercase tracking-wide">Hasta</label>
-            <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)}
-              min={startDate || new Date().toISOString().split('T')[0]}
-              className="w-full border-2 border-gray-200 focus:border-forest rounded-xl px-4 py-3 text-sm outline-none transition-colors" />
-          </div>
-        </div>
-
-        <div>
-          <label className="block text-xs font-bold text-gray-600 mb-1.5 uppercase tracking-wide">
-            <Users className="w-3.5 h-3.5 text-terra inline mr-1" /> ¿Cuántas personas?
-          </label>
-          <div className="flex items-center gap-3 border-2 border-gray-200 rounded-xl px-4 py-2.5">
-            <button type="button" onClick={() => setGuests(g => Math.max(1, g - 1))}
-              className="w-8 h-8 rounded-lg bg-gray-100 hover:bg-gray-200 font-black text-gray-700 text-lg flex items-center justify-center">−</button>
-            <span className="flex-1 text-center font-black text-gray-900">{guests} {guests === 1 ? 'persona' : 'personas'}</span>
-            <button type="button" onClick={() => setGuests(g => Math.min(20, g + 1))}
-              className="w-8 h-8 rounded-lg bg-gray-100 hover:bg-gray-200 font-black text-gray-700 text-lg flex items-center justify-center">+</button>
-          </div>
-        </div>
-
-        <button type="submit"
-          className="w-full bg-forest text-white py-4 rounded-xl font-black text-base hover:bg-forest-dark transition-colors flex items-center justify-center gap-2 shadow-lg">
-          <Sparkles className="w-5 h-5" /> Ver hogares disponibles
-        </button>
-      </form>
-
-      {results !== null && (
-        <div className="mt-6 pt-6 border-t border-gray-100">
-          {results.length === 0 ? (
-            <div className="text-center py-4">
-              <p className="text-gray-500 text-sm mb-3">No encontramos hogares en <strong>{dest}</strong> aún.</p>
-              <Link href="/auth/register" className="mt-3 inline-flex items-center gap-1.5 text-forest font-bold text-sm hover:text-forest-dark">
-                Registrar mi hogar <ArrowRight className="w-4 h-4" />
-              </Link>
-            </div>
-          ) : (
-            <div>
-              <p className="font-black text-gray-900 mb-4">
-                <span className="text-forest text-2xl">{results.length}</span> hogar{results.length !== 1 ? 'es' : ''} en <span className="text-terra">{dest}</span>
-              </p>
-              <div className="space-y-3 mb-4">
-                {results.slice(0, 2).map(h => (
-                  <div key={h.id} className="flex gap-3 bg-gray-50 rounded-xl p-3 border border-gray-100">
-                    <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 bg-forest-50">
-                      {h.images?.[0] && <img src={h.images[0]} alt="" className="w-full h-full object-cover" />}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-bold text-gray-900 text-sm truncate">{h.title}</p>
-                      <p className="text-xs text-gray-500 flex items-center gap-1 mt-0.5">
-                        <MapPin className="w-3 h-3" /> {h.comuna || h.city}
-                      </p>
-                      <p className="text-xs text-forest font-bold mt-1">✓ Disponible · {h.max_guests || h.maxGuests} pers. máx.</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              {!showGate ? (
-                results.length > 2 && (
-                  <button onClick={() => setShowGate(true)}
-                    className="w-full border-2 border-dashed border-gray-300 rounded-xl py-3 text-sm text-gray-500 font-bold hover:border-forest hover:text-forest transition-colors">
-                    +{results.length - 2} hogares más — ver todos
-                  </button>
-                )
-              ) : (
-                <div className="bg-forest-50 border-2 border-forest rounded-2xl p-5 text-center">
-                  <Lock className="w-8 h-8 text-forest mx-auto mb-2" />
-                  <h3 className="font-black text-gray-900 mb-1">Crea tu cuenta gratis para continuar</h3>
-                  <p className="text-sm text-gray-500 mb-4">Regístrate y contacta a los {results.length} anfitriones en {dest}.</p>
-                  <Link href="/auth/register"
-                    className="w-full bg-forest text-white py-3 rounded-xl font-black text-sm hover:bg-forest-dark transition-colors flex items-center justify-center gap-2">
-                    <Sparkles className="w-4 h-4" /> Registrarme gratis
-                  </Link>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-      )}
-    </div>
-  )
-}
-
 // ── PAGE ──────────────────────────────────────────────────────────────────────
 export default function HomePage() {
   const { homes, users } = useApp()
@@ -226,7 +90,7 @@ export default function HomePage() {
       <Navbar />
 
       {/* ── HERO con banner dinámico ──────────────────────────────────────── */}
-      <section className="relative min-h-[95vh] flex items-center overflow-hidden">
+      <section className="relative h-screen flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0">
           {heroBanner && (
             <img src={heroBanner.image} alt={heroBanner.city} className="w-full h-full object-cover" />
@@ -234,42 +98,30 @@ export default function HomePage() {
           <div className="absolute inset-0 hero-rukka" />
         </div>
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full py-16">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-              {heroBanner && (
-                <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm border border-white/20 text-white rounded-full px-4 py-2 text-sm font-medium mb-4">
-                  <span>{heroBanner.emoji}</span>
-                  <span>{heroBanner.tagline}</span>
-                </div>
-              )}
-              <h1 className="text-5xl sm:text-6xl font-black text-white leading-[1.05] mb-3">
-                Intercambia<br />
-                <span className="text-sand">tu hogar,</span><br />
-                viaja por Chile.
-              </h1>
-              <p className="text-base text-sand/90 font-bold italic mb-4">Mi casa es tu casa.</p>
-              <p className="text-lg text-white/80 leading-relaxed mb-4 max-w-lg">
-                {heroBanner?.description}
-              </p>
-              {heroBanner && (
-                <div className="flex flex-wrap gap-2 mb-6">
-                  {heroBanner.tags.map(tag => (
-                    <span key={tag} className="bg-white/20 backdrop-blur-sm text-white text-xs font-bold px-3 py-1.5 rounded-full">
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              )}
-              <div className="flex flex-wrap gap-3 text-white/80 text-sm">
-                {['✓ 100% gratis', '✓ Solo en Chile', '✓ Matches automáticos'].map(t => (
-                  <span key={t} className="bg-white/10 backdrop-blur-sm px-3 py-1.5 rounded-full">{t}</span>
-                ))}
+        <div className="relative w-full px-4 sm:px-6 lg:px-8 py-8 sm:py-12 flex flex-col items-center gap-6 overflow-y-auto h-full justify-center">
+          {/* Hero copy */}
+          <div className="text-center">
+            {heroBanner && (
+              <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm border border-white/20 text-white rounded-full px-4 py-2 text-sm font-medium mb-4">
+                <span>{heroBanner.emoji}</span>
+                <span>{heroBanner.tagline}</span>
               </div>
-            </div>
-            <div>
-              <SearchWizard homes={homes} users={users} />
-            </div>
+            )}
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white leading-[1.05] mb-2">
+              Intercambia tu hogar,<br />
+              <span className="text-sand">viaja por Chile.</span>
+            </h1>
+            <p className="text-base text-sand/90 font-bold italic">Mi casa es tu casa.</p>
+          </div>
+
+          {/* Fresia + buscador */}
+          <FresiaSearchModule />
+
+          {/* Badges */}
+          <div className="flex flex-wrap gap-3 justify-center text-white/80 text-sm">
+            {['✓ 100% gratis', '✓ Solo en Chile', '✓ Matches automáticos'].map(t => (
+              <span key={t} className="bg-white/10 backdrop-blur-sm px-3 py-1.5 rounded-full">{t}</span>
+            ))}
           </div>
         </div>
       </section>
@@ -391,7 +243,7 @@ export default function HomePage() {
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {featured.map(h => (
-                <HomeCard key={h.id} home={h} user={users.find(u => u.id === (h.user_id || h.userId))} />
+                <HomeCard key={h.id} home={h} user={users.find(u => u.id === h.userId)} />
               ))}
             </div>
           </div>

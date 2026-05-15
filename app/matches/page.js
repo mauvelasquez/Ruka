@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useApp } from '../../lib/store'
 import Navbar from '../../components/Navbar'
 import { Search, Star, MapPin, Users, Calendar, ArrowLeftRight, Home, Zap, Info, AlertCircle } from 'lucide-react'
+import { normalizeText } from '../../lib/store'
 
 function MatchCard({ result, myHomes, onRequest }) {
   const { home, owner, isPerfectMatch, ownerWish } = result
@@ -175,14 +176,14 @@ function MatchesContent() {
 
   if (!currentUser) return null
 
-  const myHomes = homes.filter(h => (h.user_id || h.userId) === currentUser.id)
+  const myHomes = homes.filter(h => h.userId === currentUser.id)
   const myCity  = currentUser.city || currentUser.comuna || ''
 
   function datesOverlap(s1, e1, s2, e2) {
     return new Date(s1) <= new Date(e2) && new Date(e1) >= new Date(s2)
   }
   function homeIsAvailable(home, s, e) {
-    const periods = home.availability_periods || home.availabilityPeriods || []
+    const periods = home.availabilityPeriods || []
     if (periods.length === 0) return true
     return periods.some(p => datesOverlap(p.start, p.end, s, e))
   }
@@ -192,18 +193,18 @@ function MatchesContent() {
     if (!city || !start || !end) return
 
     const candidates = homes.filter(h =>
-      (h.user_id || h.userId) !== currentUser.id &&
-      (h.max_guests || h.maxGuests || 0) >= guests &&
-      (h.city || '').toLowerCase().includes(city.toLowerCase()) &&
+      h.userId !== currentUser.id &&
+      (h.maxGuests || 0) >= guests &&
+      normalizeText(h.city).includes(normalizeText(city)) &&
       homeIsAvailable(h, start, end)
     )
 
     const matched = candidates.map(home => {
-      const owner = users.find(u => u.id === (home.user_id || home.userId))
+      const owner = users.find(u => u.id === home.userId)
       const ownerWishes = wishes.filter(w =>
-        (w.user_id || w.userId) === (home.user_id || home.userId) &&
-        (w.to_city || w.toCity || '').toLowerCase().includes(myCity.toLowerCase()) &&
-        datesOverlap(w.start_date || w.startDate, w.end_date || w.endDate, start, end)
+        w.userId === home.userId &&
+        normalizeText(w.toCity).includes(normalizeText(myCity)) &&
+        datesOverlap(w.startDate, w.endDate, start, end)
       )
       return {
         home,

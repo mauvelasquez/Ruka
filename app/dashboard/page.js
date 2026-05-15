@@ -4,9 +4,10 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useApp } from '../../lib/store'
 import Navbar from '../../components/Navbar'
+import MessageThread from '../../components/MessageThread'
 import {
   Home, Heart, ArrowLeftRight, Plus, MapPin, Users, Calendar,
-  CheckCircle, XCircle, Clock, Trash2, Eye, Star, Sparkles, AlertCircle, ScrollText
+  CheckCircle, XCircle, Clock, Trash2, Eye, Star, Sparkles, AlertCircle, ScrollText, MessageSquare
 } from 'lucide-react'
 import { COMUNAS_RUKKA } from '../../lib/comunas'
 
@@ -30,12 +31,13 @@ function StatusBadge({ status }) {
 
 export default function DashboardPage() {
   const router = useRouter()
-  const { currentUser, ready, homes, wishes, requests, addWish, removeWish, updateRequest, removeHome, syncSession } = useApp()
+  const { currentUser, ready, homes, users, wishes, requests, addWish, removeWish, updateRequest, removeHome, syncSession } = useApp()
   const [tab, setTab] = useState(TAB.WISHES)
   const [wishForm, setWishForm] = useState({ toCity: '', startDate: '', endDate: '', guests: 2 })
   const [showWishForm, setShowWishForm] = useState(false)
   const [loadingError, setLoadingError] = useState(false)
   const [showNoHomeAlert, setShowNoHomeAlert] = useState(false)
+  const [activeThread, setActiveThread] = useState(null) // { requestId, otherUser }
 
   useEffect(() => {
     if (ready) return
@@ -79,10 +81,10 @@ export default function DashboardPage() {
     </div>
   )
 
-  const myHomes  = homes.filter(h => h.user_id === currentUser.id || h.userId === currentUser.id)
-  const myWishes = wishes.filter(w => w.user_id === currentUser.id || w.userId === currentUser.id)
-  const received = requests.filter(r => r.to_user_id === currentUser.id || r.toUserId === currentUser.id)
-  const sent     = requests.filter(r => r.from_user_id === currentUser.id || r.fromUserId === currentUser.id)
+  const myHomes  = homes.filter(h => h.userId === currentUser.id)
+  const myWishes = wishes.filter(w => w.userId === currentUser.id)
+  const received = requests.filter(r => r.toUserId === currentUser.id)
+  const sent     = requests.filter(r => r.fromUserId === currentUser.id)
 
   const handleAddWish = async (e) => {
     e.preventDefault()
@@ -289,21 +291,21 @@ export default function DashboardPage() {
                       <div className="flex items-center gap-3 flex-1 min-w-0">
                         <div className="w-12 h-12 rounded-2xl bg-andean/10 flex items-center justify-center flex-shrink-0 text-2xl">🗺️</div>
                         <div className="flex-1 min-w-0">
-                          <p className="font-black text-gray-900 text-lg">{w.to_city || w.toCity}</p>
+                          <p className="font-black text-gray-900 text-lg">{w.toCity}</p>
                           <div className="flex flex-wrap gap-3 mt-1 text-xs text-gray-500">
                             <span className="flex items-center gap-1">
                               <Calendar className="w-3 h-3 text-forest" />
-                              {w.start_date || w.startDate} → {w.end_date || w.endDate}
+                              {w.startDate} → {w.endDate}
                             </span>
                             <span className="flex items-center gap-1">
                               <Users className="w-3 h-3 text-andean" />
-                              {w.needed_capacity || w.guests} viajero{(w.needed_capacity || w.guests) !== 1 ? 's' : ''}
+                              {w.neededCapacity} viajero{w.neededCapacity !== 1 ? 's' : ''}
                             </span>
                           </div>
                         </div>
                       </div>
                       <div className="flex items-center gap-2 flex-shrink-0">
-                        <Link href={`/matches?city=${encodeURIComponent(w.to_city || w.toCity)}&start=${w.start_date || w.startDate}&end=${w.end_date || w.endDate}&guests=${w.needed_capacity || w.guests}`}
+                        <Link href={`/matches?city=${encodeURIComponent(w.toCity)}&start=${w.startDate}&end=${w.endDate}&guests=${w.neededCapacity}`}
                           className="flex items-center gap-1.5 text-xs font-black text-white bg-andean hover:bg-blue-700 px-3 py-2 rounded-xl transition-colors">
                           <Star className="w-3.5 h-3.5" /> Ver matches
                         </Link>
@@ -365,7 +367,7 @@ export default function DashboardPage() {
                       </div>
                       <div className="flex items-center gap-4 mt-1 text-sm text-gray-500">
                         <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5" />{home.comuna || home.city}</span>
-                        <span className="flex items-center gap-1"><Users className="w-3.5 h-3.5" />Máx {home.max_guests || home.maxGuests}</span>
+                        <span className="flex items-center gap-1"><Users className="w-3.5 h-3.5" />Máx {home.maxGuests}</span>
                       </div>
                     </div>
                   </div>
@@ -387,14 +389,16 @@ export default function DashboardPage() {
             ) : (
               <div className="grid gap-4">
                 {received.map(req => {
-                  const fromHome = homes.find(h => h.id === (req.from_home_id || req.fromHomeId))
+                  const fromHome  = homes.find(h => h.id === req.fromHomeId)
+                  const fromUser  = users.find(u => u.id === req.fromUserId)
+                  const isActive  = activeThread?.requestId === req.id
                   return (
                     <div key={req.id} className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
                       <div className="flex items-start justify-between gap-4 mb-3">
                         <div>
                           <p className="font-black text-gray-900 text-base">{fromHome?.title || 'Hogar'}</p>
                           <p className="text-sm text-gray-500 flex items-center gap-1 mt-0.5">
-                            <MapPin className="w-3.5 h-3.5" />{fromHome?.ciudad || fromHome?.city}
+                            <MapPin className="w-3.5 h-3.5" />{fromHome?.city}
                           </p>
                         </div>
                         <StatusBadge status={req.status} />
@@ -413,6 +417,25 @@ export default function DashboardPage() {
                             <XCircle className="w-4 h-4" /> Rechazar
                           </button>
                         </div>
+                      )}
+                      {req.status === 'accepted' && (
+                        <>
+                          <button
+                            onClick={() => setActiveThread(isActive ? null : { requestId: req.id, otherUser: fromUser })}
+                            className="mt-2 flex items-center gap-1.5 text-sm font-bold text-forest hover:text-forest-dark transition-colors">
+                            <MessageSquare className="w-4 h-4" />
+                            {isActive ? 'Cerrar mensajes' : '💬 Mensajes'}
+                          </button>
+                          {isActive && (
+                            <div className="mt-3">
+                              <MessageThread
+                                requestId={req.id}
+                                otherUser={fromUser}
+                                onClose={() => setActiveThread(null)}
+                              />
+                            </div>
+                          )}
+                        </>
                       )}
                     </div>
                   )
@@ -437,18 +460,39 @@ export default function DashboardPage() {
             ) : (
               <div className="grid gap-4">
                 {sent.map(req => {
-                  const toHome = homes.find(h => h.id === (req.to_home_id || req.toHomeId))
+                  const toHome   = homes.find(h => h.id === req.toHomeId)
+                  const toUser   = users.find(u => u.id === req.toUserId)
+                  const isActive = activeThread?.requestId === req.id
                   return (
                     <div key={req.id} className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
                       <div className="flex items-start justify-between gap-4">
                         <div>
                           <p className="font-black text-gray-900 text-base">{toHome?.title || 'Hogar'}</p>
                           <p className="text-sm text-gray-500 flex items-center gap-1 mt-0.5">
-                            <MapPin className="w-3.5 h-3.5" />{toHome?.comuna || toHome?.city}
+                            <MapPin className="w-3.5 h-3.5" />{toHome?.city}
                           </p>
                         </div>
                         <StatusBadge status={req.status} />
                       </div>
+                      {req.status === 'accepted' && (
+                        <>
+                          <button
+                            onClick={() => setActiveThread(isActive ? null : { requestId: req.id, otherUser: toUser })}
+                            className="mt-3 flex items-center gap-1.5 text-sm font-bold text-forest hover:text-forest-dark transition-colors">
+                            <MessageSquare className="w-4 h-4" />
+                            {isActive ? 'Cerrar mensajes' : '💬 Mensajes'}
+                          </button>
+                          {isActive && (
+                            <div className="mt-3">
+                              <MessageThread
+                                requestId={req.id}
+                                otherUser={toUser}
+                                onClose={() => setActiveThread(null)}
+                              />
+                            </div>
+                          )}
+                        </>
+                      )}
                     </div>
                   )
                 })}
