@@ -3,11 +3,18 @@
 
 import { NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
+import { createClient } from '../../../lib/supabase/server'
 
-export const runtime = 'nodejs'        // edge no soporta formData bien
-export const maxDuration = 60          // Vercel pro; en hobby usa 10
+export const runtime = 'nodejs'
+export const maxDuration = 60
 
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
+const MAX_IMAGE_BYTES = 2 * 1024 * 1024  // 2 MB server-side guard
+
+function getClient() {
+  const apiKey = process.env.ANTHROPIC_API_KEY
+  if (!apiKey) throw new Error('ANTHROPIC_API_KEY no está configurada en las variables de entorno del servidor.')
+  return new Anthropic({ apiKey })
+}
 
 const SYSTEM_PROMPT = `Eres un extractor de datos de propiedades para la plataforma de intercambio de hogares Rukka.cl.
 El usuario te enviará uno o más pantallazos de un anuncio de Airbnb.
@@ -46,6 +53,18 @@ Reglas:
 
 export async function POST(req) {
   try {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return NextResponse.json({ error: 'No autenticado' }, { status: 401 })
+
+    let client
+    try {
+      client = getClient()
+    } catch (authErr) {
+      console.error('[import-airbnb] auth:', authErr.message)
+      return NextResponse.json({ error: authErr.message }, { status: 503 })
+    }
+
     const formData = await req.formData()
 
     // Recolectar todas las imágenes enviadas
@@ -54,9 +73,16 @@ export async function POST(req) {
     while (formData.has(`image_${idx}`)) {
       const file   = formData.get(`image_${idx}`)
       const buffer = Buffer.from(await file.arrayBuffer())
-      const base64 = buffer.toString('base64')
 
-      // Determinar media_type
+      // Guard server-side: reject images above 2 MB
+      if (buffer.byteLength > MAX_IMAGE_BYTES) {
+        return NextResponse.json(
+          { error: `La imagen ${file.name || idx} supera el límite de 2 MB.` },
+          { status: 413 }
+        )
+      }
+
+      const base64 = buffer.toString('base64')
       let mediaType = file.type || 'image/jpeg'
       if (!['image/jpeg','image/png','image/gif','image/webp'].includes(mediaType)) {
         mediaType = 'image/jpeg'
@@ -80,7 +106,7 @@ export async function POST(req) {
     })
 
     const message = await client.messages.create({
-      model:      'claude-opus-4-5',
+      model:      'claude-sonnet-4-6',
       max_tokens: 1024,
       system:     SYSTEM_PROMPT,
       messages: [{ role: 'user', content: imageContent }],

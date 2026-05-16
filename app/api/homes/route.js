@@ -17,6 +17,7 @@ export async function GET(req) {
   const search   = searchParams.get('search')   || ''
   const type     = searchParams.get('type')     || ''
   const region   = searchParams.get('region')   || ''
+  const city     = searchParams.get('city')     || ''
   const minBeds  = parseInt(searchParams.get('minBeds')  || '0', 10)
   const sort     = searchParams.get('sort')     || 'rating'
   const page     = Math.max(1, parseInt(searchParams.get('page')  || '1', 10))
@@ -39,6 +40,10 @@ export async function GET(req) {
 
     if (type)   query = query.eq('type', type)
     if (region) query = query.eq('region', region)
+    if (city) {
+      const safeCity = city.replace(/[^a-z0-9\s]/gi, '').trim()
+      if (safeCity) query = query.or(`city.ilike.%${safeCity}%,comuna.ilike.%${safeCity}%`)
+    }
     if (minBeds > 0) query = query.gte('bedrooms', minBeds)
 
     const orderCol = sort === 'reviews' ? 'review_count' : sort === 'newest' ? 'created_at' : 'rating'

@@ -5,7 +5,7 @@ import Navbar from '../../components/Navbar'
 import Footer from '../../components/Footer'
 import HomeCard from '../../components/HomeCard'
 import { SlidersHorizontal, X, ChevronDown, MapPin, ChevronLeft, ChevronRight } from 'lucide-react'
-import { REGIONES_RUKKA } from '../../lib/comunas'
+import { COMUNAS_RUKKA } from '../../lib/comunas'
 import { getRandomBanner } from '../../lib/chile-banners'
 
 const TYPES = ['Todos', 'Casa', 'Departamento', 'Cabaña', 'Estudio', 'Loft', 'Villa', 'Habitación']
@@ -32,6 +32,7 @@ function HomesContent() {
   const [search,      setSearch]      = useState(initialSearch)
   const [type,        setType]        = useState('Todos')
   const [region,      setRegion]      = useState('Todas')
+  const [city,        setCity]        = useState('Todas')
   const [minBeds,     setMinBeds]     = useState(0)
   const [showFilters, setShowFilters] = useState(false)
   const [sort,        setSort]        = useState('rating')
@@ -53,6 +54,7 @@ function HomesContent() {
         ...(search    && { search }),
         ...(type !== 'Todos'  && { type }),
         ...(region !== 'Todas' && { region }),
+        ...(city !== 'Todas'  && { city }),
         ...(minBeds > 0 && { minBeds: String(minBeds) }),
       })
       const res  = await fetch(`/api/homes?${params}`)
@@ -66,7 +68,7 @@ function HomesContent() {
     } finally {
       setLoading(false)
     }
-  }, [search, type, region, minBeds, sort])
+  }, [search, type, region, city, minBeds, sort])
 
   // Debounce para el campo de búsqueda
   useEffect(() => {
@@ -75,16 +77,17 @@ function HomesContent() {
       fetchHomes(1)
     }, 300)
     return () => clearTimeout(timer)
-  }, [search, type, region, minBeds, sort])
+  }, [search, type, region, city, minBeds, sort])
 
   const clear = () => {
     setSearch('')
     setType('Todos')
     setRegion('Todas')
+    setCity('Todas')
     setMinBeds(0)
     setPage(1)
   }
-  const hasFilters = search || type !== 'Todos' || region !== 'Todas' || minBeds > 0
+  const hasFilters = search || type !== 'Todos' || region !== 'Todas' || city !== 'Todas' || minBeds > 0
   const sortLabels = { rating: 'Mejor valorados', reviews: 'Más reseñas', newest: 'Más recientes' }
 
   const goToPage = (p) => {
@@ -164,12 +167,12 @@ function HomesContent() {
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-5">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
               <div>
-                <label className="block text-xs font-bold text-gray-700 mb-2 uppercase tracking-wide">Región</label>
+                <label className="block text-xs font-bold text-gray-700 mb-2 uppercase tracking-wide">Localidad</label>
                 <div className="relative">
-                  <select value={region} onChange={e => setRegion(e.target.value)}
+                  <select value={city} onChange={e => setCity(e.target.value)}
                     className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-forest bg-gray-50 appearance-none">
-                    <option>Todas</option>
-                    {REGIONES_RUKKA.map(r => <option key={r.id} value={r.nombre}>{r.nombre}</option>)}
+                    <option value="Todas">Todas las localidades</option>
+                    {COMUNAS_RUKKA.map(c => <option key={c} value={c}>{c}</option>)}
                   </select>
                   <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center">
                     <ChevronDown className="w-4 h-4 text-gray-400" />

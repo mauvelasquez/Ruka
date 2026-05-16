@@ -13,14 +13,14 @@ const DESTINATION_CHIPS = [
 ]
 
 const CITIES = [
-  { icon: '🌊', name: 'Viña del Mar',  desc: 'Playa y vida urbana' },
-  { icon: '🏖️', name: 'La Serena',     desc: 'Valle del Elqui' },
+  { icon: '🌺', name: 'Zapallar',      desc: 'Exclusividad costera' },
+  { icon: '🐧', name: 'Cachagua',      desc: 'Playa secreta' },
+  { icon: '⚓', name: 'Papudo',        desc: 'Caleta pintoresca' },
+  { icon: '🏖️', name: 'Santo Domingo', desc: 'Arena blanca y dunas' },
   { icon: '🏄', name: 'Pichilemu',     desc: 'Capital del surf' },
-  { icon: '🌲', name: 'Puerto Varas',  desc: 'Lagos y volcanes' },
-  { icon: '⛵', name: 'Zapallar',      desc: 'Exclusividad costera' },
-  { icon: '🌿', name: 'Panguipulli',   desc: 'Naturaleza patagónica' },
-  { icon: '🌧️', name: 'Valdivia',      desc: 'Ciudad de los ríos' },
-  { icon: '🏙️', name: 'Concepción',    desc: 'La capital del Bío Bío' },
+  { icon: '🤙', name: 'Puertecillo',   desc: 'Olas de clase mundial' },
+  { icon: '🌊', name: 'Navidad',       desc: 'Costa salvaje' },
+  { icon: '🪁', name: 'Matanzas',      desc: 'Paraíso del kitesurf' },
 ]
 
 const SESSION_KEY = 'fresia_messages'

@@ -7,6 +7,13 @@ import { Eye, EyeOff, ArrowRight } from 'lucide-react'
 import { getRandomBanner } from '../../../lib/chile-banners'
 import RukkaLogo from '../../../components/RukkaLogo'
 
+const ERROR_MESSAGES = {
+  auth_error:       'Error al iniciar sesión con Google. Intenta de nuevo.',
+  timeout:          'El servidor tardó demasiado. Verifica tu conexión e intenta de nuevo.',
+  no_code:          'Acceso inválido. Usa el botón de Google para iniciar sesión.',
+  profile_creation: 'Sesión iniciada pero hubo un error al crear tu perfil. Intenta de nuevo.',
+}
+
 export default function LoginPage() {
   const router = useRouter()
   const { login, loginWithGoogle } = useApp()
@@ -18,6 +25,12 @@ export default function LoginPage() {
   const [banner,   setBanner]   = useState(null)
 
   useEffect(() => { setBanner(getRandomBanner()) }, [])
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const errParam = params.get('error')
+    if (errParam) setError(ERROR_MESSAGES[errParam] || 'Error al iniciar sesión. Intenta de nuevo.')
+  }, [])
 
   const handleSubmit = async (e) => {
     e.preventDefault()

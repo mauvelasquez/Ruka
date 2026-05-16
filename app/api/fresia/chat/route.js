@@ -4,6 +4,20 @@ import { createClient } from '../../../../lib/supabase/server'
 export const runtime = 'nodejs'
 export const maxDuration = 60
 
+// Rate limit: 20 requests per IP per minute (resets on cold start — acceptable for serverless)
+const ipCounts = new Map()
+
+function isRateLimited(ip) {
+  const now    = Date.now()
+  const WINDOW = 60_000
+  const MAX    = 20
+  const entry  = ipCounts.get(ip) ?? { count: 0, resetAt: now + WINDOW }
+  if (now > entry.resetAt) { entry.count = 1; entry.resetAt = now + WINDOW }
+  else entry.count += 1
+  ipCounts.set(ip, entry)
+  return entry.count > MAX
+}
+
 const FRESIA_TOOLS = [
   {
     name: 'create_hogar',
@@ -126,7 +140,7 @@ async function buildContext(supabase, userId) {
     if (userId) {
       const { data: profile } = await supabase
         .from('profiles')
-        .select('id,name,email')
+        .select('id,name')
         .eq('id', userId)
         .maybeSingle()
 
@@ -139,7 +153,6 @@ async function buildContext(supabase, userId) {
         ctx.usuario = {
           id: profile.id,
           nombre: profile.name,
-          email: profile.email,
           hogares_publicados: userHomes?.length || 0,
           mis_hogares: (userHomes || []).map(h => ({
             id: h.id, titulo: h.title, tipo: h.type, ciudad: h.city, dormitorios: h.bedrooms,
@@ -214,12 +227,20 @@ async function executeTool(name, input, ctx, supabase, userId) {
 export async function POST(req) {
   const encoder = new TextEncoder()
 
+  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
+  if (isRateLimited(ip)) {
+    return new Response(JSON.stringify({ error: 'Demasiadas solicitudes. Espera un momento.' }), {
+      status: 429, headers: { 'Content-Type': 'application/json' },
+    })
+  }
+
   let body
   try { body = await req.json() }
   catch { return new Response('Bad request', { status: 400 }) }
 
   const { messages = [] } = body
   if (!messages.length) return new Response('No messages', { status: 400 })
+  if (messages.length > 50) return new Response('Too many messages', { status: 400 })
 
   const apiKey = process.env.ANTHROPIC_API_KEY
   if (!apiKey) return new Response('API key not configured', { status: 503 })
