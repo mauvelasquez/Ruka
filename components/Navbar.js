@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useApp } from '../lib/store'
 import { Menu, X, Globe, User, LogOut, PlusCircle, LayoutDashboard, ChevronDown, Sparkles } from 'lucide-react'
 import RukkaLogo from './RukkaLogo'
+import { FresiaAvatar } from './fresia/ChatInterface'
 
 export default function Navbar() {
   const router = useRouter()
@@ -50,6 +51,9 @@ export default function Navbar() {
 
           {/* Auth */}
           <div className="hidden md:flex items-center gap-3">
+            <Link href="/FresIA" className="flex items-center gap-1.5 text-sm font-medium text-gray-600 hover:text-forest transition-colors">
+              <FresiaAvatar size={20} /> Conversa con Fresia
+            </Link>
             {user ? (
               <div className="flex items-center gap-3 relative">
                 <Link href="/matches" className="flex items-center gap-1.5 text-sm font-semibold text-terra-dark bg-terra-50 px-4 py-2 rounded-full hover:bg-terra/10 transition-colors border border-terra/20">
@@ -122,6 +126,9 @@ export default function Navbar() {
           </Link>
           <Link href="/anfitriones-airbnb" onClick={() => setMenuOpen(false)} className="flex items-center gap-2 p-3 rounded-xl text-[#ff5a5f] hover:bg-[#ff5a5f]/8 font-bold">
             🏠 Para anfitriones de Airbnb
+          </Link>
+          <Link href="/FresIA" onClick={() => setMenuOpen(false)} className="flex items-center gap-2 p-3 rounded-xl text-gray-700 hover:bg-forest-50 hover:text-forest">
+            <FresiaAvatar size={20} /> Conversa con Fresia
           </Link>
           {user ? (
             <>

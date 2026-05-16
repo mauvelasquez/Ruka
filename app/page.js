@@ -5,9 +5,12 @@ import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import HomeCard from '../components/HomeCard'
 import FresiaSearchModule from '../components/FresiaSearchModule'
+import FeaturedHomeCard from '../components/FeaturedHomeCard'
 import { useApp } from '../lib/store'
 import { CHILE_BANNERS } from '../lib/chile-banners'
 import { DESTINOS_RUKKA } from '../lib/comunas'
+import { HOGARES_FALLBACK } from '../lib/data/hogaresDestacados'
+import { supabase } from '../lib/supabase'
 import { ArrowRight, Sparkles, Shield, ArrowLeftRight, Gift, Zap, Heart } from 'lucide-react'
 
 const STEPS = [
@@ -79,10 +82,30 @@ export default function HomePage() {
   const { homes, users } = useApp()
   const featured = homes.filter(h => h.featured).slice(0, 3)
 
-  const [heroBanner, setHeroBanner] = useState(null)
+  const [heroBanner,    setHeroBanner]    = useState(null)
+  const [exploreHomes,  setExploreHomes]  = useState([])
+  const [usingFallback, setUsingFallback] = useState(false)
 
   useEffect(() => {
     setHeroBanner(CHILE_BANNERS[Math.floor(Math.random() * CHILE_BANNERS.length)])
+  }, [])
+
+  useEffect(() => {
+    supabase
+      .from('homes')
+      .select('*')
+      .eq('activo', true)
+      .order('created_at', { ascending: false })
+      .limit(8)
+      .then(({ data, error }) => {
+        if (!error && data && data.length > 0) {
+          setExploreHomes(data)
+          setUsingFallback(false)
+        } else {
+          setExploreHomes(HOGARES_FALLBACK)
+          setUsingFallback(true)
+        }
+      })
   }, [])
 
   return (
@@ -125,6 +148,29 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* ── EXPLORA HOGARES ──────────────────────────────────────────────────── */}
+      {exploreHomes.length > 0 && (
+        <section className="py-12" style={{ background: '#F8F4EE' }}>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="mb-6">
+              <h2 className="text-xl font-extrabold text-forest">Explora hogares</h2>
+              <p className="text-sm text-gray-500">Intercambia tu hogar y viaja gratis por Chile</p>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {exploreHomes.map(home => (
+                <FeaturedHomeCard key={home.id} home={home} />
+              ))}
+            </div>
+            {usingFallback && (
+              <p className="text-xs text-center mt-5" style={{ color: '#9ca3af' }}>
+                Sé el primero en publicar tu hogar en Rukka{' '}
+                <Link href="/onboarding" className="hover:underline" style={{ color: '#C4622D' }}>→</Link>
+              </p>
+            )}
+          </div>
+        </section>
+      )}
 
       {/* ── BANNER 1 ─────────────────────────────────────────────────────────── */}
       <section className="py-8 bg-white border-y border-stone-200/60">

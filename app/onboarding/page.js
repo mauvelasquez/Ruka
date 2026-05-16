@@ -39,7 +39,7 @@ export default function OnboardingPage() {
     setStep(2)
   }
 
-  const handleChoice = async (addNow) => {
+  const handleChoice = async (addNow, destination = null) => {
     setError('')
     setLoadingChoice(addNow ? 'now' : 'later')
     const res = await completeProfile({
@@ -50,7 +50,7 @@ export default function OnboardingPage() {
     })
     setLoadingChoice(null)
     if (!res.success) { setError(res.error || 'Error al guardar. Intenta de nuevo.'); return }
-    router.push(addNow ? '/dashboard/property/new' : '/dashboard')
+    router.push(destination ?? (addNow ? '/dashboard/property/new' : '/dashboard'))
   }
 
   return (
@@ -171,7 +171,7 @@ export default function OnboardingPage() {
               <div className="text-5xl mb-4">🏠</div>
               <h2 className="text-xl font-black text-gray-900 mb-2">¿Tienes una propiedad para intercambiar?</h2>
               <p className="text-sm text-gray-500 mb-8 max-w-sm mx-auto">
-                Para hacer intercambios necesitas registrar tu hogar. Puedes hacerlo ahora o explorar la plataforma primero.
+                No es obligatorio. Puedes explorar Rukka y agregar tu hogar cuando quieras desde tu dashboard.
               </p>
 
               <div className="grid gap-3">
@@ -182,18 +182,18 @@ export default function OnboardingPage() {
                   className="w-full bg-forest text-white py-4 rounded-2xl font-extrabold text-sm hover:bg-forest-dark disabled:opacity-60 transition flex items-center justify-center gap-2">
                   {loadingChoice === 'now'
                     ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    : <><Plus className="w-5 h-5" /> Agregar mi propiedad de Airbnb ahora</>
+                    : <><Plus className="w-5 h-5" /> Sí, quiero agregar mi hogar</>
                   }
                 </button>
 
                 <button
                   type="button"
-                  onClick={() => handleChoice(false)}
+                  onClick={() => handleChoice(false, '/homes')}
                   disabled={loadingChoice !== null}
-                  className="w-full bg-white text-gray-700 border-2 border-gray-200 py-4 rounded-2xl font-bold text-sm hover:border-gray-300 hover:text-gray-900 disabled:opacity-60 transition flex items-center justify-center gap-2">
+                  className="w-full bg-white text-forest border-2 border-forest py-4 rounded-2xl font-bold text-sm hover:bg-forest/5 disabled:opacity-60 transition flex items-center justify-center gap-2">
                   {loadingChoice === 'later'
-                    ? <div className="w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
-                    : 'Cargar mi hogar después →'
+                    ? <div className="w-5 h-5 border-2 border-forest border-t-transparent rounded-full animate-spin" />
+                    : 'Ahora no, quiero explorar'
                   }
                 </button>
               </div>
