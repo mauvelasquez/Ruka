@@ -24,16 +24,15 @@ export async function middleware(req) {
     }
   )
 
-  // getSession() lee de cookies sin llamada de red — confiable aunque Supabase sea lento.
-  // getUser() (que valida el JWT con red) se reserva para server actions y route handlers
-  // donde la seguridad es crítica. En middleware, la latencia de red causaba que usuarios
-  // autenticados fueran redirigidos a /login cuando Supabase tardaba en responder.
+  // getUser() valida el JWT contra Supabase (revalida el token expirado).
+  // Si falla por red, el catch devuelve response sin redirigir — mismo comportamiento
+  // seguro que antes pero sin el riesgo de sesiones falsas por getSession() local.
   let user = null
   try {
-    const { data } = await supabase.auth.getSession()
-    user = data?.session?.user ?? null
+    const { data: { user: authUser } } = await supabase.auth.getUser()
+    user = authUser ?? null
   } catch (err) {
-    console.error('[middleware] getSession falló:', err?.message)
+    console.error('[middleware] getUser falló:', err?.message)
     return response // dejar pasar sin redirigir ante error de red
   }
   const { pathname } = req.nextUrl
@@ -43,12 +42,14 @@ export async function middleware(req) {
   }
 
   if (AUTH_ONLY.some(p => pathname.startsWith(p)) && user) {
-    return NextResponse.redirect(new URL('/dashboard', req.url))
+    return NextResponse.redirect(new URL('/', req.url))
   }
 
   return response
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*', '/matches/:path*', '/onboarding/:path*', '/auth/:path*'],
+  // /auth/callback se excluye deliberadamente: es el handler OAuth y no necesita
+  // protección de middleware. Incluirlo podría interferir con el flujo de sesión.
+  matcher: ['/dashboard/:path*', '/matches/:path*', '/onboarding/:path*', '/auth/login', '/auth/register'],
 }

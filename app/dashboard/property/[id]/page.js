@@ -347,7 +347,7 @@ export default function PropertyPage() {
       setSuccess(true)
       setTimeout(() => router.push('/dashboard?tab=homes'), 1200)
     } catch (err) {
-      console.log('Error guardando propiedad:', err)
+      console.error('Error guardando propiedad:', err)
       setError('Error al guardar. Intenta de nuevo.')
     } finally {
       setSaving(false)

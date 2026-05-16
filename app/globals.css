@@ -62,3 +62,22 @@ body { font-family: 'Inter', system-ui, sans-serif; background-color: #F8F4EE; }
 .landscape-gradient {
   background: linear-gradient(135deg, #1A2E1E 0%, #2A5C45 40%, #5BA3C9 80%, #E8D5B0 100%);
 }
+
+/* Fresia widget popup slide-up animation */
+@keyframes fresia-slide-up {
+  from { opacity: 0; transform: scale(0.95) translateY(12px); }
+  to   { opacity: 1; transform: scale(1)    translateY(0); }
+}
+.fresia-popup {
+  animation: fresia-slide-up 0.2s ease-out forwards;
+  transform-origin: bottom right;
+}
+
+/* Search dropdown fade-in */
+@keyframes dropdown-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.rukka-dropdown {
+  animation: dropdown-in 180ms ease-out forwards;
+}

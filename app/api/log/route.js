@@ -36,7 +36,7 @@ export async function POST(request) {
 
     let userId = null
     try {
-      const supabase = createClient()
+      const supabase = await createClient()
       const { data: { user } } = await supabase.auth.getUser()
       userId = user?.id ?? null
     } catch {}

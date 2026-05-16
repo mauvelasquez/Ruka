@@ -2,6 +2,44 @@
 import { useState, useRef, useCallback } from 'react'
 import { X, Upload, Sparkles, CheckCircle, AlertCircle, Loader2, Camera, ImagePlus, ChevronDown, ChevronUp, RotateCcw } from 'lucide-react'
 
+const MAX_FILE_MB = 2
+const MAX_FILE_BYTES = MAX_FILE_MB * 1024 * 1024
+const TARGET_OUTPUT_BYTES = 350_000  // ~350KB per image → 5 imgs ≈ 1.75MB payload
+
+// Compress image using Canvas API — targets ~350KB per image for Vercel 4.5MB limit
+async function compressImage(file, maxPx = 1024, quality = 0.68) {
+  if (file.size < 150_000) return file
+  const compress = (canvas, q) => new Promise(res =>
+    canvas.toBlob(
+      blob => res(new File([blob], file.name.replace(/\.[^.]+$/, '.jpg'), { type: 'image/jpeg' })),
+      'image/jpeg', q
+    )
+  )
+  return new Promise((resolve, reject) => {
+    const img = new Image()
+    const url = URL.createObjectURL(file)
+    img.onload = async () => {
+      URL.revokeObjectURL(url)
+      const canvas = document.createElement('canvas')
+      let { width, height } = img
+      if (width > maxPx || height > maxPx) {
+        if (width >= height) { height = Math.round(height * maxPx / width); width = maxPx }
+        else                  { width = Math.round(width * maxPx / height); height = maxPx }
+      }
+      canvas.width = width; canvas.height = height
+      canvas.getContext('2d').drawImage(img, 0, 0, width, height)
+      let result = await compress(canvas, quality)
+      // If still too large, apply a second pass at lower quality
+      if (result.size > TARGET_OUTPUT_BYTES) {
+        result = await compress(canvas, 0.50)
+      }
+      resolve(result)
+    }
+    img.onerror = reject
+    img.src = url
+  })
+}
+
 const FIELD_LABELS = {
   title:       'Nombre de la propiedad',
   description: 'Descripción',
@@ -23,7 +61,7 @@ const FIELD_LABELS = {
 // ─────────────────────────────────────────────────────────
 
 export default function AirbnbImportModal({ onClose, onImport }) {
-  const [step,      setStep]      = useState('idle')       // idle | uploading | extracting | review | done
+  const [step,      setStep]      = useState('idle')       // idle | uploading | compressing | extracting | review | done
   const [files,     setFiles]     = useState([])           // File[]
   const [previews,  setPreviews]  = useState([])           // dataURL[]
   const [extracted, setExtracted] = useState(null)         // parsed object
@@ -41,6 +79,11 @@ export default function AirbnbImportModal({ onClose, onImport }) {
   }, [])
 
   const addFiles = newFiles => {
+    const oversized = newFiles.filter(f => f.size > MAX_FILE_BYTES)
+    if (oversized.length) {
+      setError(`${oversized.map(f => f.name).join(', ')}: supera el límite de ${MAX_FILE_MB} MB por imagen.`)
+      return
+    }
     const merged = [...files, ...newFiles].slice(0, 5) // max 5 screenshots
     setFiles(merged)
     merged.forEach(f => {
@@ -66,14 +109,31 @@ export default function AirbnbImportModal({ onClose, onImport }) {
   // ── call API ───────────────────────────────────────────
   const extract = async () => {
     if (!files.length) return
-    setStep('extracting')
     setError('')
+
+    // Compress all images client-side before sending (prevents 413)
+    setStep('compressing')
+    let compressed
+    try {
+      compressed = await Promise.all(files.map(f => compressImage(f)))
+    } catch {
+      setError('Error al procesar las imágenes. Intenta de nuevo.')
+      setStep('uploading')
+      return
+    }
+
+    setStep('extracting')
     try {
       const formData = new FormData()
-      files.forEach((f, i) => formData.append(`image_${i}`, f))
+      compressed.forEach((f, i) => formData.append(`image_${i}`, f))
 
       const res = await fetch('/api/import-airbnb', { method: 'POST', body: formData })
-      if (!res.ok) throw new Error((await res.json()).error || 'Error del servidor')
+      if (!res.ok) {
+        if (res.status === 413) throw new Error('Las imágenes son demasiado grandes. Intenta con menos capturas o resolución menor.')
+        let msg = 'Error del servidor'
+        try { msg = (await res.json()).error || msg } catch {}
+        throw new Error(msg)
+      }
       const data = await res.json()
       setExtracted(data)
       setEdited(data)
@@ -120,7 +180,7 @@ export default function AirbnbImportModal({ onClose, onImport }) {
 
         <div className="p-6 space-y-5">
 
-          {/* ── STEP: idle or uploading ─────────────────────── */}
+          {/* ── STEP: idle or uploading (or back from error) ── */}
           {(step === 'idle' || step === 'uploading') && (<>
 
             {/* Drop zone */}
@@ -135,7 +195,7 @@ export default function AirbnbImportModal({ onClose, onImport }) {
                 <Camera className="w-7 h-7 text-[#FF5A5F]" />
               </div>
               <p className="font-bold text-gray-800 mb-1">Arrastra tus pantallazos aquí</p>
-              <p className="text-sm text-gray-400 mb-4">o haz clic para seleccionar · JPG, PNG, WEBP · máx. 5 imágenes</p>
+              <p className="text-sm text-gray-400 mb-4">o haz clic para seleccionar · JPG, PNG, WEBP · máx. 5 imágenes · 2 MB c/u</p>
               <span className="inline-flex items-center gap-1.5 bg-[#FF5A5F] text-white text-sm font-semibold px-4 py-2 rounded-xl hover:bg-[#e04e53] transition-colors">
                 <ImagePlus className="w-4 h-4" /> Seleccionar imágenes
               </span>
@@ -199,6 +259,17 @@ export default function AirbnbImportModal({ onClose, onImport }) {
               Extraer datos con IA ({files.length} imagen{files.length !== 1 ? 'es' : ''})
             </button>
           </>)}
+
+          {/* ── STEP: compressing ───────────────────────────── */}
+          {step === 'compressing' && (
+            <div className="py-16 text-center">
+              <div className="w-16 h-16 rounded-full bg-amber-50 flex items-center justify-center mx-auto mb-4">
+                <Loader2 className="w-8 h-8 text-amber-500 animate-spin" />
+              </div>
+              <p className="font-bold text-gray-900 mb-1">Optimizando imágenes…</p>
+              <p className="text-sm text-gray-400">Reduciendo tamaño para el envío</p>
+            </div>
+          )}
 
           {/* ── STEP: extracting ────────────────────────────── */}
           {step === 'extracting' && (
