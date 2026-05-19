@@ -4,6 +4,7 @@ import { X, ExternalLink } from 'lucide-react'
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 import ChatInterface, { FresiaAvatar } from './ChatInterface'
+import { analytics } from '../../lib/analytics'
 
 export default function FresiaWidget() {
   const pathname   = usePathname()
@@ -71,7 +72,11 @@ export default function FresiaWidget() {
 
       {/* Toggle button */}
       <button
-        onClick={() => setOpen(v => !v)}
+        onClick={() => setOpen(v => {
+          if (!v) analytics.fresiaWidgetOpen()
+          else analytics.fresiaWidgetClose()
+          return !v
+        })}
         aria-label={open ? 'Cerrar Fresia' : 'Abrir Fresia, asistente IA'}
         className={`pointer-events-auto w-14 h-14 bg-forest text-white rounded-full shadow-xl
           flex items-center justify-center

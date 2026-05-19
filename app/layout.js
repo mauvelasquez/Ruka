@@ -1,6 +1,7 @@
 import './globals.css'
 import Providers from './providers'
 import FresiaWidget from '../components/fresia/FresiaWidget'
+import GoogleAnalytics from '../components/GoogleAnalytics'
 
 export const dynamic = 'force-dynamic'
 
@@ -39,6 +40,7 @@ export default function RootLayout({ children }) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </head>
       <body suppressHydrationWarning>
+        <GoogleAnalytics />
         <Providers>
           {children}
           <FresiaWidget />

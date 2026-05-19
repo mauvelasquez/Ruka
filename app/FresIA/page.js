@@ -1,10 +1,13 @@
 'use client'
+import { useEffect } from 'react'
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
 import ChatInterface from '../../components/fresia/ChatInterface'
 import { FresiaAvatar } from '../../components/fresia/ChatInterface'
+import { analytics } from '../../lib/analytics'
 
 export default function FresIAPage() {
+  useEffect(() => { analytics.fresiaPageView() }, [])
   return (
     <div className="flex flex-col h-screen bg-[#F8F4EE]">
       {/* Page header */}

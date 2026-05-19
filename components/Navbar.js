@@ -6,6 +6,7 @@ import { useApp } from '../lib/store'
 import { Menu, X, Globe, User, LogOut, PlusCircle, LayoutDashboard, ChevronDown, Sparkles } from 'lucide-react'
 import RukkaLogo from './RukkaLogo'
 import { FresiaAvatar } from './fresia/ChatInterface'
+import { analytics } from '../lib/analytics'
 
 export default function Navbar() {
   const router = useRouter()
@@ -33,13 +34,13 @@ export default function Navbar() {
 
           {/* Desktop links */}
           <div className="hidden md:flex items-center gap-6">
-            <Link href="/homes" className="text-gray-600 hover:text-forest font-medium text-sm transition-colors flex items-center gap-1.5">
+            <Link href="/homes" onClick={() => analytics.navClick('explorar_hogares')} className="text-gray-600 hover:text-forest font-medium text-sm transition-colors flex items-center gap-1.5">
               <Globe className="w-4 h-4" /> Explorar hogares
             </Link>
-            <Link href="/como-funciona" className="text-gray-600 hover:text-forest font-medium text-sm transition-colors">
+            <Link href="/como-funciona" onClick={() => analytics.navClick('como_funciona')} className="text-gray-600 hover:text-forest font-medium text-sm transition-colors">
               ¿Cómo funciona?
             </Link>
-            <Link href="/anfitriones-airbnb" className="flex items-center gap-1.5 text-sm font-bold text-[#ff5a5f] hover:text-[#e0484d] transition-colors">
+            <Link href="/anfitriones-airbnb" onClick={() => analytics.navClick('anfitriones_airbnb')} className="flex items-center gap-1.5 text-sm font-bold text-[#ff5a5f] hover:text-[#e0484d] transition-colors">
               <span className="text-base leading-none">🏠</span> Para anfitriones Airbnb
             </Link>
             {user && (
@@ -51,7 +52,7 @@ export default function Navbar() {
 
           {/* Auth */}
           <div className="hidden md:flex items-center gap-3">
-            <Link href="/FresIA" className="flex items-center gap-1.5 text-sm font-medium text-gray-600 hover:text-forest transition-colors">
+            <Link href="/FresIA" onClick={() => analytics.navClick('fresia')} className="flex items-center gap-1.5 text-sm font-medium text-gray-600 hover:text-forest transition-colors">
               <FresiaAvatar size={20} /> Conversa con Fresia
             </Link>
             {user ? (

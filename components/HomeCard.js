@@ -1,6 +1,7 @@
 'use client'
 import Link from 'next/link'
 import { Star, MapPin, Bed, Users, Calendar, ArrowLeftRight, CheckCircle } from 'lucide-react'
+import { analytics } from '../lib/analytics'
 
 export default function HomeCard({ home, user, compact = false }) {
   if (!home) return null
@@ -18,7 +19,7 @@ export default function HomeCard({ home, user, compact = false }) {
   const nextAvail = home.availabilityPeriods?.find(p => p.end >= new Date().toISOString().split('T')[0])
 
   return (
-    <Link href={`/homes/${home.id}`} className="group block">
+    <Link href={`/homes/${home.id}`} className="group block" onClick={() => analytics.homeCardClick(home)}>
       <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-stone-200/50 card-lift">
         {/* Image */}
         <div className="relative h-48 overflow-hidden bg-gray-100">

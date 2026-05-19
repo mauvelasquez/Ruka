@@ -3,6 +3,7 @@ import { useReducer, useRef, useEffect, useCallback } from 'react'
 import { Send, Paperclip, X, Home, Search, MessageCircle, User } from 'lucide-react'
 import Link from 'next/link'
 import { useApp } from '../../lib/store'
+import { analytics } from '../../lib/analytics'
 
 // ── Fresia SVG avatar ──────────────────────────────────────────────────────────
 export function FresiaAvatar({ size = 32, className = '' }) {
@@ -224,6 +225,7 @@ export default function ChatInterface({ compact = false, showHeader = false }) {
     const apiMessages = toApiMessages([...state.messages, userMsg])
 
     dispatch({ type: 'ADD_USER_MSG', msg: userMsg })
+    analytics.fresiaMessageSent(compact ? 'widget' : 'page')
     dispatch({ type: 'ADD_ASSISTANT_MSG', msg: {
       id:        `a_${Date.now() + 1}`,
       role:      'assistant',
@@ -306,7 +308,7 @@ export default function ChatInterface({ compact = false, showHeader = false }) {
         {QUICK_ACTIONS.map(({ icon, label, msg }) => (
           <button
             key={msg}
-            onClick={() => sendMessage(msg)}
+            onClick={() => { analytics.fresiaQuickAction(label); sendMessage(msg) }}
             className={`flex items-center gap-2 bg-white border border-gray-200 hover:border-forest hover:text-forest rounded-xl px-4 py-2.5 text-sm font-medium transition-colors ${compact ? 'w-full justify-start' : ''}`}
           >
             <span>{icon}</span> {label}

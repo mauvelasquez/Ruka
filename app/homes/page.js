@@ -7,6 +7,7 @@ import HomeCard from '../../components/HomeCard'
 import { SlidersHorizontal, X, ChevronDown, MapPin, ChevronLeft, ChevronRight } from 'lucide-react'
 import { COMUNAS_RUKKA } from '../../lib/comunas'
 import { getRandomBanner } from '../../lib/chile-banners'
+import { analytics } from '../../lib/analytics'
 
 const TYPES = ['Todos', 'Casa', 'Departamento', 'Cabaña', 'Estudio', 'Loft', 'Villa', 'Habitación']
 const LIMIT = 24
@@ -75,6 +76,7 @@ function HomesContent() {
     const timer = setTimeout(() => {
       setPage(1)
       fetchHomes(1)
+      if (search) analytics.homesSearch(search)
     }, 300)
     return () => clearTimeout(timer)
   }, [search, type, region, city, minBeds, sort])
@@ -110,7 +112,7 @@ function HomesContent() {
             <div className="inline-flex items-center gap-2 bg-white/20 text-white rounded-full px-3 py-1 text-xs font-bold mb-3">
               {banner.emoji} {banner.tagline}
             </div>
-            <h1 className="text-3xl font-extrabold text-white mb-1">Explorar hogares en Chile</h1>
+            <h1 className="text-3xl font-extrabold text-white mb-1">Explorar hogares en todo Chile</h1>
             <p className="text-white/70 mb-6 text-sm">{banner.description}</p>
             <div className="flex items-center gap-3 bg-white rounded-xl p-3 max-w-xl shadow-lg">
               <MapPin className="w-5 h-5 text-terra flex-shrink-0 ml-1" />
@@ -128,7 +130,7 @@ function HomesContent() {
         <div className="flex items-center gap-3 mb-5 flex-wrap">
           <div className="flex gap-2 flex-wrap">
             {TYPES.map(t => (
-              <button key={t} onClick={() => setType(t)}
+              <button key={t} onClick={() => { setType(t); if (t !== 'Todos') analytics.homesFilterType(t) }}
                 className={`px-4 py-2 rounded-full text-sm font-semibold border transition-all ${
                   type === t ? 'bg-forest text-white border-forest' : 'bg-white text-gray-600 border-gray-200 hover:border-forest/50 hover:text-forest'
                 }`}>
@@ -169,7 +171,7 @@ function HomesContent() {
               <div>
                 <label className="block text-xs font-bold text-gray-700 mb-2 uppercase tracking-wide">Localidad</label>
                 <div className="relative">
-                  <select value={city} onChange={e => setCity(e.target.value)}
+                  <select value={city} onChange={e => { setCity(e.target.value); if (e.target.value !== 'Todas') analytics.homesFilterCity(e.target.value) }}
                     className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-forest bg-gray-50 appearance-none">
                     <option value="Todas">Todas las localidades</option>
                     {COMUNAS_RUKKA.map(c => <option key={c} value={c}>{c}</option>)}
@@ -183,7 +185,7 @@ function HomesContent() {
                 <label className="block text-xs font-bold text-gray-700 mb-2 uppercase tracking-wide">Habitaciones mínimas</label>
                 <div className="flex gap-2">
                   {[0,1,2,3].map(n => (
-                    <button key={n} onClick={() => setMinBeds(n)}
+                    <button key={n} onClick={() => { setMinBeds(n); if (n > 0) analytics.homesFilterBeds(n) }}
                       className={`w-11 h-10 rounded-xl border text-sm font-bold transition-colors ${
                         minBeds === n ? 'bg-forest text-white border-forest' : 'border-gray-200 text-gray-600 hover:border-forest/50'
                       }`}>
