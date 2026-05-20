@@ -4,14 +4,22 @@ import { Search, ChevronLeft, ChevronRight, Minus, Plus, Navigation } from 'luci
 import { useRouter } from 'next/navigation'
 
 const CITIES = [
-  { icon: '🌺', name: 'Zapallar',      desc: 'Exclusividad costera' },
-  { icon: '🐧', name: 'Cachagua',      desc: 'Playa secreta' },
-  { icon: '⚓', name: 'Papudo',        desc: 'Caleta pintoresca' },
-  { icon: '🏖️', name: 'Santo Domingo', desc: 'Arena blanca y dunas' },
-  { icon: '🏄', name: 'Pichilemu',     desc: 'Capital del surf' },
-  { icon: '🤙', name: 'Puertecillo',   desc: 'Olas de clase mundial' },
-  { icon: '🌊', name: 'Navidad',       desc: 'Costa salvaje' },
-  { icon: '🪁', name: 'Matanzas',      desc: 'Paraíso del kitesurf' },
+  { icon: '🌺', name: 'Zapallar',            desc: 'Exclusividad costera' },
+  { icon: '🐧', name: 'Cachagua',            desc: 'Playa secreta' },
+  { icon: '⚓', name: 'Papudo',              desc: 'Caleta pintoresca' },
+  { icon: '🏖️', name: 'Santo Domingo',       desc: 'Arena blanca y dunas' },
+  { icon: '🏄', name: 'Pichilemu',           desc: 'Capital del surf' },
+  { icon: '🤙', name: 'Puertecillo',         desc: 'Olas de clase mundial' },
+  { icon: '🌊', name: 'Navidad',             desc: 'Costa salvaje' },
+  { icon: '🪁', name: 'Matanzas',            desc: 'Paraíso del kitesurf' },
+  { icon: '🌋', name: 'Pucón',              desc: 'Volcán y aventura' },
+  { icon: '🌹', name: 'Puerto Varas',        desc: 'Lago y volcán Osorno' },
+  { icon: '🔭', name: 'La Serena',           desc: 'Playas y astronomía' },
+  { icon: '🌵', name: 'San Pedro de Atacama', desc: 'Desierto y estrellas' },
+  { icon: '🏔️', name: 'Torres del Paine',    desc: 'Trekking y glaciares' },
+  { icon: '🌸', name: 'Viña del Mar',        desc: 'Playa y ciudad jardín' },
+  { icon: '🐋', name: 'Puerto Montt',        desc: 'Patagonia y fiordos' },
+  { icon: '🍷', name: 'Santa Cruz',          desc: 'Vino y cultura rural' },
 ]
 
 const FOREST = '#1B4332'

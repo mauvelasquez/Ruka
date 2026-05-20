@@ -35,8 +35,6 @@ export default function RootLayout({ children }) {
   return (
     <html lang="es">
       <head>
-        <link rel="icon" href="/rukka-logo.png" type="image/png" sizes="32x32" />
-        <link rel="apple-touch-icon" href="/rukka-logo.png" sizes="180x180" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </head>
       <body suppressHydrationWarning>

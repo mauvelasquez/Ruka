@@ -1,49 +1,125 @@
 'use client'
-import { Suspense } from 'react'
+import { Suspense, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
-import Link from 'next/link'
 import Navbar from '../../components/Navbar'
-import { Shield, Clock } from 'lucide-react'
+import ConsentStep  from './components/ConsentStep'
+import IdCaptureStep from './components/IdCaptureStep'
+import FaceMatchStep from './components/FaceMatchStep'
+import ResultStep   from './components/ResultStep'
+import { Shield, FileText, Camera, CheckCircle } from 'lucide-react'
 
-const ACTION_CONTEXT = {
-  publish: 'Querías publicar tu hogar',
-  contact: 'Querías contactar a un usuario',
-  match:   'Querías buscar matches',
+const STEPS = [
+  { id: 1, label: 'Consentimiento', icon: Shield },
+  { id: 2, label: 'Carnet',         icon: FileText },
+  { id: 3, label: 'Selfie',         icon: Camera },
+  { id: 4, label: 'Resultado',      icon: CheckCircle },
+]
+
+function Stepper({ current }) {
+  return (
+    <div className="flex items-center justify-between w-full max-w-sm mx-auto mb-8">
+      {STEPS.map((step, i) => {
+        const Icon      = step.icon
+        const done      = current > step.id
+        const active    = current === step.id
+        const pending   = current < step.id
+        const isLast    = i === STEPS.length - 1
+        return (
+          <div key={step.id} className="flex items-center flex-1">
+            <div className="flex flex-col items-center gap-1">
+              <div className={`w-9 h-9 rounded-full flex items-center justify-center transition-colors ${
+                done    ? 'bg-forest text-white' :
+                active  ? 'bg-terra text-white' :
+                          'bg-sand/60 text-gray-400'
+              }`}>
+                {done
+                  ? <CheckCircle className="w-4 h-4" />
+                  : <Icon className="w-4 h-4" />
+                }
+              </div>
+              <span className={`text-xs font-medium hidden sm:block ${
+                active ? 'text-terra' : done ? 'text-forest' : 'text-gray-400'
+              }`}>{step.label}</span>
+            </div>
+            {!isLast && (
+              <div className={`flex-1 h-0.5 mx-1 rounded-full transition-colors ${
+                current > step.id ? 'bg-forest' : 'bg-gray-200'
+              }`} />
+            )}
+          </div>
+        )
+      })}
+    </div>
+  )
 }
 
 function VerificarContent() {
   const searchParams = useSearchParams()
   const action = searchParams.get('action')
 
+  const [step, setStep]             = useState(1)
+  const [ocrResult, setOcrResult]   = useState(null)   // { extracted_data, idImageBase64 }
+  const [faceResult, setFaceResult] = useState(null)   // { match, distance, confidence }
+  const [attemptsLeft, setAttemptsLeft] = useState(3)
+  const [idImageBase64, setIdImageBase64] = useState(null) // raw base64 of carnet image for face matching
+
+  const handleConsent = () => setStep(2)
+
+  const handleOcrSuccess = (data) => {
+    // data comes from IdCaptureStep which also passes back the compressed base64
+    setOcrResult(data)
+    setIdImageBase64(data.idImageBase64 ?? null)
+    setStep(3)
+  }
+
+  const handleFaceSuccess = (result) => {
+    setFaceResult(result)
+    setStep(4)
+  }
+
+  const handleRetry = () => {
+    setAttemptsLeft(prev => prev - 1)
+    setFaceResult(null)
+    setStep(3)
+  }
+
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-6" style={{ background: '#F8F4EE' }}>
-      <div className="max-w-md w-full bg-white rounded-2xl shadow-sm border border-gray-100 p-8 text-center">
-        <div className="w-16 h-16 bg-forest/10 rounded-2xl flex items-center justify-center mx-auto mb-5">
-          <Shield className="w-8 h-8 text-forest" />
-        </div>
+    <div className="min-h-screen flex flex-col" style={{ background: '#F8F4EE' }}>
+      <div className="flex-1 flex flex-col items-center justify-center p-4 py-10">
+        <div className="w-full max-w-md">
+          <Stepper current={step} />
 
-        <h1 className="text-2xl font-black text-gray-900 mb-2">Verificación de identidad</h1>
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8">
+            {step === 1 && <ConsentStep onAccept={handleConsent} />}
 
-        {action && ACTION_CONTEXT[action] && (
-          <p className="text-xs font-bold text-terra uppercase tracking-wide mb-4">
-            {ACTION_CONTEXT[action]}
+            {step === 2 && (
+              <IdCaptureStep
+                onSuccess={handleOcrSuccess}
+              />
+            )}
+
+            {step === 3 && ocrResult && (
+              <FaceMatchStep
+                ocrResult={{ ...ocrResult, idImageBase64 }}
+                onSuccess={handleFaceSuccess}
+              />
+            )}
+
+            {step === 4 && ocrResult && faceResult && (
+              <ResultStep
+                ocrResult={ocrResult}
+                faceResult={faceResult}
+                action={action}
+                attemptsLeft={attemptsLeft}
+                onRetry={handleRetry}
+              />
+            )}
+          </div>
+
+          <p className="text-center text-xs text-gray-400 mt-4">
+            Protegido bajo Ley 19.628 · Datos biométricos procesados solo en tu dispositivo
           </p>
-        )}
-
-        <div className="flex items-center justify-center gap-2 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 mb-6">
-          <Clock className="w-4 h-4 text-amber-500 flex-shrink-0" />
-          <p className="text-sm text-amber-700 font-medium">Próximamente — Estamos construyendo este proceso</p>
         </div>
-
-        <p className="text-sm text-gray-400 mb-6">
-          Pronto podrás verificar tu identidad para acceder a todas las funciones de Rukka.
-          Te avisaremos cuando esté disponible.
-        </p>
-
-        <Link href="/dashboard"
-          className="inline-flex items-center gap-2 bg-forest text-white px-6 py-3 rounded-xl font-bold text-sm hover:bg-forest-dark transition-colors">
-          Volver al dashboard
-        </Link>
       </div>
     </div>
   )

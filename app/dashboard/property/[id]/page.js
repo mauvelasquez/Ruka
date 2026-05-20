@@ -424,6 +424,7 @@ export default function PropertyPage() {
               >
                 <Camera className="w-4 h-4" /> Importar con pantallazos
               </button>
+              <p className="text-xs text-gray-400 mt-2">Máx. 2 MB por imagen · hasta 5 imágenes</p>
             </div>
             {showAirbnbModal && (
               <ImportFromAirbnb
