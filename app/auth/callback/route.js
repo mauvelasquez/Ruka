@@ -64,15 +64,15 @@ export async function GET(request) {
     try {
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
-        .select('status')
+        .select('id')
         .eq('id', user.id)
         .maybeSingle()
 
       if (profileError) {
-        // DB error → go to dashboard optimistically; store will redirect if needed
+        // DB error → go to dashboard optimistically
         console.error('[auth/callback] profile fetch error:', profileError.message)
       } else if (!profile) {
-        // First login → create initial profile and send to onboarding
+        // First login → create basic profile, go straight to dashboard (no onboarding required)
         const { error: upsertErr } = await supabase.from('profiles').upsert(
           {
             id:     user.id,
@@ -84,15 +84,10 @@ export async function GET(request) {
           { ignoreDuplicates: true }
         )
         if (upsertErr) {
-          // Log but continue to onboarding — the page will retry upsert
           console.error('[auth/callback] profile upsert failed:', upsertErr.message)
         }
-        destination = '/onboarding'
-      } else if (profile.status && profile.status !== 'confirmed') {
-        // Profile exists but onboarding is incomplete
-        destination = '/onboarding'
       }
-      // profile.status === 'confirmed' → keep destination = '/dashboard'
+      // Always land on dashboard — onboarding is no longer mandatory
     } catch (err) {
       // Unexpected error → proceed optimistically; store handles edge cases
       console.error('[auth/callback] profile check threw:', err?.message)

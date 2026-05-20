@@ -24,7 +24,7 @@ export default function RegisterPage() {
     setLoading(false)
     if (!res.success) { setError(res.error || 'Error al crear la cuenta'); return }
     // Si Supabase no requiere confirmación de email, la sesión ya existe → ir directo al onboarding
-    router.push(res.confirmRequired ? '/auth/confirm' : '/onboarding')
+    router.push(res.confirmRequired ? '/auth/confirm' : '/dashboard')
   }
 
   return (

@@ -10,6 +10,8 @@ import {
   CheckCircle, XCircle, Clock, Trash2, Eye, Star, Sparkles, AlertCircle, ScrollText, MessageSquare
 } from 'lucide-react'
 import { COMUNAS_RUKKA } from '../../lib/comunas'
+import { useVerificationGate } from '../../hooks/useVerificationGate'
+import VerificationRequiredModal from '../../components/VerificationRequiredModal'
 
 const TAB = { WISHES: 'wishes', HOMES: 'homes', RECEIVED: 'received', SENT: 'sent' }
 
@@ -32,6 +34,7 @@ function StatusBadge({ status }) {
 export default function DashboardPage() {
   const router = useRouter()
   const { currentUser, ready, homes, users, wishes, requests, addWish, removeWish, updateRequest, removeHome, syncSession } = useApp()
+  const { gate, modalOpen, modalAction, closeModal } = useVerificationGate()
   const [tab, setTab] = useState(TAB.WISHES)
   const [wishForm, setWishForm] = useState({ toCity: '', startDate: '', endDate: '', guests: 2 })
   const [showWishForm, setShowWishForm] = useState(false)
@@ -51,8 +54,6 @@ export default function DashboardPage() {
   useEffect(() => {
     if (!ready) return
     if (!currentUser) router.push('/auth/login')
-    // status===null significa que el perfil aún está cargando — no redirigir todavía
-    else if (currentUser.status && currentUser.status !== 'confirmed') router.push('/onboarding')
   }, [currentUser, ready])
 
   // Mostrar loading mientras el store inicializa
@@ -163,10 +164,10 @@ export default function DashboardPage() {
               <p className="font-black text-base mb-1">🏠 Aún no tienes un hogar registrado</p>
               <p className="text-white/80 text-sm">Publica tu hogar para poder intercambiar y encontrar matches.</p>
             </div>
-            <Link href="/dashboard/property/new"
+            <button onClick={() => gate('publish', () => router.push('/dashboard/property/new'))}
               className="flex-shrink-0 bg-white text-forest-dark font-black px-5 py-2.5 rounded-xl text-sm hover:bg-sand transition-colors flex items-center gap-2 whitespace-nowrap">
               <Plus className="w-4 h-4" /> Publicar mi hogar
-            </Link>
+            </button>
           </div>
         )}
 
@@ -218,10 +219,10 @@ export default function DashboardPage() {
                 <div>
                   <p className="font-bold text-amber-900 text-sm mb-1">Necesitas agregar tu propiedad primero</p>
                   <p className="text-amber-700 text-xs mb-2">Para ingresar un destino de viaje, primero debes publicar tu hogar en Rukka.</p>
-                  <Link href="/dashboard/property/new"
+                  <button onClick={() => gate('publish', () => router.push('/dashboard/property/new'))}
                     className="inline-flex items-center gap-1.5 bg-forest text-white text-xs font-bold px-3 py-1.5 rounded-lg hover:bg-forest-dark transition-colors">
                     <Plus className="w-3.5 h-3.5" /> Agregar mi propiedad
-                  </Link>
+                  </button>
                 </div>
               </div>
             )}
@@ -326,10 +327,10 @@ export default function DashboardPage() {
           <div>
             <div className="flex justify-between items-center mb-4">
               <h2 className="font-black text-gray-800 text-lg">Mis hogares registrados</h2>
-              <Link href="/dashboard/property/new"
+              <button onClick={() => gate('publish', () => router.push('/dashboard/property/new'))}
                 className="flex items-center gap-1.5 bg-forest text-white px-4 py-2 rounded-xl font-bold text-sm hover:bg-forest-dark transition-colors">
                 <Plus className="w-4 h-4" /> Añadir hogar
-              </Link>
+              </button>
             </div>
             {myHomes.length === 0 ? (
               <div className="bg-white rounded-2xl p-10 text-center border border-dashed border-gray-200">
@@ -337,10 +338,10 @@ export default function DashboardPage() {
                 <p className="text-gray-900 font-black text-base mb-1">Aún no tienes hogares registrados</p>
                 <p className="text-gray-400 text-sm mb-2">¿Tienes una propiedad en Airbnb? Impórtala en un clic e intercámbiala con otros usuarios de Rukka.</p>
                 <p className="text-gray-400 text-xs mb-6">O publica tu hogar manualmente en menos de 5 minutos.</p>
-                <Link href="/dashboard/property/new"
+                <button onClick={() => gate('publish', () => router.push('/dashboard/property/new'))}
                   className="inline-flex items-center gap-2 bg-forest text-white px-6 py-3 rounded-xl font-bold text-sm hover:bg-forest-dark transition-colors">
                   <Plus className="w-4 h-4" /> Publicar mi primer hogar
-                </Link>
+                </button>
               </div>
             ) : (
               <div className="grid gap-4">
@@ -501,6 +502,9 @@ export default function DashboardPage() {
           </div>
         )}
       </div>
-    </div>
+    {modalOpen && (
+      <VerificationRequiredModal action={modalAction} onClose={closeModal} />
+    )}
+  </div>
   )
 }

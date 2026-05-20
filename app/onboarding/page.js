@@ -16,7 +16,7 @@ export default function OnboardingPage() {
   const { completeProfile, user, ready } = useApp()
 
   useEffect(() => {
-    if (ready && user?.status === 'confirmed') {
+    if (ready && user) {
       router.replace('/dashboard')
     }
   }, [ready, user, router])
