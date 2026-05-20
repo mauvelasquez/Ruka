@@ -1,12 +1,13 @@
 'use client'
-import { Suspense, useState } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { Suspense, useState, useEffect } from 'react'
+import { useSearchParams, useRouter } from 'next/navigation'
+import { createBrowserClient } from '@supabase/ssr'
 import Navbar from '../../components/Navbar'
 import ConsentStep  from './components/ConsentStep'
 import IdCaptureStep from './components/IdCaptureStep'
 import FaceMatchStep from './components/FaceMatchStep'
 import ResultStep   from './components/ResultStep'
-import { Shield, FileText, Camera, CheckCircle } from 'lucide-react'
+import { Shield, FileText, Camera, CheckCircle, Loader, ArrowRight } from 'lucide-react'
 
 const STEPS = [
   { id: 1, label: 'Consentimiento', icon: Shield },
@@ -53,6 +54,111 @@ function Stepper({ current }) {
   )
 }
 
+const ACTION_ROUTES = {
+  publish: '/dashboard?tab=hogar',
+  contact: '/dashboard',
+  match:   '/homes',
+}
+
+function ExistingProfileStep({ profile, action, onSkip }) {
+  const router = useRouter()
+  const [status, setStatus] = useState('idle') // idle | saving | done | error
+
+  const handleConfirm = async () => {
+    setStatus('saving')
+    try {
+      const res = await fetch('/api/verify-id/confirm-existing', { method: 'POST' })
+      const data = await res.json()
+      if (data.success) {
+        setStatus('done')
+      } else {
+        setStatus('error')
+      }
+    } catch {
+      setStatus('error')
+    }
+  }
+
+  if (status === 'done') {
+    return (
+      <div className="space-y-6 text-center">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-20 h-20 bg-forest/10 rounded-full flex items-center justify-center">
+            <CheckCircle className="w-10 h-10 text-forest" />
+          </div>
+          <h2 className="text-2xl font-black text-gray-900">¡Identidad verificada!</h2>
+          <p className="text-sm text-gray-500 max-w-xs">
+            Tu cuenta ahora está verificada. Ya puedes acceder a todas las funciones de Rukka.
+          </p>
+        </div>
+        {action && ACTION_ROUTES[action] && (
+          <button
+            onClick={() => router.push(ACTION_ROUTES[action])}
+            className="w-full flex items-center justify-center gap-2 bg-forest text-white py-3.5 rounded-xl font-bold text-sm hover:bg-forest-dark transition-colors"
+          >
+            Continuar
+            <ArrowRight className="w-4 h-4" />
+          </button>
+        )}
+        <button
+          onClick={() => router.push('/dashboard')}
+          className="w-full text-sm text-gray-500 hover:text-gray-700 transition-colors py-1"
+        >
+          Ir al dashboard
+        </button>
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-5">
+      <div className="text-center">
+        <h2 className="text-xl font-black text-gray-900 mb-1">Datos ya registrados</h2>
+        <p className="text-sm text-gray-500">Ya tenemos tu información del carnet guardada</p>
+      </div>
+
+      <div className="bg-forest/5 border border-forest/20 rounded-xl p-4 space-y-2">
+        <p className="text-xs font-bold text-forest uppercase tracking-wide mb-3">Datos del carnet</p>
+        {profile.full_name && (
+          <div>
+            <p className="text-xs text-gray-400">Nombre</p>
+            <p className="text-sm font-semibold text-gray-800">{profile.full_name}</p>
+          </div>
+        )}
+        {profile.rut && (
+          <div>
+            <p className="text-xs text-gray-400">RUT</p>
+            <p className="text-sm font-semibold text-gray-800">{profile.rut}</p>
+          </div>
+        )}
+      </div>
+
+      {status === 'error' && (
+        <p className="text-sm text-red-600 text-center">Error al confirmar. Intenta nuevamente.</p>
+      )}
+
+      <button
+        onClick={handleConfirm}
+        disabled={status === 'saving'}
+        className="w-full flex items-center justify-center gap-2 bg-forest text-white py-3.5 rounded-xl font-bold text-sm hover:bg-forest-dark transition-colors disabled:opacity-60"
+      >
+        {status === 'saving' ? (
+          <><Loader className="w-4 h-4 animate-spin" />Verificando...</>
+        ) : (
+          <>Confirmar identidad<ArrowRight className="w-4 h-4" /></>
+        )}
+      </button>
+
+      <button
+        onClick={onSkip}
+        className="w-full text-xs text-gray-400 hover:text-gray-600 transition-colors py-1"
+      >
+        Subir carnet nuevamente
+      </button>
+    </div>
+  )
+}
+
 function VerificarContent() {
   const searchParams = useSearchParams()
   const action = searchParams.get('action')
@@ -61,12 +167,37 @@ function VerificarContent() {
   const [ocrResult, setOcrResult]   = useState(null)   // { extracted_data, idImageBase64 }
   const [faceResult, setFaceResult] = useState(null)   // { match, distance, confidence }
   const [attemptsLeft, setAttemptsLeft] = useState(3)
-  const [idImageBase64, setIdImageBase64] = useState(null) // raw base64 of carnet image for face matching
+  const [idImageBase64, setIdImageBase64] = useState(null)
+  const [existingProfile, setExistingProfile] = useState(null) // profile with rut+full_name
+  const [forceUpload, setForceUpload] = useState(false) // user wants to re-upload carnet
+
+  useEffect(() => {
+    async function checkProfile() {
+      try {
+        const supabase = createBrowserClient(
+          process.env.NEXT_PUBLIC_SUPABASE_URL,
+          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+        )
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) return
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('full_name, rut, birth_date')
+          .eq('id', user.id)
+          .single()
+        if (profile?.rut && profile?.full_name) {
+          setExistingProfile(profile)
+        }
+      } catch {
+        // non-critical
+      }
+    }
+    checkProfile()
+  }, [])
 
   const handleConsent = () => setStep(2)
 
   const handleOcrSuccess = (data) => {
-    // data comes from IdCaptureStep which also passes back the compressed base64
     setOcrResult(data)
     setIdImageBase64(data.idImageBase64 ?? null)
     setStep(3)
@@ -83,6 +214,8 @@ function VerificarContent() {
     setStep(3)
   }
 
+  const showExistingProfile = step === 2 && existingProfile && !forceUpload
+
   return (
     <div className="min-h-screen flex flex-col" style={{ background: '#F8F4EE' }}>
       <div className="flex-1 flex flex-col items-center justify-center p-4 py-10">
@@ -92,7 +225,15 @@ function VerificarContent() {
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8">
             {step === 1 && <ConsentStep onAccept={handleConsent} />}
 
-            {step === 2 && (
+            {step === 2 && showExistingProfile && (
+              <ExistingProfileStep
+                profile={existingProfile}
+                action={action}
+                onSkip={() => setForceUpload(true)}
+              />
+            )}
+
+            {step === 2 && !showExistingProfile && (
               <IdCaptureStep
                 onSuccess={handleOcrSuccess}
               />

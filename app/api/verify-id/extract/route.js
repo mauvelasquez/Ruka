@@ -1,5 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk'
 import { createClient } from '../../../../lib/supabase/server'
+import { createClient as createAdminClient } from '@supabase/supabase-js'
 
 export const runtime = 'nodejs'
 export const maxDuration = 30
@@ -16,6 +17,15 @@ function isRateLimited(userId) {
   else entry.count += 1
   userCounts.set(userId, entry)
   return entry.count > MAX
+}
+
+function parseBirthDate(dateStr) {
+  if (!dateStr) return null
+  const parts = dateStr.split('/')
+  if (parts.length !== 3) return null
+  const [day, month, year] = parts
+  if (!day || !month || !year || year.length !== 4) return null
+  return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
 }
 
 // Chilean RUT digit verifier
@@ -122,6 +132,29 @@ export async function POST(request) {
     }
 
     const rutValid = validateRUT(extracted.rut)
+
+    // Save OCR data to profile (non-critical — doesn't block the response)
+    if (rutValid) {
+      try {
+        const admin = createAdminClient(
+          process.env.NEXT_PUBLIC_SUPABASE_URL,
+          process.env.SUPABASE_SERVICE_ROLE_KEY
+        )
+        const profileUpdate = {}
+        if (extracted.nombre_completo) {
+          profileUpdate.full_name = extracted.nombre_completo
+          profileUpdate.name = extracted.nombre_completo
+        }
+        if (extracted.rut) profileUpdate.rut = extracted.rut
+        const birthDate = parseBirthDate(extracted.fecha_nacimiento)
+        if (birthDate) profileUpdate.birth_date = birthDate
+        if (Object.keys(profileUpdate).length > 0) {
+          await admin.from('profiles').update(profileUpdate).eq('id', user.id)
+        }
+      } catch (saveErr) {
+        console.error('[verify-id/extract] profile update failed:', saveErr.message)
+      }
+    }
 
     return Response.json({
       success: true,

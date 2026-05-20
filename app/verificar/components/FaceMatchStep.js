@@ -256,7 +256,7 @@ export default function FaceMatchStep({ ocrResult, onSuccess }) {
       {(phase === 'liveness' || phase === 'capturing' || phase === 'matching') && (
         <div className="space-y-3">
           <div className="relative rounded-2xl overflow-hidden bg-black aspect-[4/3]">
-            <video ref={videoRef} className="w-full h-full object-cover" muted playsInline />
+            <video autoPlay playsInline muted ref={videoRef} className="w-full h-full object-cover" />
             <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />
             {/* Center guide circle */}
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
