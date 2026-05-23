@@ -30,8 +30,13 @@ export async function GET(request) {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
     {
       cookies: {
-        getAll:  ()      => request.cookies.getAll(),
-        setAll:  (list)  => pendingCookies.push(...list),
+        getAll: () => request.cookies.getAll(),
+        setAll: (list) => {
+          // Update request.cookies so Supabase can read back what it just wrote
+          // (needed if a token refresh occurs during the profile fetch)
+          list.forEach(({ name, value }) => request.cookies.set(name, value))
+          pendingCookies.push(...list)
+        },
       },
     }
   )
@@ -64,27 +69,35 @@ export async function GET(request) {
     try {
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
-        .select('id')
+        .select('id, email')
         .eq('id', user.id)
         .maybeSingle()
+
+      const isGoogleLogin = user.app_metadata?.provider === 'google'
 
       if (profileError) {
         // DB error → go to dashboard optimistically
         console.error('[auth/callback] profile fetch error:', profileError.message)
       } else if (!profile) {
-        // First login → create basic profile, go straight to dashboard (no onboarding required)
-        const { error: upsertErr } = await supabase.from('profiles').upsert(
-          {
-            id:     user.id,
-            name:   user.user_metadata?.full_name || user.user_metadata?.name || 'Usuario',
-            email:  user.email || user.user_metadata?.email || '',
-            avatar: user.user_metadata?.picture || user.user_metadata?.avatar_url || null,
-            status: 'pending',
-          },
-          { ignoreDuplicates: true }
-        )
+        // First login → create basic profile
+        const { error: upsertErr } = await supabase.from('profiles').upsert({
+          id:     user.id,
+          name:   user.user_metadata?.full_name || user.user_metadata?.name || 'Usuario',
+          email:  user.email || user.user_metadata?.email || '',
+          avatar: user.user_metadata?.picture || user.user_metadata?.avatar_url || null,
+          status: 'pending',
+        })
         if (upsertErr) {
           console.error('[auth/callback] profile upsert failed:', upsertErr.message)
+        }
+      } else if (isGoogleLogin && user.email && profile.email !== user.email) {
+        // Existing profile — Google email is always source of truth
+        const { error: emailErr } = await supabase
+          .from('profiles')
+          .update({ email: user.email })
+          .eq('id', user.id)
+        if (emailErr) {
+          console.error('[auth/callback] Google email sync failed:', emailErr.message)
         }
       }
       // Always land on dashboard — onboarding is no longer mandatory

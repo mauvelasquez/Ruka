@@ -133,14 +133,36 @@ export async function POST(request) {
 
     const rutValid = validateRUT(extracted.rut)
 
-    // Save OCR data to profile (non-critical — doesn't block the response)
+    // Save OCR data to profile and mark as verified
     if (rutValid) {
       try {
         const admin = createAdminClient(
           process.env.NEXT_PUBLIC_SUPABASE_URL,
           process.env.SUPABASE_SERVICE_ROLE_KEY
         )
-        const profileUpdate = {}
+
+        // Block if this RUT is already registered by a different user
+        if (extracted.rut) {
+          const { data: rutConflict } = await admin
+            .from('profiles')
+            .select('id')
+            .eq('rut', extracted.rut)
+            .neq('id', user.id)
+            .maybeSingle()
+
+          if (rutConflict) {
+            return Response.json({
+              success: false,
+              error: 'Este RUT ya se encuentra inscrito en Rukka. Si crees que es un error, contáctanos.',
+            })
+          }
+        }
+
+        const profileUpdate = {
+          verified:                  true,
+          verification_status:       'id_verified',
+          verification_completed_at: new Date().toISOString(),
+        }
         if (extracted.nombre_completo) {
           profileUpdate.full_name = extracted.nombre_completo
           profileUpdate.name = extracted.nombre_completo
@@ -148,9 +170,7 @@ export async function POST(request) {
         if (extracted.rut) profileUpdate.rut = extracted.rut
         const birthDate = parseBirthDate(extracted.fecha_nacimiento)
         if (birthDate) profileUpdate.birth_date = birthDate
-        if (Object.keys(profileUpdate).length > 0) {
-          await admin.from('profiles').update(profileUpdate).eq('id', user.id)
-        }
+        await admin.from('profiles').update(profileUpdate).eq('id', user.id)
       } catch (saveErr) {
         console.error('[verify-id/extract] profile update failed:', saveErr.message)
       }

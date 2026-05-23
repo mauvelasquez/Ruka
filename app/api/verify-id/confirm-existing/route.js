@@ -25,7 +25,8 @@ export async function POST() {
     )
 
     await admin.from('profiles').update({
-      verification_status: 'verified',
+      verified:                  true,
+      verification_status:       'id_verified',
       verification_completed_at: new Date().toISOString(),
     }).eq('id', user.id)
 

@@ -7,13 +7,13 @@ import Navbar from '../../components/Navbar'
 import MessageThread from '../../components/MessageThread'
 import {
   Home, Heart, ArrowLeftRight, Plus, MapPin, Users, Calendar,
-  CheckCircle, XCircle, Clock, Trash2, Eye, Star, Sparkles, AlertCircle, ScrollText, MessageSquare
+  CheckCircle, XCircle, Clock, Trash2, Eye, Star, Sparkles, AlertCircle, ScrollText, MessageSquare, User
 } from 'lucide-react'
 import { COMUNAS_RUKKA } from '../../lib/comunas'
 import { useVerificationGate } from '../../hooks/useVerificationGate'
 import VerificationRequiredModal from '../../components/VerificationRequiredModal'
 
-const TAB = { WISHES: 'wishes', HOMES: 'homes', RECEIVED: 'received', SENT: 'sent' }
+const TAB = { WISHES: 'wishes', HOMES: 'homes', RECEIVED: 'received', SENT: 'sent', PROFILE: 'profile' }
 
 const CHILE_CITIES = COMUNAS_RUKKA
 
@@ -111,6 +111,7 @@ export default function DashboardPage() {
     { id: TAB.HOMES,    label: 'Mis hogares',   icon: Home,           count: myHomes.length },
     { id: TAB.RECEIVED, label: 'Recibidas',     icon: ArrowLeftRight, count: received.length },
     { id: TAB.SENT,     label: 'Enviadas',      icon: ArrowLeftRight, count: sent.length },
+    { id: TAB.PROFILE,  label: 'Mi perfil',     icon: User,           count: 0 },
   ]
 
   return (
@@ -501,6 +502,89 @@ export default function DashboardPage() {
             )}
           </div>
         )}
+        {/* ── TAB: MI PERFIL ── */}
+        {tab === TAB.PROFILE && (
+          <div className="max-w-xl">
+            <h2 className="font-black text-gray-800 text-lg mb-4">Mi perfil</h2>
+            <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+
+              {/* Avatar */}
+              <div className="flex items-center gap-5 mb-6 pb-6 border-b border-gray-100">
+                <div className="w-20 h-20 rounded-2xl bg-forest flex items-center justify-center text-white text-3xl font-black overflow-hidden flex-shrink-0">
+                  {currentUser.avatar
+                    ? <img src={currentUser.avatar} alt={currentUser.name} className="w-full h-full object-cover" />
+                    : <span>{currentUser.name?.[0]?.toUpperCase() || '?'}</span>
+                  }
+                </div>
+                <div>
+                  <p className="font-black text-gray-900 text-xl">{currentUser.name}</p>
+                  <p className="text-sm text-gray-400 mt-0.5">{currentUser.email}</p>
+                </div>
+              </div>
+
+              {/* Campos */}
+              <div className="space-y-4">
+
+                {/* Nombre */}
+                <div>
+                  <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1.5">
+                    Nombre completo
+                  </label>
+                  <div className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-700 select-none">
+                    {currentUser.name || '—'}
+                  </div>
+                  {currentUser.rut && (
+                    <p className="text-xs text-gray-400 mt-1">El nombre no puede modificarse una vez verificada la identidad.</p>
+                  )}
+                </div>
+
+                {/* Correo */}
+                <div>
+                  <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1.5">
+                    Correo electrónico
+                  </label>
+                  <div className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-700 select-none">
+                    {currentUser.email || '—'}
+                  </div>
+                </div>
+
+                {/* RUT */}
+                <div>
+                  <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1.5">
+                    RUT
+                  </label>
+                  <div className={`w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm select-none ${currentUser.rut ? 'text-gray-700' : 'text-gray-400 italic'}`}>
+                    {currentUser.rut || 'No verificado'}
+                  </div>
+                </div>
+
+                {/* Estado de verificación */}
+                <div>
+                  <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1.5">
+                    Estado de identidad
+                  </label>
+                  {currentUser.verified ? (
+                    <span className="inline-flex items-center gap-1.5 bg-forest/10 text-forest text-sm font-bold px-3 py-1.5 rounded-full border border-forest/20">
+                      <CheckCircle className="w-4 h-4" /> Verificado
+                    </span>
+                  ) : (
+                    <div className="flex items-center gap-3 flex-wrap">
+                      <span className="inline-flex items-center gap-1.5 bg-gray-100 text-gray-500 text-sm font-bold px-3 py-1.5 rounded-full border border-gray-200">
+                        <User className="w-4 h-4" /> Sin verificar
+                      </span>
+                      <Link href="/onboarding"
+                        className="text-sm font-bold text-forest hover:text-forest-dark underline underline-offset-2 transition-colors">
+                        Verificar mi identidad →
+                      </Link>
+                    </div>
+                  )}
+                </div>
+
+              </div>
+            </div>
+          </div>
+        )}
+
       </div>
     {modalOpen && (
       <VerificationRequiredModal action={modalAction} onClose={closeModal} />

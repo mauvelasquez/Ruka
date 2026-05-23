@@ -104,8 +104,8 @@ export default function ProfileClient({ id }) {
                   </span>
                 )}
                 {profileUser.verified && (
-                  <span className="flex items-center gap-1 text-forest text-xs font-bold">
-                    <CheckCircle className="w-3.5 h-3.5" /> Verificado
+                  <span className="inline-flex items-center gap-1 bg-forest/10 text-forest text-xs font-bold px-2 py-0.5 rounded-full border border-forest/20">
+                    <CheckCircle className="w-3 h-3" /> Verificado
                   </span>
                 )}
               </div>

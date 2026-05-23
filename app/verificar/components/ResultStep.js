@@ -22,6 +22,11 @@ export default function ResultStep({ ocrResult, faceResult, action, onRetry, att
 
   useEffect(() => {
     if (!faceResult) return
+    // OCR-only mode: profile already marked verified by the extract API route
+    if (faceResult.ocr_only) {
+      setStatus('verified')
+      return
+    }
     async function save() {
       try {
         const res = await fetch('/api/verify-id/complete', {

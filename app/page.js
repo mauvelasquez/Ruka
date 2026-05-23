@@ -10,7 +10,7 @@ import { useApp } from '../lib/store'
 import { CHILE_BANNERS } from '../lib/chile-banners'
 import { DESTINOS_RUKKA } from '../lib/comunas'
 import { HOGARES_FALLBACK } from '../lib/data/hogaresDestacados'
-import { supabase } from '../lib/supabase'
+import { createClient } from '../lib/supabase'
 import { ArrowRight, Sparkles, Shield, ArrowLeftRight, Gift, Zap, Heart } from 'lucide-react'
 
 const STEPS = [
@@ -91,7 +91,7 @@ export default function HomePage() {
   }, [])
 
   useEffect(() => {
-    supabase
+    createClient()
       .from('homes')
       .select('*')
       .eq('activo', true)

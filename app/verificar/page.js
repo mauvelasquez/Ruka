@@ -9,12 +9,22 @@ import FaceMatchStep from './components/FaceMatchStep'
 import ResultStep   from './components/ResultStep'
 import { Shield, FileText, Camera, CheckCircle, Loader, ArrowRight } from 'lucide-react'
 
-const STEPS = [
-  { id: 1, label: 'Consentimiento', icon: Shield },
-  { id: 2, label: 'Carnet',         icon: FileText },
-  { id: 3, label: 'Selfie',         icon: Camera },
-  { id: 4, label: 'Resultado',      icon: CheckCircle },
-]
+const FACIAL_ENABLED = process.env.NEXT_PUBLIC_FACIAL_VERIFICATION_ENABLED !== 'false'
+
+const STEPS = FACIAL_ENABLED
+  ? [
+      { id: 1, label: 'Consentimiento', icon: Shield },
+      { id: 2, label: 'Carnet',         icon: FileText },
+      { id: 3, label: 'Selfie',         icon: Camera },
+      { id: 4, label: 'Resultado',      icon: CheckCircle },
+    ]
+  : [
+      { id: 1, label: 'Consentimiento', icon: Shield },
+      { id: 2, label: 'Carnet',         icon: FileText },
+      { id: 3, label: 'Resultado',      icon: CheckCircle },
+    ]
+
+const RESULT_STEP = FACIAL_ENABLED ? 4 : 3
 
 function Stepper({ current }) {
   return (
@@ -200,7 +210,13 @@ function VerificarContent() {
   const handleOcrSuccess = (data) => {
     setOcrResult(data)
     setIdImageBase64(data.idImageBase64 ?? null)
-    setStep(3)
+    if (!FACIAL_ENABLED) {
+      // OCR already saved verified status in the extract route — skip face step
+      setFaceResult({ match: true, distance: 0, ocr_only: true })
+      setStep(RESULT_STEP)
+    } else {
+      setStep(3)
+    }
   }
 
   const handleFaceSuccess = (result) => {
@@ -239,14 +255,14 @@ function VerificarContent() {
               />
             )}
 
-            {step === 3 && ocrResult && (
+            {FACIAL_ENABLED && step === 3 && ocrResult && (
               <FaceMatchStep
                 ocrResult={{ ...ocrResult, idImageBase64 }}
                 onSuccess={handleFaceSuccess}
               />
             )}
 
-            {step === 4 && ocrResult && faceResult && (
+            {step === RESULT_STEP && ocrResult && faceResult && (
               <ResultStep
                 ocrResult={ocrResult}
                 faceResult={faceResult}
