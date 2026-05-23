@@ -112,7 +112,14 @@ export default function LoginPage() {
             </div>
           )}
 
-          <button type="button" onClick={() => { analytics.loginAttempt('google'); loginWithGoogle() }}
+          <button type="button" disabled={loading} onClick={async () => {
+            analytics.loginAttempt('google')
+            setLoading(true)
+            setError('')
+            const result = await loginWithGoogle()
+            setLoading(false)
+            if (result?.error) setError('No se pudo conectar con Google. Verifica tu conexión e intenta de nuevo.')
+          }}
             className="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors shadow-sm mb-2">
             <svg viewBox="0 0 24 24" className="w-5 h-5 flex-shrink-0">
               <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
