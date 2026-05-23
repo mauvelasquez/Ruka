@@ -115,8 +115,17 @@ export async function GET(request) {
 function redirect(url, pendingCookies) {
   const response = NextResponse.redirect(url, { status: 302 })
   response.headers.set('Cache-Control', 'no-store, max-age=0')
-  pendingCookies.forEach(({ name, value, options }) =>
-    response.cookies.set(name, value, options)
-  )
+  pendingCookies.forEach(({ name, value, options }) => {
+    // Ensure cookies are accessible across all paths and persist for the session duration.
+    // Supabase's default options may omit path, which causes some browsers to scope
+    // the cookie to /auth/* only — making it invisible to the client on /dashboard.
+    const mergedOptions = {
+      path:     '/',
+      sameSite: 'lax',
+      secure:   process.env.NODE_ENV === 'production',
+      ...options,
+    }
+    response.cookies.set(name, value, mergedOptions)
+  })
   return response
 }

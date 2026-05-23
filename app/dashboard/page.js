@@ -38,16 +38,14 @@ export default function DashboardPage() {
   const [tab, setTab] = useState(TAB.WISHES)
   const [wishForm, setWishForm] = useState({ toCity: '', startDate: '', endDate: '', guests: 2 })
   const [showWishForm, setShowWishForm] = useState(false)
-  const [loadingError, setLoadingError] = useState(false)
   const [showNoHomeAlert, setShowNoHomeAlert] = useState(false)
   const [activeThread, setActiveThread] = useState(null) // { requestId, otherUser }
 
   useEffect(() => {
     if (ready) return
-    const timer = setTimeout(() => {
-      setLoadingError(true)
-      syncSession()
-    }, 8000)
+    // Si el store no resuelve en 15s (red muy lenta o error real), recargar la página.
+    // Con el nuevo initAuth de getSession(), en condiciones normales esto nunca debería dispararse.
+    const timer = setTimeout(() => window.location.reload(), 15000)
     return () => clearTimeout(timer)
   }, [ready])
 
@@ -56,22 +54,9 @@ export default function DashboardPage() {
     if (!currentUser) router.push('/auth/login')
   }, [currentUser, ready])
 
-  // Mostrar loading mientras el store inicializa
   if (!ready) return (
     <div className="min-h-screen flex items-center justify-center" style={{ background: '#F8F4EE' }}>
-      {loadingError ? (
-        <div className="text-center px-4">
-          <AlertCircle className="w-10 h-10 text-amber-500 mx-auto mb-3" />
-          <p className="text-gray-700 font-bold mb-1">Error de conexión</p>
-          <p className="text-gray-400 text-sm mb-4">No se pudo cargar la sesión. Verifica tu conexión a internet.</p>
-          <button onClick={() => window.location.reload()}
-            className="bg-forest text-white px-6 py-2.5 rounded-xl font-bold text-sm hover:bg-forest-dark transition-colors">
-            Reintentar
-          </button>
-        </div>
-      ) : (
-        <div className="w-8 h-8 border-4 border-forest border-t-transparent rounded-full animate-spin" />
-      )}
+      <div className="w-8 h-8 border-4 border-forest border-t-transparent rounded-full animate-spin" />
     </div>
   )
 

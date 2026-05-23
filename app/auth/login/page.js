@@ -10,6 +10,7 @@ import { analytics } from '../../../lib/analytics'
 
 const ERROR_MESSAGES = {
   auth_error:       'Error al iniciar sesión con Google. Intenta de nuevo.',
+  session_expired:  'La sesión de Google expiró. Por favor intenta de nuevo.',
   timeout:          'El servidor tardó demasiado. Verifica tu conexión e intenta de nuevo.',
   no_code:          'Acceso inválido. Usa el botón de Google para iniciar sesión.',
   profile_creation: 'Sesión iniciada pero hubo un error al crear tu perfil. Intenta de nuevo.',

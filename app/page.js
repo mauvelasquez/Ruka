@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
@@ -79,12 +80,24 @@ function AdBanner({ variant = 'primary', className = '', heroBanner = null }) {
 
 // ── PAGE ──────────────────────────────────────────────────────────────────────
 export default function HomePage() {
+  const router = useRouter()
   const { homes, users } = useApp()
   const featured = homes.filter(h => h.featured).slice(0, 3)
 
   const [heroBanner,    setHeroBanner]    = useState(null)
   const [exploreHomes,  setExploreHomes]  = useState([])
   const [usingFallback, setUsingFallback] = useState(false)
+
+  // Redirect OAuth errors that Supabase sends to the site root
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const errorCode = params.get('error_code')
+    if (errorCode === 'bad_oauth_state') {
+      router.replace('/auth/login?error=session_expired')
+    } else if (params.get('error')) {
+      router.replace('/auth/login?error=auth_error')
+    }
+  }, [router])
 
   useEffect(() => {
     setHeroBanner(CHILE_BANNERS[Math.floor(Math.random() * CHILE_BANNERS.length)])
@@ -94,7 +107,6 @@ export default function HomePage() {
     supabase
       ?.from('homes')
       .select('*')
-      .eq('activo', true)
       .order('created_at', { ascending: false })
       .limit(8)
       .then(({ data, error }) => {
