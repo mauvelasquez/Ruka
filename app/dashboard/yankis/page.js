@@ -46,10 +46,10 @@ function TxRow({ tx }) {
 export default function YankisDashboard() {
   const router = useRouter()
   const { currentUser, ready } = useApp()
-  const [balance, setBalance]         = useState(null)
-  const [stats, setStats]             = useState({ total_earned: 0, total_spent: 0 })
+  const [balance, setBalance]           = useState(null)
+  const [stats, setStats]               = useState({ total_earned: 0, total_spent: 0 })
   const [transactions, setTransactions] = useState([])
-  const [loading, setLoading]         = useState(true)
+  const [loading, setLoading]           = useState(true)
 
   useEffect(() => {
     if (!ready) return
@@ -80,7 +80,58 @@ export default function YankisDashboard() {
           <ArrowLeft className="w-4 h-4" /> Volver al panel
         </Link>
 
-        {/* Header */}
+        {/* ── ¿Qué son los Yankis? — hero con imagen de fondo ──────────────── */}
+        <div className="relative rounded-3xl overflow-hidden mb-8">
+          <div
+            className="absolute inset-0 bg-cover bg-center"
+            style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1526749837599-b4eba9fd855e?w=1200&q=80)' }}
+          />
+          {/* Double-layer overlay: first darken, then add forest tint */}
+          <div className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.72)' }} />
+          <div className="absolute inset-0" style={{ background: 'rgba(26,46,30,0.55)' }} />
+
+          <div className="relative p-8 sm:p-10 text-white">
+            <p className="text-xs font-bold uppercase tracking-widest text-green-300 mb-2">Sistema de tokens</p>
+            <h2 className="text-2xl sm:text-3xl font-black text-white mb-2">¿Qué son los Yankis?</h2>
+            <p className="text-white/90 text-sm leading-relaxed max-w-xl mb-2">
+              <strong className="text-white">Yanki</strong> es una palabra en quechua que significa <em>trueque o intercambio</em>.
+              Es la moneda interna de Rukka: cada noche de hospitalidad se convierte en una noche de viaje.
+            </p>
+            <p className="text-lg font-black text-sand mb-8">1 Yanki = 1 noche de alojamiento en cualquier hogar de Rukka.</p>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="rounded-2xl p-5" style={{ background: 'rgba(255,255,255,0.12)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.18)' }}>
+                <div className="text-2xl mb-2">🪙</div>
+                <h3 className="font-black text-white text-sm mb-2">¿Qué son?</h3>
+                <p className="text-white/85 text-xs leading-relaxed">
+                  La moneda del intercambio. Cada vez que prestas tu hogar, ganas Yankis. Los usas para alojarte en otros hogares de la comunidad.
+                </p>
+              </div>
+
+              <div className="rounded-2xl p-5" style={{ background: 'rgba(255,255,255,0.12)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.18)' }}>
+                <div className="text-2xl mb-2">📈</div>
+                <h3 className="font-black text-white text-sm mb-2">¿Cómo ganas Yankis?</h3>
+                <ul className="text-white/85 text-xs space-y-1.5">
+                  <li>• 1 noche hospedada = 1 Yanki</li>
+                  <li>• 3 Yankis al completar tu perfil</li>
+                  <li>• No caducan nunca</li>
+                </ul>
+              </div>
+
+              <div className="rounded-2xl p-5" style={{ background: 'rgba(255,255,255,0.12)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.18)' }}>
+                <div className="text-2xl mb-2">✈️</div>
+                <h3 className="font-black text-white text-sm mb-2">¿Cómo usas tus Yankis?</h3>
+                <ul className="text-white/85 text-xs space-y-1.5">
+                  <li>• 1 Yanki = 1 noche en cualquier hogar</li>
+                  <li>• Se descuentan al confirmar</li>
+                  <li>• Reembolso íntegro si cancelas</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Header balance */}
         <div className="bg-gradient-to-br from-terra to-[#9B4A1E] rounded-3xl p-8 text-white mb-6">
           <p className="text-sm font-bold text-white/70 uppercase tracking-widest mb-2">Tu saldo</p>
           <div className="flex items-end gap-3 mb-1">
@@ -96,8 +147,8 @@ export default function YankisDashboard() {
         {/* Stats */}
         <div className="grid grid-cols-3 gap-4 mb-6">
           {[
-            { label: 'Disponibles', value: balance, color: 'bg-terra-50 border-terra/20', text: 'text-terra', icon: '🪙' },
-            { label: 'Ganados',     value: stats.total_earned, color: 'bg-forest-50 border-forest/20', text: 'text-forest', icon: '📈' },
+            { label: 'Disponibles', value: balance,            color: 'bg-terra-50 border-terra/20',  text: 'text-terra',    icon: '🪙' },
+            { label: 'Ganados',     value: stats.total_earned, color: 'bg-forest-50 border-forest/20', text: 'text-forest',   icon: '📈' },
             { label: 'Gastados',    value: stats.total_spent,  color: 'bg-gray-50 border-gray-200',    text: 'text-gray-600', icon: '📤' },
           ].map((s, i) => (
             <div key={i} className={`${s.color} border-2 rounded-2xl p-4 text-center`}>
@@ -109,7 +160,7 @@ export default function YankisDashboard() {
         </div>
 
         {/* Historial */}
-        <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 mb-6">
+        <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-6">
           <h2 className="font-black text-gray-900 text-lg mb-4 flex items-center gap-2">
             <Wallet className="w-5 h-5 text-terra" /> Historial de Yankis
           </h2>
@@ -124,49 +175,6 @@ export default function YankisDashboard() {
               {transactions.map(tx => <TxRow key={tx.id} tx={tx} />)}
             </div>
           )}
-        </div>
-
-        {/* Próximamente: compra de Yankis */}
-        <div className="bg-white rounded-3xl shadow-sm border border-dashed border-andean/40 p-6 mb-8">
-          <div className="flex items-start gap-4">
-            <span className="text-3xl">💳</span>
-            <div className="flex-1">
-              <h3 className="font-black text-gray-900 text-base mb-1">Próximamente: Compra Yankis</h3>
-              <p className="text-gray-500 text-sm leading-relaxed mb-3">
-                Podrás adquirir Yankis directamente con tu tarjeta de crédito o débito
-                a través de Mercado Pago. Esto te permitirá viajar aunque aún no hayas
-                prestado tu hogar.
-              </p>
-              <span className="inline-flex items-center gap-1.5 bg-andean-50 text-andean text-xs font-bold px-3 py-1.5 rounded-full border border-andean/20">
-                En desarrollo
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Explicación del sistema */}
-        <div className="prose prose-sm max-w-none text-gray-600">
-          <h2 className="text-gray-900 font-black text-xl">¿Qué son los Yankis?</h2>
-          <p>
-            <strong>Yanki</strong> es una palabra en quechua que significa <em>trueque o intercambio</em>.
-            Es la moneda interna de Rukka: un sistema simple y justo donde cada noche de hospitalidad
-            se convierte en una noche de viaje.
-          </p>
-          <p className="font-bold text-terra">1 Yanki = 1 noche de alojamiento en cualquier hogar de Rukka.</p>
-
-          <h3 className="font-black text-gray-900">¿Cómo ganas Yankis?</h3>
-          <ul>
-            <li>1 noche hospedada = 1 Yanki acreditado automáticamente</li>
-            <li>3 Yankis de bienvenida al completar tu perfil</li>
-            <li>Los Yankis no caducan nunca</li>
-          </ul>
-
-          <h3 className="font-black text-gray-900">¿Cómo usas tus Yankis?</h3>
-          <ul>
-            <li>1 Yanki = 1 noche en el hogar que elijas</li>
-            <li>Los Yankis se descuentan automáticamente al confirmar tu estadía</li>
-            <li>Si cancelas, tus Yankis se devuelven íntegros</li>
-          </ul>
         </div>
       </div>
     </div>

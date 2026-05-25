@@ -1,10 +1,10 @@
 export const metadata = {
   title: 'Hogares disponibles para intercambio en Chile — Rukka',
-  description: 'Explora casas, departamentos y cabañas disponibles para intercambio en todo Chile. Zapallar, Pichilemu, Puerto Varas, Frutillar y más. 100% gratis.',
-  keywords: ['hogares intercambio Chile', 'casas intercambio', 'home exchange Chile', 'cabañas intercambio', 'alojamiento gratis Chile'],
+  description: 'Explora casas, departamentos y cabañas disponibles para intercambio en Latinoamérica. Chile, México, Colombia, Argentina y más.',
+  keywords: ['hogares intercambio latinoamerica', 'casas intercambio', 'home exchange Chile México Colombia Argentina', 'cabañas intercambio', 'alojamiento intercambio latam'],
   openGraph: {
-    title: 'Hogares para intercambio en Chile — Rukka',
-    description: 'Encuentra tu hogar ideal para intercambiar. Casas, cabañas y departamentos en todo Chile, 100% gratis.',
+    title: 'Hogares para intercambio en Latinoamérica — Rukka',
+    description: 'Encuentra tu hogar ideal para intercambiar. Casas, cabañas y departamentos en toda Latinoamérica.',
     url: 'https://rukka.cl/homes',
     siteName: 'Rukka',
     locale: 'es_CL',

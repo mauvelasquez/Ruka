@@ -1,6 +1,6 @@
 export const metadata = {
   title: 'Anfitriones de Airbnb — Usa tu propiedad también en Rukka',
-  description: 'Si ya tienes tu propiedad en Airbnb, impórtala a Rukka en segundos y empieza a intercambiarla cuando viajas. 100% gratis, sin dejar Airbnb.',
+  description: 'Si ya tienes tu propiedad en Airbnb, impórtala a Rukka en segundos y empieza a intercambiarla cuando viajas. Sin dejar Airbnb.',
   keywords: ['airbnb chile intercambio', 'anfitriones airbnb rukka', 'importar airbnb', 'home exchange airbnb', 'propiedad airbnb intercambio'],
   openGraph: {
     title: 'Anfitriones de Airbnb — Usa tu propiedad también en Rukka',

@@ -26,7 +26,7 @@ const FAQS = [
   },
   {
     q: '¿Tengo que pagar algo?',
-    a: 'No. Rukka es 100% gratis para siempre. Sin comisión por intercambio, sin suscripción mensual, sin letra chica. Tu hogar es tu única moneda de cambio.',
+    a: 'Rukka no cobra comisión por intercambio, ni suscripción mensual, ni ningún costo oculto. Tu hogar es tu única moneda de cambio.',
   },
   {
     q: '¿Puedo importar más de una propiedad?',
@@ -146,7 +146,7 @@ export default function AnfitrionesAirbnbPage() {
 
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white leading-[1.05] mb-6">
               Tu Airbnb ya existe.<br />
-              <span style={{ color: '#E8D5B0' }}>Ahora úsalo para<br />viajar gratis.</span>
+              <span style={{ color: '#E8D5B0' }}>Ahora úsalo para<br />viajar por intercambio.</span>
             </h1>
 
             <p className="text-lg sm:text-xl text-white/80 leading-relaxed mb-8 max-w-xl">
@@ -157,7 +157,7 @@ export default function AnfitrionesAirbnbPage() {
             <div className="flex flex-col sm:flex-row gap-3">
               <Link href="/auth/register"
                 className="inline-flex items-center justify-center gap-2 bg-white text-forest-dark font-black px-8 py-4 rounded-2xl text-base hover:bg-sand transition-colors shadow-lg">
-                Importar mi Airbnb gratis <ArrowRight className="w-5 h-5" />
+                Importar mi Airbnb <ArrowRight className="w-5 h-5" />
               </Link>
               <Link href="/homes"
                 className="inline-flex items-center justify-center gap-2 border-2 border-white/40 text-white font-bold px-8 py-4 rounded-2xl text-base hover:bg-white/10 transition-colors">
@@ -165,7 +165,7 @@ export default function AnfitrionesAirbnbPage() {
               </Link>
             </div>
 
-            <p className="text-white/40 text-sm mt-4">Sin tarjeta de crédito · 100% gratis · Tarda 2 minutos</p>
+            <p className="text-white/40 text-sm mt-4">Sin tarjeta de crédito · Tarda 2 minutos · Sin comisiones</p>
           </div>
         </div>
       </section>
@@ -214,7 +214,7 @@ export default function AnfitrionesAirbnbPage() {
                 { icon: '😤', label: 'No tienes red de anfitriones de confianza', bad: true },
                 { icon: '✅', label: 'Con Rukka: usas tu propiedad como moneda de cambio', bad: false },
                 { icon: '✅', label: 'Intercambias con anfitriones verificados como tú', bad: false },
-                { icon: '✅', label: 'Viajas gratis. Tu Airbnb ya está listo para importar', bad: false },
+                { icon: '✅', label: 'Con Rukka: tu Airbnb ya está listo para importar y usarlo en intercambios', bad: false },
               ].map((item, i) => (
                 <div key={i} className={`flex items-center gap-3 p-4 rounded-2xl border ${
                   item.bad
@@ -362,7 +362,7 @@ export default function AnfitrionesAirbnbPage() {
                 n: '03',
                 emoji: '🤝',
                 title: 'Intercambia y viaja',
-                desc: 'Cuando hay un match, te notificamos. Acuerdan los detalles y cada uno aloja gratis en la propiedad del otro.',
+                desc: 'Cuando hay un match, te notificamos. Acuerdan los detalles y cada uno se aloja en la propiedad del otro.',
                 color: 'border-andean/30 bg-andean/5',
               },
             ].map((step, i) => (
@@ -484,7 +484,7 @@ export default function AnfitrionesAirbnbPage() {
               </thead>
               <tbody>
                 {[
-                  ['Costo por noche',      '🎉 Gratis',        '$80k-300k',       '$50k-200k'],
+                  ['Costo por noche',      '🔄 Intercambio',   '$80k-300k',       '$50k-200k'],
                   ['Import de propiedad',  '✓ 1 clic',         '—',               '—'],
                   ['Comunidad verificada', '✓ Chile',          '—',               'Parcial'],
                   ['Match automático',     '✓ Bilateral',      '—',               '—'],
@@ -561,7 +561,7 @@ export default function AnfitrionesAirbnbPage() {
                 { icon: Shield, color: 'text-forest', bg: 'bg-forest/8', title: 'Perfiles verificados', desc: 'Email verificado y perfil completo obligatorio para todos los miembros.' },
                 { icon: Star, color: 'text-amber-600', bg: 'bg-amber-50', title: 'Historial de intercambios', desc: 'Puedes ver el historial y valoraciones de cada anfitrión antes de aceptar.' },
                 { icon: Users, color: 'text-andean', bg: 'bg-andean/10', title: 'Solo anfitriones', desc: 'Para publicar debes tener una propiedad real. No hay perfiles sin hogar.' },
-                { icon: Gift, color: 'text-[#ff5a5f]', bg: 'bg-[#ff5a5f]/8', title: 'Sin presión económica', desc: 'Al ser gratis, no hay incentivo de estafar. Ambos pierden si algo sale mal.' },
+                { icon: Gift, color: 'text-[#ff5a5f]', bg: 'bg-[#ff5a5f]/8', title: 'Sin presión económica', desc: 'El intercambio crea simetría: ambos tienen algo que perder si el trato sale mal.' },
               ].map(({ icon: Icon, color, bg, title, desc }, i) => (
                 <div key={i} className="flex items-start gap-4 p-4 rounded-2xl border border-gray-100 bg-gray-50/50">
                   <div className={`${bg} rounded-xl p-2.5 flex-shrink-0`}>
@@ -608,19 +608,19 @@ export default function AnfitrionesAirbnbPage() {
                 <span style={{ color: '#E8D5B0' }}>Solo falta importarlo.</span>
               </h2>
               <p className="text-white/70 text-lg mb-8 max-w-lg mx-auto">
-                Únete a la comunidad de anfitriones chilenos que usan sus propiedades para viajar gratis por Chile.
+                Únete a la comunidad de anfitriones que usan sus propiedades para viajar por intercambio.
               </p>
 
               <Link href="/auth/register"
                 className="inline-flex items-center gap-2 bg-white text-forest-dark font-black px-10 py-4 rounded-2xl text-lg hover:bg-sand transition-colors shadow-lg">
-                Importar mi Airbnb gratis <ArrowRight className="w-5 h-5" />
+                Importar mi Airbnb <ArrowRight className="w-5 h-5" />
               </Link>
 
               <div className="flex flex-wrap justify-center gap-6 mt-8">
                 {[
                   '✓ Sin tarjeta de crédito',
                   '✓ Tarda 2 minutos',
-                  '✓ 100% gratis para siempre',
+                  '✓ Sin comisiones',
                 ].map((t, i) => (
                   <span key={i} className="text-white/50 text-sm">{t}</span>
                 ))}

@@ -2,25 +2,33 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Heart, Mail } from 'lucide-react'
-import { getRandomBanners } from '../lib/chile-banners'
+import { getDestinations } from '../lib/geo/destinations'
+import { useCountry } from '../hooks/useCountry'
 import RukkaLogo from './RukkaLogo'
 
 export default function Footer() {
+  const userCountry = useCountry()
   const [destinations, setDestinations] = useState([])
-  useEffect(() => { setDestinations(getRandomBanners(5)) }, [])
+
+  useEffect(() => {
+    const country = userCountry || 'CL'
+    const dataset = getDestinations(country).cities
+    const shuffled = [...dataset].sort(() => 0.5 - Math.random()).slice(0, 5)
+    setDestinations(shuffled)
+  }, [userCountry])
 
   return (
-    <footer className="bg-rukka-dark text-gray-400">
+    <footer className="bg-rukka-dark text-gray-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
           <div className="md:col-span-1">
             <div className="flex items-center gap-2.5 mb-4">
               <RukkaLogo height={44} />
             </div>
-            <p className="text-sm leading-relaxed mb-4 text-gray-400">
-              <em>Rukka</em> significa "hogar" en Mapudungun, la lengua del pueblo Mapuche. Conectamos viajeros que creen que la mejor forma de conocer Chile es desde adentro.
+            <p className="text-sm leading-relaxed mb-4 text-gray-300">
+              <em>Rukka</em> significa "hogar" en Mapudungun, la lengua del pueblo Mapuche. Conectamos viajeros de Latinoamérica que creen en la hospitalidad como forma de conocer el mundo desde adentro.
             </p>
-            <p className="text-xs text-gray-600 italic">Hecho con ❤️ en Chile</p>
+            <p className="text-xs text-gray-400 italic">Con cariño, desde Chile para el mundo</p>
           </div>
 
           <div>
@@ -29,7 +37,7 @@ export default function Footer() {
               {destinations.map(b => (
                 <li key={b.id}>
                   <Link href={`/homes?search=${encodeURIComponent(b.city)}`}
-                    className="hover:text-forest-light transition-colors flex items-center gap-1.5">
+                    className="text-gray-300 hover:text-forest-light transition-colors flex items-center gap-1.5">
                     <span>{b.emoji}</span> {b.city}
                   </Link>
                 </li>
@@ -42,16 +50,15 @@ export default function Footer() {
             <ul className="space-y-2.5 text-sm">
               {[
                 ['Cómo funciona', '/como-funciona'],
-                ['Registrarse gratis', '/auth/register'],
-                ['Buscar match', '/matches'],
+                ['Registrarse', '/auth/register'],
                 ['Explorar hogares', '/homes'],
               ].map(([label, href]) => (
                 <li key={label}>
-                  <Link href={href} className="hover:text-forest-light transition-colors">{label}</Link>
+                  <Link href={href} className="text-gray-300 hover:text-forest-light transition-colors">{label}</Link>
                 </li>
               ))}
               <li>
-                <Link href="/anfitriones-airbnb" className="hover:text-[#ff5a5f] transition-colors text-[#ff5a5f]/70 font-semibold">
+                <Link href="/anfitriones-airbnb" className="hover:text-[#ff5a5f] transition-colors text-[#ff5a5f]/80 font-semibold">
                   🏠 Para anfitriones Airbnb
                 </Link>
               </li>
@@ -63,7 +70,7 @@ export default function Footer() {
             <ul className="space-y-2.5 text-sm">
               {[['Centro de ayuda', '#'], ['Seguridad', '#'], ['Términos', '/terminos'], ['Privacidad', '/terminos#privacidad']].map(([label, href]) => (
                 <li key={label}>
-                  <a href={href} className="hover:text-forest-light transition-colors">{label}</a>
+                  <a href={href} className="text-gray-300 hover:text-forest-light transition-colors">{label}</a>
                 </li>
               ))}
             </ul>
@@ -73,11 +80,11 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-gray-800/60 mt-12 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-600">
+        <div className="border-t border-gray-700/60 mt-12 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-400">
           <p>© 2026 Rukka. Todos los derechos reservados.</p>
-          <p className="text-gray-500 italic text-sm">"Mi casa es tu casa."</p>
+          <p className="text-gray-300 italic text-sm">"Mi casa es tu casa."</p>
           <p className="flex items-center gap-1.5">
-            Construido con <Heart className="w-3 h-3 text-terra fill-current" /> para la comunidad viajera de Chile
+            Construido con <Heart className="w-3 h-3 text-terra fill-current" /> para la comunidad viajera de Latinoamérica
           </p>
         </div>
       </div>

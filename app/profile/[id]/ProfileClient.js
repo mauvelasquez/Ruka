@@ -8,13 +8,12 @@ function AdBanner() {
   return (
     <div className="bg-gradient-to-r from-forest to-forest-dark rounded-2xl p-5 text-white flex flex-col sm:flex-row items-center gap-4 shadow-md my-6">
       <div className="flex-1">
-        <span className="inline-block bg-white/20 text-white text-xs font-black px-3 py-1 rounded-full mb-2">🎉 100% GRATIS</span>
         <h3 className="font-black text-base sm:text-lg mb-1">¿También quieres intercambiar tu hogar?</h3>
-        <p className="text-white/80 text-xs">Regístrate gratis, publica tu hogar y viaja por Chile sin pagar alojamiento.</p>
+        <p className="text-white/80 text-xs">Regístrate, publica tu hogar y viaja por Latinoamérica usando el intercambio.</p>
       </div>
       <Link href="/auth/register"
         className="flex-shrink-0 bg-white text-forest-dark font-black px-5 py-2.5 rounded-xl text-sm hover:bg-sand transition-colors flex items-center gap-2 whitespace-nowrap">
-        <Gift className="w-4 h-4" /> Unirme gratis
+        <Gift className="w-4 h-4" /> Unirme
       </Link>
     </div>
   )

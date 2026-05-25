@@ -174,14 +174,14 @@ export default function LoginPage() {
           </form>
 
           <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-xl text-center">
-            <p className="text-green-800 text-sm font-bold mb-1">🎉 Rukka es 100% gratis</p>
+            <p className="text-green-800 text-sm font-bold mb-1">🌎 Rukka — Intercambio de hogares en Latinoamérica</p>
             <p className="text-green-700 text-xs">Sin costo de alojamiento, sin comisiones, sin letra chica.</p>
           </div>
 
           <p className="mt-6 text-center text-sm text-gray-500">
             ¿Primera vez en Rukka?{' '}
             <Link href="/auth/register" className="text-forest font-bold hover:text-forest-dark">
-              Crea tu cuenta gratis →
+              Crea tu cuenta →
             </Link>
           </p>
         </div>

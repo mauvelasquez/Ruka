@@ -35,7 +35,7 @@ export default function RegisterPage() {
             <RukkaLogo height={56} />
           </Link>
           <h1 className="text-2xl font-extrabold text-gray-900">Crea tu cuenta</h1>
-          <p className="text-gray-500 mt-1 text-sm">Gratis, sin letra chica, solo para Chile 🇨🇱</p>
+          <p className="text-gray-500 mt-1 text-sm">Intercambia tu hogar en Chile, México, Colombia y Argentina</p>
         </div>
 
         <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6 sm:p-8">

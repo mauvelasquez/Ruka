@@ -6,7 +6,20 @@ import Footer from '../../components/Footer'
 import { CHILE_BANNERS } from '../../lib/chile-banners'
 import { ArrowRight, ArrowLeftRight, Sparkles, ChevronDown, ChevronUp } from 'lucide-react'
 
-// ── FAQ Acordeón ──────────────────────────────────────────────────────────────
+const STEPS = [
+  { n: '01', icon: '🏔️', title: 'Publica tu rukka', desc: 'Crea tu perfil y registra tu hogar. ¿Ya estás en Airbnb? Impórtalo en segundos y empieza a recibir solicitudes de intercambio.' },
+  { n: '02', icon: '🗺️', title: 'Elige tu destino', desc: 'Busca hogares en Chile, México, Colombia o Argentina.' },
+  { n: '03', icon: '✦',  title: 'El algoritmo trabaja', desc: 'Rukka detecta matches perfectos entre viajeros con fechas compatibles.' },
+  { n: '04', icon: '🤝', title: 'Intercambia y viaja', desc: 'Confirmen el intercambio y vivan como locales en la ciudad del otro.' },
+]
+
+const BENEFITS = [
+  { icon: '🌎', title: 'Latinoamérica completa', desc: 'Operamos en Chile, México, Colombia y Argentina. Cruza fronteras usando el intercambio de hogares.' },
+  { icon: '🔁', title: 'Match bilateral', desc: 'El sistema detecta cuándo dos viajeros quieren visitarse en fechas compatibles.' },
+  { icon: '🔒', title: 'Comunidad verificada', desc: 'Verificación de email obligatoria y perfil completo para todos los miembros.' },
+  { icon: '✈️', title: 'Importa tu Airbnb al instante', desc: 'Si ya tienes tu propiedad en Airbnb, pega el link y traemos fotos, descripción y características automáticamente.' },
+]
+
 const FAQS = [
   {
     q: '¿Tengo que intercambiar al mismo tiempo?',
@@ -17,12 +30,8 @@ const FAQS = [
     a: 'Todos los perfiles están verificados y tienen valoraciones visibles. Puedes hablar con el otro usuario antes de confirmar y siempre quedan registros dentro de la plataforma.',
   },
   {
-    q: '¿Es realmente gratis?',
-    a: 'Sí, 100%. Rukka no cobra comisión, no tiene suscripción mensual ni tarifa por intercambio. El modelo es simple: tu hogar es tu moneda de cambio.',
-  },
-  {
-    q: '¿Solo funciona en Chile?',
-    a: 'Por ahora sí. Estamos enfocados en construir una comunidad chilena sólida y de confianza. En el futuro podría expandirse.',
+    q: '¿En qué países funciona Rukka?',
+    a: 'Actualmente operamos en Chile, México, Colombia y Argentina. Estamos construyendo una comunidad sólida en toda Latinoamérica y seguimos expandiéndonos.',
   },
 ]
 
@@ -41,7 +50,6 @@ function FaqItem({ q, a }) {
           : <ChevronDown className="w-5 h-5 text-gray-400 flex-shrink-0" />
         }
       </button>
-      {/* Siempre en el DOM para que los crawlers indexen las respuestas */}
       <div
         className={`px-5 text-gray-600 text-sm leading-relaxed bg-white border-t border-gray-100 overflow-hidden transition-all duration-200 ${open ? 'pb-5 max-h-96' : 'max-h-0 border-t-0'}`}
         aria-hidden={!open}
@@ -52,7 +60,6 @@ function FaqItem({ q, a }) {
   )
 }
 
-// ── Página ────────────────────────────────────────────────────────────────────
 export default function ComoFuncionaPage() {
   const [heroBanner, setHeroBanner] = useState(null)
 
@@ -76,21 +83,21 @@ export default function ComoFuncionaPage() {
         </div>
         <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
           <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm border border-white/25 text-white rounded-full px-4 py-2 text-sm font-bold mb-6">
-            🇨🇱 La primera plataforma chilena de intercambio de hogares
+            🌎 La plataforma LATAM de intercambio de hogares
           </div>
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white leading-tight mb-5">
-            Viaja por Chile sin<br />
+            Viaja por Latinoamérica sin<br />
             <span className="text-sand">pagar hotel. En serio.</span>
           </h1>
           <p className="text-base text-sand/90 font-bold italic mb-3">Mi casa es tu casa.</p>
           <p className="text-lg sm:text-xl text-white/80 max-w-2xl mx-auto leading-relaxed mb-8">
-            Rukka es la primera plataforma chilena de intercambio de hogares.
+            Rukka es la plataforma de intercambio de hogares de Latinoamérica.
             Tú cuidas el hogar de alguien, ellos cuidan el tuyo.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/auth/register"
               className="bg-white text-forest-dark font-black px-8 py-4 rounded-2xl text-base hover:bg-sand transition-colors flex items-center justify-center gap-2">
-              Crear mi cuenta gratis <ArrowRight className="w-5 h-5" />
+              Crear mi cuenta <ArrowRight className="w-5 h-5" />
             </Link>
             <Link href="/homes"
               className="border-2 border-white/40 text-white font-bold px-8 py-4 rounded-2xl text-base hover:bg-white/10 transition-colors flex items-center justify-center">
@@ -109,10 +116,10 @@ export default function ComoFuncionaPage() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
-              { emoji: '🏠', title: 'Tienes un hogar', desc: 'Puede ser casa, depto, cabaña. Da igual dónde en Chile.' },
-              { emoji: '🗺️', title: 'Alguien más tiene otro', desc: 'En Pichilemu, Puerto Varas, Zapallar, donde quieras ir.' },
+              { emoji: '🏠', title: 'Tienes un hogar', desc: 'Puede ser casa, depto, cabaña. Da igual dónde en Latinoamérica.' },
+              { emoji: '🗺️', title: 'Alguien más tiene otro', desc: 'En Pichilemu, Cancún, Cartagena, Bariloche, donde quieras ir.' },
               { emoji: '🤝', title: 'Se ponen de acuerdo', desc: 'Fechas, personas, detalles. Todo dentro de Rukka.' },
-              { emoji: '🏖️', title: 'Ambos alojan gratis', desc: 'Sin hoteles, sin Airbnb, sin pagar alojamiento.' },
+              { emoji: '🏖️', title: 'Ambos alojan sin pagar', desc: 'Sin hoteles, sin Airbnb, sin pagar alojamiento.' },
             ].map((s, i) => (
               <div key={i} className="relative">
                 <div className="bg-white border-2 border-gray-100 rounded-3xl p-6 h-full hover:border-forest/30 hover:shadow-md transition-all text-center">
@@ -131,19 +138,47 @@ export default function ComoFuncionaPage() {
         </div>
       </section>
 
-      {/* ── SECCIÓN 3: POR QUÉ CONFIAR ─────────────────────────────────────── */}
+      {/* ── SECCIÓN 3: 4 PASOS ─────────────────────────────────────────────── */}
+      <section className="py-20 bg-rukka-dark">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-14">
+            <p className="text-xs font-bold uppercase tracking-widest text-forest-light mb-3">Cómo funciona</p>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-3">4 pasos para viajar diferente</h2>
+            <p className="text-gray-400 max-w-lg mx-auto">Sin hoteles, sin Airbnb, sin pagar alojamiento. Solo intercambio real.</p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {STEPS.map((s, i) => (
+              <div key={i} className="relative">
+                <div className="bg-white/5 border border-white/10 rounded-2xl p-6 h-full">
+                  <div className="text-3xl mb-4">{s.icon}</div>
+                  <p className="text-forest-light text-xs font-bold mb-2">Paso {s.n}</p>
+                  <h3 className="text-white font-bold text-lg mb-3">{s.title}</h3>
+                  <p className="text-gray-400 text-sm leading-relaxed">{s.desc}</p>
+                </div>
+                {i < STEPS.length - 1 && (
+                  <div className="hidden lg:block absolute -right-3 top-1/2 -translate-y-1/2 z-10">
+                    <ArrowRight className="w-6 h-6 text-forest/40" />
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── SECCIÓN 4: POR QUÉ CONFIAR ─────────────────────────────────────── */}
       <section className="py-20" style={{ background: '#F8F4EE' }}>
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-14">
             <p className="text-xs font-bold uppercase tracking-widest text-terra mb-3">Por qué confiar</p>
-            <h2 className="text-3xl sm:text-4xl font-black text-gray-900">Diseñado para Chile</h2>
+            <h2 className="text-3xl sm:text-4xl font-black text-gray-900">Diseñado para viajeros de verdad</h2>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">
             {[
               {
-                emoji: '🇨🇱',
-                title: 'Solo Chile',
-                desc: 'Comunidad local, personas reales, cultura compartida. No somos una plataforma global genérica.',
+                emoji: '🌎',
+                title: 'Comunidad LATAM',
+                desc: 'Chile, México, Colombia y Argentina. Personas reales, cultura compartida. No somos una plataforma global genérica.',
                 color: 'bg-terra-50 border-terra/20',
                 titleColor: 'text-terra',
               },
@@ -153,13 +188,6 @@ export default function ComoFuncionaPage() {
                 desc: 'Email verificado y perfil completo obligatorio para todos los miembros. Sin perfiles anónimos.',
                 color: 'bg-forest-50 border-forest/20',
                 titleColor: 'text-forest',
-              },
-              {
-                emoji: '💸',
-                title: '100% gratis',
-                desc: 'Sin comisiones, sin suscripción, sin letra chica. Tu hogar es tu única moneda de cambio.',
-                color: 'bg-andean-50 border-andean/20',
-                titleColor: 'text-andean',
               },
             ].map((c, i) => (
               <div key={i} className={`${c.color} border-2 rounded-3xl p-8`}>
@@ -172,7 +200,7 @@ export default function ComoFuncionaPage() {
         </div>
       </section>
 
-      {/* ── SECCIÓN 4: MATCH REAL ──────────────────────────────────────────── */}
+      {/* ── SECCIÓN 5: MATCH REAL ──────────────────────────────────────────── */}
       <section className="py-20 bg-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
@@ -185,7 +213,6 @@ export default function ComoFuncionaPage() {
 
           <div className="bg-forest-50 border border-forest-100 rounded-3xl p-8 sm:p-12">
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-10 mb-8">
-              {/* Card Camila */}
               <div style={{ position:'relative', borderRadius:16, overflow:'hidden', height:160, width:'100%', maxWidth:280, flexShrink:0 }}>
                 <img src="https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=600"
                   alt="Hogar Camila"
@@ -209,7 +236,6 @@ export default function ComoFuncionaPage() {
                 </span>
               </div>
 
-              {/* Card Roberto */}
               <div style={{ position:'relative', borderRadius:16, overflow:'hidden', height:160, width:'100%', maxWidth:280, flexShrink:0 }}>
                 <img src="https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=600"
                   alt="Hogar Roberto"
@@ -235,7 +261,7 @@ export default function ComoFuncionaPage() {
         </div>
       </section>
 
-      {/* ── SECCIÓN 5: YANKIS ─────────────────────────────────────────────── */}
+      {/* ── SECCIÓN 6: YANKIS ─────────────────────────────────────────────── */}
       <section id="yankis" className="py-20 bg-white">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-14">
@@ -282,7 +308,6 @@ export default function ComoFuncionaPage() {
             </div>
           </div>
 
-          {/* Explicación del modelo no-simultáneo */}
           <div className="bg-gradient-to-r from-forest-dark to-forest rounded-3xl p-8 sm:p-10 text-white text-center">
             <div className="text-3xl mb-4">🔄</div>
             <h3 className="font-black text-2xl mb-3">Intercambia sin coincidir en el tiempo</h3>
@@ -295,8 +320,27 @@ export default function ComoFuncionaPage() {
         </div>
       </section>
 
-      {/* ── SECCIÓN 6: FAQ ─────────────────────────────────────────────────── */}
+      {/* ── SECCIÓN 7: POR QUÉ RUKKA ──────────────────────────────────────── */}
       <section className="py-20" style={{ background: '#F8F4EE' }}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <p className="text-xs font-bold uppercase tracking-widest text-terra mb-3">Por qué Rukka</p>
+            <h2 className="text-3xl font-extrabold text-gray-900">Viajar diferente, en Latinoamérica</h2>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {BENEFITS.map((b, i) => (
+              <div key={i} className={`bg-white rounded-2xl p-6 border shadow-sm hover:shadow-md transition-shadow ${i === 3 ? 'border-[#ff5a5f]/20 bg-[#ff5a5f]/3' : 'border-stone-200/60'}`}>
+                <div className="text-4xl mb-4">{b.icon}</div>
+                <h3 className="font-bold text-gray-900 mb-2">{b.title}</h3>
+                <p className="text-gray-500 text-sm leading-relaxed">{b.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── SECCIÓN 8: FAQ ─────────────────────────────────────────────────── */}
+      <section className="py-20 bg-white">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <p className="text-xs font-bold uppercase tracking-widest text-terra mb-3">Preguntas frecuentes</p>
@@ -308,8 +352,8 @@ export default function ComoFuncionaPage() {
         </div>
       </section>
 
-      {/* ── SECCIÓN 7: CTA FINAL ───────────────────────────────────────────── */}
-      <section className="py-24 bg-white">
+      {/* ── SECCIÓN 9: CTA FINAL ───────────────────────────────────────────── */}
+      <section className="py-24" style={{ background: '#F8F4EE' }}>
         <div className="max-w-3xl mx-auto px-4 text-center">
           <div className="bg-forest-dark rounded-3xl p-12 sm:p-16">
             <Sparkles className="w-10 h-10 text-forest-light mx-auto mb-5" />
@@ -317,11 +361,11 @@ export default function ComoFuncionaPage() {
               ¿Lista tu rukka para<br />el intercambio?
             </h2>
             <p className="text-white/70 text-lg mb-8">
-              Únete gratis y empieza a intercambiar hogares por todo Chile.
+              Únete y empieza a intercambiar hogares por Latinoamérica.
             </p>
             <Link href="/auth/register"
               className="inline-flex items-center gap-2 bg-white text-forest-dark font-black px-10 py-4 rounded-2xl text-lg hover:bg-sand transition-colors shadow-lg">
-              Crear mi cuenta gratis <ArrowRight className="w-5 h-5" />
+              Crear mi cuenta <ArrowRight className="w-5 h-5" />
             </Link>
             <p className="text-white/40 text-sm mt-5">Tarda 2 minutos. Sin tarjeta de crédito.</p>
           </div>

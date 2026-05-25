@@ -3,8 +3,8 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useApp } from '../lib/store'
-import { Menu, X, Globe, User, LogOut, PlusCircle, LayoutDashboard, ChevronDown, Sparkles } from 'lucide-react'
-import RukkaLogo from './RukkaLogo'
+import { Menu, X, Globe, User, LogOut, LayoutDashboard, ChevronDown, Sparkles } from 'lucide-react'
+import Image from 'next/image'
 import { FresiaAvatar } from './fresia/ChatInterface'
 import { analytics } from '../lib/analytics'
 import YankiBalance from './yankis/YankiBalance'
@@ -29,8 +29,7 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 group hover:opacity-90 transition-opacity">
-            <RukkaLogo height={48} />
-            <span className="hidden sm:inline text-xs text-stone font-normal">· intercambia tu hogar</span>
+            <Image src="/rukka-logo-nuevo.png" alt="Rukka" width={48} height={48} className="object-contain" priority />
           </Link>
 
           {/* Desktop links */}
@@ -44,11 +43,6 @@ export default function Navbar() {
             <Link href="/anfitriones-airbnb" onClick={() => analytics.navClick('anfitriones_airbnb')} className="flex items-center gap-1.5 text-sm font-bold text-[#ff5a5f] hover:text-[#e0484d] transition-colors">
               <span className="text-base leading-none">🏠</span> Para anfitriones Airbnb
             </Link>
-            {user && (
-              <Link href="/matches" className="text-gray-600 hover:text-terra font-medium text-sm transition-colors flex items-center gap-1.5">
-                <Sparkles className="w-4 h-4" /> Buscar match
-              </Link>
-            )}
           </div>
 
           {/* Auth */}
@@ -59,9 +53,6 @@ export default function Navbar() {
             {user ? (
               <div className="flex items-center gap-3 relative">
                 <YankiBalance size="sm" showLabel linkable />
-                <Link href="/matches" className="flex items-center gap-1.5 text-sm font-semibold text-terra-dark bg-terra-50 px-4 py-2 rounded-full hover:bg-terra/10 transition-colors border border-terra/20">
-                  <Sparkles className="w-4 h-4 text-terra" /> Buscar match
-                </Link>
                 <div className="relative">
                   <button
                     onClick={() => setDropdownOpen(!dropdownOpen)}
@@ -106,7 +97,7 @@ export default function Navbar() {
                   Iniciar sesión
                 </Link>
                 <Link href="/auth/register" className="text-sm font-bold bg-forest text-white px-5 py-2 rounded-full hover:bg-forest-dark transition-colors shadow-sm">
-                  Unirme gratis
+                  Crear cuenta
                 </Link>
               </div>
             )}
@@ -138,9 +129,6 @@ export default function Navbar() {
               <div className="px-3 py-2">
                 <YankiBalance size="md" showLabel linkable />
               </div>
-              <Link href="/matches" onClick={() => setMenuOpen(false)} className="flex items-center gap-2 p-3 rounded-xl text-gray-700 hover:bg-terra-50">
-                <Sparkles className="w-4 h-4 text-terra" /> Buscar match
-              </Link>
               <Link href="/dashboard" onClick={() => setMenuOpen(false)} className="flex items-center gap-2 p-3 rounded-xl text-gray-700 hover:bg-forest-50">
                 <LayoutDashboard className="w-4 h-4 text-forest" /> Mi Panel
               </Link>
@@ -151,7 +139,7 @@ export default function Navbar() {
           ) : (
             <div className="flex flex-col gap-2 pt-2">
               <Link href="/auth/login" onClick={() => setMenuOpen(false)} className="text-center p-3 rounded-xl border border-gray-200 text-gray-700 font-semibold">Iniciar sesión</Link>
-              <Link href="/auth/register" onClick={() => setMenuOpen(false)} className="text-center p-3 rounded-xl bg-forest text-white font-bold">Unirme gratis</Link>
+              <Link href="/auth/register" onClick={() => setMenuOpen(false)} className="text-center p-3 rounded-xl bg-forest text-white font-bold">Crear cuenta</Link>
             </div>
           )}
         </div>

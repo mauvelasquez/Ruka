@@ -1,9 +1,9 @@
 export const metadata = {
   title: 'Publica tu hogar — Rukka',
-  description: 'Registra tu hogar en Rukka gratis. Publica tu casa, cabaña o departamento y empieza a recibir propuestas de intercambio de otros viajeros chilenos.',
+  description: 'Registra tu hogar en Rukka. Publica tu casa, cabaña o departamento y empieza a recibir propuestas de intercambio de otros viajeros en Latinoamérica.',
   openGraph: {
-    title: 'Publica tu hogar en Rukka — Gratis',
-    description: 'Registra tu hogar y empieza a intercambiarlo con otros viajeros en Chile.',
+    title: 'Publica tu hogar en Rukka',
+    description: 'Registra tu hogar y empieza a intercambiarlo con otros viajeros en Latinoamérica.',
     url: 'https://rukka.cl/onboarding',
     siteName: 'Rukka',
     locale: 'es_CL',

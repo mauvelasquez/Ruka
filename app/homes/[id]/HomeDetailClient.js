@@ -288,7 +288,7 @@ export default function HomeDetailClient({ id }) {
                       <ArrowLeftRight className="w-5 h-5" />
                       {user ? 'Enviar solicitud' : 'Inicia sesión para solicitar'}
                     </button>
-                    {!user && <p className="text-center text-xs text-gray-400"><Link href="/auth/register" className="text-forest font-semibold hover:underline">Regístrate gratis</Link> para intercambiar</p>}
+                    {!user && <p className="text-center text-xs text-gray-400"><Link href="/auth/register" className="text-forest font-semibold hover:underline">Regístrate</Link> para intercambiar</p>}
                   </form>
                   <div className="mt-5 pt-5 border-t border-gray-50 space-y-2.5">
                     {[[<Shield className="w-4 h-4 text-forest" />, 'Comunidad verificada'],
