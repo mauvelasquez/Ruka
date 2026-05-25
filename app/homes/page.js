@@ -8,6 +8,7 @@ import { SlidersHorizontal, X, ChevronDown, MapPin, ChevronLeft, ChevronRight } 
 import { COMUNAS_RUKKA } from '../../lib/comunas'
 import { getRandomBanner } from '../../lib/chile-banners'
 import { analytics } from '../../lib/analytics'
+import { COUNTRIES, getRegions, getCities } from '../../lib/geo/latam'
 
 const TYPES = ['Todos', 'Casa', 'Departamento', 'Cabaña', 'Estudio', 'Loft', 'Villa', 'Habitación']
 const LIMIT = 24
@@ -31,6 +32,7 @@ function HomesContent() {
   const [banner]      = useState(() => getRandomBanner())
 
   const [search,      setSearch]      = useState(initialSearch)
+  const [country,     setCountry]     = useState(searchParams.get('country') || '')
   const [type,        setType]        = useState('Todos')
   const [region,      setRegion]      = useState('Todas')
   const [city,        setCity]        = useState('Todas')
@@ -53,6 +55,7 @@ function HomesContent() {
         limit:   String(LIMIT),
         sort,
         ...(search    && { search }),
+        ...(country   && { country }),
         ...(type !== 'Todos'  && { type }),
         ...(region !== 'Todas' && { region }),
         ...(city !== 'Todas'  && { city }),
@@ -69,7 +72,7 @@ function HomesContent() {
     } finally {
       setLoading(false)
     }
-  }, [search, type, region, city, minBeds, sort])
+  }, [search, country, type, region, city, minBeds, sort])
 
   // Debounce para el campo de búsqueda
   useEffect(() => {
@@ -83,13 +86,18 @@ function HomesContent() {
 
   const clear = () => {
     setSearch('')
+    setCountry('')
     setType('Todos')
     setRegion('Todas')
     setCity('Todas')
     setMinBeds(0)
     setPage(1)
   }
-  const hasFilters = search || type !== 'Todos' || region !== 'Todas' || city !== 'Todas' || minBeds > 0
+  const hasFilters = search || country || type !== 'Todos' || region !== 'Todas' || city !== 'Todas' || minBeds > 0
+
+  const selectedCountry = COUNTRIES.find(c => c.code === country)
+  const latamRegions    = country ? getRegions(country) : []
+  const latamCities     = (country && region !== 'Todas') ? getCities(country, region) : []
   const sortLabels = { rating: 'Mejor valorados', reviews: 'Más reseñas', newest: 'Más recientes' }
 
   const goToPage = (p) => {
@@ -112,7 +120,11 @@ function HomesContent() {
             <div className="inline-flex items-center gap-2 bg-white/20 text-white rounded-full px-3 py-1 text-xs font-bold mb-3">
               {banner.emoji} {banner.tagline}
             </div>
-            <h1 className="text-3xl font-extrabold text-white mb-1">Explorar hogares en todo Chile</h1>
+            <h1 className="text-3xl font-extrabold text-white mb-1">
+            {selectedCountry
+              ? `Hogares en ${selectedCountry.flag} ${selectedCountry.name}`
+              : 'Explorar hogares en Latinoamérica'}
+          </h1>
             <p className="text-white/70 mb-6 text-sm">{banner.description}</p>
             <div className="flex items-center gap-3 bg-white rounded-xl p-3 max-w-xl shadow-lg">
               <MapPin className="w-5 h-5 text-terra flex-shrink-0 ml-1" />
@@ -126,6 +138,24 @@ function HomesContent() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        {/* Chips país */}
+        <div className="flex gap-2 mb-3 flex-wrap">
+          <button onClick={() => { setCountry(''); setRegion('Todas'); setCity('Todas') }}
+            className={`px-3 py-1.5 rounded-full text-xs font-bold border transition-all ${
+              !country ? 'bg-forest text-white border-forest' : 'bg-white text-gray-600 border-gray-200 hover:border-forest/50'
+            }`}>
+            🌎 Latinoamérica
+          </button>
+          {COUNTRIES.map(c => (
+            <button key={c.code} onClick={() => { setCountry(c.code); setRegion('Todas'); setCity('Todas') }}
+              className={`px-3 py-1.5 rounded-full text-xs font-bold border transition-all ${
+                country === c.code ? 'bg-forest text-white border-forest' : 'bg-white text-gray-600 border-gray-200 hover:border-forest/50'
+              }`}>
+              {c.flag} {c.name}
+            </button>
+          ))}
+        </div>
+
         {/* Chips tipo */}
         <div className="flex items-center gap-3 mb-5 flex-wrap">
           <div className="flex gap-2 flex-wrap">
@@ -167,20 +197,48 @@ function HomesContent() {
 
         {showFilters && (
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-5">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {/* País */}
               <div>
-                <label className="block text-xs font-bold text-gray-700 mb-2 uppercase tracking-wide">Localidad</label>
+                <label className="block text-xs font-bold text-gray-700 mb-2 uppercase tracking-wide">País</label>
                 <div className="relative">
-                  <select value={city} onChange={e => { setCity(e.target.value); if (e.target.value !== 'Todas') analytics.homesFilterCity(e.target.value) }}
+                  <select value={country} onChange={e => { setCountry(e.target.value); setRegion('Todas'); setCity('Todas') }}
                     className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-forest bg-gray-50 appearance-none">
-                    <option value="Todas">Todas las localidades</option>
-                    {COMUNAS_RUKKA.map(c => <option key={c} value={c}>{c}</option>)}
+                    <option value="">Todos los países</option>
+                    {COUNTRIES.map(c => <option key={c.code} value={c.code}>{c.flag} {c.name}</option>)}
                   </select>
                   <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center">
                     <ChevronDown className="w-4 h-4 text-gray-400" />
                   </div>
                 </div>
               </div>
+
+              {/* Localidad: usa LATAM si hay país seleccionado, sino COMUNAS Chile */}
+              <div>
+                <label className="block text-xs font-bold text-gray-700 mb-2 uppercase tracking-wide">
+                  {country && country !== 'CL' ? (COUNTRIES.find(c=>c.code===country)?.code === 'MX' ? 'Estado' : country === 'AR' ? 'Provincia' : 'Región') : 'Localidad'}
+                </label>
+                <div className="relative">
+                  {country && country !== 'CL' ? (
+                    <select value={region} onChange={e => { setRegion(e.target.value); setCity('Todas') }}
+                      className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-forest bg-gray-50 appearance-none">
+                      <option value="Todas">Todas</option>
+                      {latamRegions.map(r => <option key={r.code} value={r.code}>{r.name}</option>)}
+                    </select>
+                  ) : (
+                    <select value={city} onChange={e => { setCity(e.target.value); if (e.target.value !== 'Todas') analytics.homesFilterCity(e.target.value) }}
+                      className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-forest bg-gray-50 appearance-none">
+                      <option value="Todas">Todas las localidades</option>
+                      {COMUNAS_RUKKA.map(c => <option key={c} value={c}>{c}</option>)}
+                    </select>
+                  )}
+                  <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center">
+                    <ChevronDown className="w-4 h-4 text-gray-400" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Habitaciones */}
               <div>
                 <label className="block text-xs font-bold text-gray-700 mb-2 uppercase tracking-wide">Habitaciones mínimas</label>
                 <div className="flex gap-2">
@@ -194,6 +252,7 @@ function HomesContent() {
                   ))}
                 </div>
               </div>
+
               {hasFilters && (
                 <div className="flex items-end">
                   <button onClick={clear} className="flex items-center gap-1.5 text-sm text-red-500 hover:text-red-700 font-semibold">

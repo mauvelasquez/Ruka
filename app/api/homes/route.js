@@ -16,6 +16,7 @@ export async function GET(req) {
   const { searchParams } = new URL(req.url)
   const search   = searchParams.get('search')   || ''
   const type     = searchParams.get('type')     || ''
+  const country  = searchParams.get('country')  || ''
   const region   = searchParams.get('region')   || ''
   const city     = searchParams.get('city')     || ''
   const minBeds  = parseInt(searchParams.get('minBeds')  || '0', 10)
@@ -38,8 +39,9 @@ export async function GET(req) {
       )
     }
 
-    if (type)   query = query.eq('type', type)
-    if (region) query = query.eq('region', region)
+    if (country) query = query.eq('country_code', country)
+    if (type)    query = query.eq('type', type)
+    if (region)  query = query.eq('region_code', region)
     if (city) {
       const safeCity = city.replace(/[^a-z0-9\s]/gi, '').trim()
       if (safeCity) query = query.or(`city.ilike.%${safeCity}%,comuna.ilike.%${safeCity}%`)

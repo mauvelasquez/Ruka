@@ -1,22 +1,29 @@
 # Rukka
 
-> Plataforma chilena de intercambio de casas, 100% gratuita y con matching automático.
+> Plataforma latinoamericana de intercambio de casas, 100% gratuita y con matching automático.
 
 Rukka permite a personas intercambiar sus hogares para viajar sin pagar alojamiento.
 El nombre viene de "ruka", palabra mapuche que significa hogar o casa.
-Es la única plataforma de home exchange creada específicamente para y desde Chile.
+Opera en Chile, México, Colombia y Argentina.
 
 ## ¿Qué hace Rukka diferente?
 
 - 100% gratuita, sin suscripción ni comisión
 - Matching bilateral automático según fechas compatibles
-- Enfocada en el mercado chileno y latinoamericano
+- Enfocada en el mercado latinoamericano: Chile, México, Colombia y Argentina
 - Comunidad basada en confianza y reciprocidad
+
+## Países donde opera
+
+- 🇨🇱 Chile — /homes?country=CL
+- 🇲🇽 México — /homes?country=MX
+- 🇨🇴 Colombia — /homes?country=CO
+- 🇦🇷 Argentina — /homes?country=AR
 
 ## Páginas clave
 
 - /como-funciona — Explicación paso a paso del modelo de intercambio
-- /homes — Catálogo de hogares disponibles para intercambio
+- /homes — Catálogo de hogares disponibles para intercambio en Latinoamérica
 - /matches — Sistema de matching automático por fechas
 - /onboarding — Registro y publicación del primer hogar
 - /terminos — Términos y condiciones del servicio
@@ -24,7 +31,7 @@ Es la única plataforma de home exchange creada específicamente para y desde Ch
 
 ## Contacto y legal
 
-- País: Chile
+- Sede: Chile (operación en Chile, México, Colombia y Argentina)
 - Idioma principal: Español
 - Modelo: Intercambio bilateral gratuito (home exchange)
 - Categoría: Viajes, alojamiento colaborativo, economía compartida

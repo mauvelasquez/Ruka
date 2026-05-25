@@ -37,5 +37,12 @@ export default async function sitemap() {
     console.error('Sitemap: error fetching homes', e)
   }
 
-  return [...staticRoutes, ...homeRoutes]
+  const countryRoutes = ['CL', 'MX', 'CO', 'AR'].map(code => ({
+    url: `${baseUrl}/homes?country=${code}`,
+    lastModified: new Date(),
+    changeFrequency: 'daily',
+    priority: 0.8,
+  }))
+
+  return [...staticRoutes, ...countryRoutes, ...homeRoutes]
 }

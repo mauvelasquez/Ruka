@@ -4,6 +4,7 @@ import { useRouter, useParams } from 'next/navigation'
 import dynamic from 'next/dynamic'
 import { useApp } from '../../../../lib/store'
 import ChileLocationSelect from '../../../../components/ChileLocationSelect'
+import CountryRegionSelector from '../../../../components/geo/CountryRegionSelector'
 import DescriptionHints from '../../../../components/DescriptionHints'
 import Link from 'next/link'
 
@@ -113,7 +114,7 @@ export default function PropertyPage() {
     private_bathroom: false, bed_type: '', shared_with: 1,
     amenities: [],
   })
-  const [location, setLocation] = useState({ region: '', comuna: '', direccion: '' })
+  const [location, setLocation] = useState({ country_code: 'CL', region: '', region_code: '', comuna: '', city: '', direccion: '' })
   const [photos,   setPhotos]   = useState([])
   const [coords,   setCoords]   = useState(null)
 
@@ -146,7 +147,7 @@ export default function PropertyPage() {
       shared_with:      home.shared_with || 1,
       amenities:        home.amenities || [],
     })
-    setLocation({ region: home.region || '', comuna: home.comuna || '', direccion: home.direccion || '' })
+    setLocation({ country_code: home.country_code || 'CL', region: home.region || '', region_code: home.region_code || '', comuna: home.comuna || '', city: home.city || home.comuna || '', direccion: home.direccion || '' })
     setPhotos(home.images || [])
     if (home.coords) setCoords(home.coords)
   }, [isNew, ready, homes, id])
@@ -311,8 +312,10 @@ export default function PropertyPage() {
     e?.preventDefault()
     setError('')
     if (!homeForm.title.trim()) { setError('Ingresa el título del hogar'); return }
-    if (!location.region)       { setError('Selecciona la región'); return }
-    if (!location.comuna)       { setError('Selecciona la comuna'); return }
+    if (location.country_code === 'CL' && !location.region) { setError('Selecciona la región'); return }
+    if (location.country_code === 'CL' && !location.comuna) { setError('Selecciona la ciudad'); return }
+    if (location.country_code !== 'CL' && !location.region_code) { setError('Selecciona la región'); return }
+    if (location.country_code !== 'CL' && !location.city) { setError('Selecciona la ciudad'); return }
     if (!subtype)               { setError('Selecciona el tipo de hogar'); return }
 
     setSaving(true)
@@ -322,11 +325,13 @@ export default function PropertyPage() {
       category,
       subtype,
       type:             subtype,
+      country_code:     location.country_code || 'CL',
       region:           location.region,
+      region_code:      location.region_code,
       comuna:           location.comuna,
+      city:             location.city || location.comuna,
       direccion:        location.direccion,
       coords,
-      city:             location.comuna,
       bedrooms:         homeForm.bedrooms,
       bathrooms:        homeForm.bathrooms,
       maxGuests:        homeForm.maxGuests,
@@ -573,7 +578,27 @@ export default function PropertyPage() {
         {/* ── Ubicación + Mapa ── */}
         <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
           <h2 className="font-black text-gray-900 text-lg mb-4">Ubicación</h2>
-          <ChileLocationSelect value={location} onChange={setLocation} showDireccion required />
+
+          {/* Selector de país */}
+          <div className="mb-4">
+            <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">País *</label>
+            <CountryRegionSelector
+              value={{ country_code: location.country_code, region_code: location.region_code, city: location.city }}
+              onChange={geo => setLocation(prev => ({
+                ...prev,
+                country_code: geo.country_code,
+                region_code:  geo.region_code,
+                city:         geo.city,
+                region:       geo.country_code === 'CL' ? prev.region : '',
+                comuna:       geo.country_code === 'CL' ? prev.comuna : geo.city,
+              }))}
+            />
+          </div>
+
+          {/* Para Chile: mantener el selector detallado con direccion */}
+          {location.country_code === 'CL' && (
+            <ChileLocationSelect value={location} onChange={v => setLocation(prev => ({ ...prev, ...v }))} showDireccion required />
+          )}
 
           <button type="button" onClick={geocode} disabled={geocoding}
             className="mt-4 flex items-center gap-2 text-sm font-semibold text-forest hover:text-forest-dark transition-colors disabled:opacity-60">

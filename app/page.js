@@ -12,17 +12,25 @@ import { CHILE_BANNERS } from '../lib/chile-banners'
 import { DESTINOS_RUKKA } from '../lib/comunas'
 import { HOGARES_FALLBACK } from '../lib/data/hogaresDestacados'
 import { supabase } from '../lib/supabase'
+import { COUNTRIES } from '../lib/geo/latam'
 import { ArrowRight, Sparkles, Shield, ArrowLeftRight, Gift, Zap, Heart } from 'lucide-react'
+
+const LATAM_COUNTRIES = [
+  { code: 'CL', flag: '🇨🇱', name: 'Chile',     img: 'https://images.unsplash.com/photo-1591378603223-e15b45a81640?w=800', alt: 'Santiago de Chile' },
+  { code: 'MX', flag: '🇲🇽', name: 'México',    img: 'https://images.unsplash.com/photo-1518105779142-d975f22f1b0a?w=800', alt: 'Ciudad de México' },
+  { code: 'CO', flag: '🇨🇴', name: 'Colombia',  img: 'https://images.unsplash.com/photo-1598522325074-042db73aa4e6?w=800', alt: 'Cartagena de Indias' },
+  { code: 'AR', flag: '🇦🇷', name: 'Argentina', img: 'https://images.unsplash.com/photo-1589909202802-8f4aadce1849?w=800', alt: 'Buenos Aires' },
+]
 
 const STEPS = [
   { n: '01', icon: '🏔️', title: 'Publica tu rukka', desc: 'Crea tu perfil y registra tu hogar. ¿Ya estás en Airbnb? Impórtalo en segundos y empieza a recibir solicitudes de intercambio.' },
-  { n: '02', icon: '🗺️', title: 'Elige tu destino', desc: 'Busca hogares en tu ciudad soñada dentro de Chile.' },
+  { n: '02', icon: '🗺️', title: 'Elige tu destino', desc: 'Busca hogares en Chile, México, Colombia o Argentina.' },
   { n: '03', icon: '✦', title: 'El algoritmo trabaja', desc: 'Rukka detecta matches perfectos entre viajeros con fechas compatibles.' },
   { n: '04', icon: '🤝', title: 'Intercambia y viaja', desc: 'Confirmen el intercambio y vivan como locales en la ciudad del otro.' },
 ]
 
 const BENEFITS = [
-  { icon: '🏕️', title: 'Inspirado en Chile', desc: 'Nace del espíritu Mapuche de compartir la "rukka". Conexión auténtica entre chilenos.' },
+  { icon: '🌎', title: 'Latinoamérica completa', desc: 'Operamos en Chile, México, Colombia y Argentina. Cruza fronteras sin pagar alojamiento.' },
   { icon: '💸', title: '100% gratis', desc: 'Sin hoteles, sin Airbnb, sin comisiones. Tu hogar como moneda de cambio.' },
   { icon: '🔁', title: 'Match bilateral', desc: 'El sistema detecta cuándo dos viajeros quieren visitarse en fechas compatibles.' },
   { icon: '🔒', title: 'Comunidad verificada', desc: 'Verificación de email obligatoria y perfil completo para todos los miembros.' },
@@ -84,9 +92,10 @@ export default function HomePage() {
   const { homes, users } = useApp()
   const featured = homes.filter(h => h.featured).slice(0, 3)
 
-  const [heroBanner,    setHeroBanner]    = useState(null)
-  const [exploreHomes,  setExploreHomes]  = useState([])
-  const [usingFallback, setUsingFallback] = useState(false)
+  const [heroBanner,     setHeroBanner]     = useState(null)
+  const [exploreHomes,   setExploreHomes]   = useState([])
+  const [usingFallback,  setUsingFallback]  = useState(false)
+  const [countryCounts,  setCountryCounts]  = useState({ CL: 0, MX: 0, CO: 0, AR: 0 })
 
   // Redirect OAuth errors that Supabase sends to the site root
   useEffect(() => {
@@ -120,6 +129,18 @@ export default function HomePage() {
       })
   }, [])
 
+  useEffect(() => {
+    if (!supabase) return
+    Promise.all(
+      ['CL', 'MX', 'CO', 'AR'].map(code =>
+        supabase.from('homes').select('id', { count: 'exact', head: true }).eq('country_code', code)
+          .then(({ count }) => [code, count || 0])
+      )
+    ).then(results => {
+      setCountryCounts(Object.fromEntries(results))
+    })
+  }, [])
+
   return (
     <div className="min-h-screen" style={{ background: '#F8F4EE' }}>
       <Navbar />
@@ -143,10 +164,12 @@ export default function HomePage() {
               </div>
             )}
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white leading-[1.05] mb-2">
-              Intercambia tu hogar,<br />
-              <span className="text-sand">viaja por Chile.</span>
+              El hogar de Latinoamérica<br />
+              <span className="text-sand">está lleno de puertas abiertas.</span>
             </h1>
-            <p className="text-base text-sand/90 font-bold italic">Mi casa es tu casa.</p>
+            <p className="text-base text-sand/90 font-medium leading-relaxed max-w-lg mx-auto">
+              Intercambia tu casa con viajeros de Chile, México, Colombia y Argentina.<br className="hidden sm:block" /> Gratis, sin intermediarios, con matching automático.
+            </p>
           </div>
 
           {/* Fresia + buscador */}
@@ -154,7 +177,7 @@ export default function HomePage() {
 
           {/* Badges */}
           <div className="flex flex-wrap gap-3 justify-center text-white/80 text-sm">
-            {['✓ 100% gratis', '✓ Solo en Chile', '✓ Matches automáticos'].map(t => (
+            {['✓ 100% gratis', '✓ Chile · México · Colombia · Argentina', '✓ Matches automáticos'].map(t => (
               <span key={t} className="bg-white/10 backdrop-blur-sm px-3 py-1.5 rounded-full">{t}</span>
             ))}
           </div>
@@ -249,17 +272,40 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── DESTINOS CHILE ───────────────────────────────────────────────────── */}
+      {/* ── 4 PAÍSES LATAM ───────────────────────────────────────────────────── */}
       <section className="py-16" style={{ background: '#F8F4EE' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between mb-8">
             <div>
-              <p className="text-xs font-bold uppercase tracking-widest text-terra mb-1">🇨🇱 Destinos en Chile</p>
-              <h2 className="text-2xl font-extrabold text-gray-900">¿A dónde quieres ir?</h2>
+              <p className="text-xs font-bold uppercase tracking-widest text-terra mb-1">🌎 Destinos LATAM</p>
+              <h2 className="text-2xl font-extrabold text-gray-900">¿A qué país quieres ir?</h2>
             </div>
             <Link href="/homes" className="text-forest font-semibold text-sm hover:text-forest-dark flex items-center gap-1">
               Ver todos <ArrowRight className="w-4 h-4" />
             </Link>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-10">
+            {LATAM_COUNTRIES.map(c => (
+              <Link key={c.code} href={`/homes?country=${c.code}`}
+                className="group relative rounded-2xl overflow-hidden h-44 block shadow-sm hover:shadow-lg transition-shadow">
+                <img src={c.img} alt={c.alt} loading="lazy"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
+                <div className="absolute bottom-0 left-0 right-0 p-4">
+                  <p className="text-2xl mb-0.5">{c.flag}</p>
+                  <p className="text-white font-black text-sm leading-tight">{c.name}</p>
+                  <p className="text-white/60 text-[11px] leading-tight">
+                    {countryCounts[c.code] > 0 ? `${countryCounts[c.code]} hogares` : 'Próximamente'}
+                  </p>
+                </div>
+              </Link>
+            ))}
+          </div>
+
+          {/* Destinos Chile */}
+          <div className="mb-4">
+            <p className="text-xs font-bold uppercase tracking-widest text-terra mb-1">🇨🇱 Destinos en Chile</p>
+            <h3 className="text-lg font-extrabold text-gray-900 mb-4">Explora ciudades chilenas</h3>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
             {DESTINOS_RUKKA.map(b => (
@@ -431,7 +477,7 @@ export default function HomePage() {
             <p className="text-5xl mb-6">🏔️ ↔ 🌿</p>
             <h2 className="text-3xl sm:text-4xl font-extrabold mb-4">¿Lista tu rukka para el intercambio?</h2>
             <p className="text-white/80 mb-8 text-lg">
-              Únete gratis, registra tu hogar y deja que el algoritmo encuentre tu match perfecto en Chile.
+              Únete gratis, registra tu hogar y deja que el algoritmo encuentre tu match perfecto en Latinoamérica.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/auth/register"
