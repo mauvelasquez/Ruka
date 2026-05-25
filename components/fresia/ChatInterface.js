@@ -5,20 +5,78 @@ import Link from 'next/link'
 import { useApp } from '../../lib/store'
 import { analytics } from '../../lib/analytics'
 
-// ── Fresia SVG avatar ──────────────────────────────────────────────────────────
+// ── Fresia SVG avatar — Propuesta 2 · Küyen ───────────────────────────────────
 export function FresiaAvatar({ size = 32, className = '' }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 40 40" fill="none" className={className} aria-hidden>
-      <circle cx="20" cy="20" r="20" fill="#2A5C45" />
-      {/* Stylized leaf / flower petals */}
-      <ellipse cx="20" cy="12" rx="3.5" ry="6" fill="#52B788" />
-      <ellipse cx="27" cy="16" rx="3.5" ry="6" fill="#40916C" transform="rotate(60 27 16)" />
-      <ellipse cx="27" cy="24" rx="3.5" ry="6" fill="#52B788" transform="rotate(120 27 24)" />
-      <ellipse cx="20" cy="28" rx="3.5" ry="6" fill="#40916C" transform="rotate(180 20 28)" />
-      <ellipse cx="13" cy="24" rx="3.5" ry="6" fill="#52B788" transform="rotate(240 13 24)" />
-      <ellipse cx="13" cy="16" rx="3.5" ry="6" fill="#40916C" transform="rotate(300 13 16)" />
-      <circle cx="20" cy="20" r="5" fill="#D8F3DC" />
-      <circle cx="20" cy="20" r="2.5" fill="#2A5C45" />
+    <svg width={size} height={size} viewBox="0 0 100 100" fill="none" className={className} aria-hidden>
+      <defs>
+        <clipPath id="fresia-clip">
+          <circle cx="50" cy="50" r="50" />
+        </clipPath>
+      </defs>
+
+      {/* Dark green circular background */}
+      <circle cx="50" cy="50" r="50" fill="#1e3a20" />
+
+      {/* Darker shadow areas framing the hair */}
+      <ellipse cx="18" cy="46" rx="24" ry="40" fill="#152c17" clipPath="url(#fresia-clip)" />
+      <ellipse cx="76" cy="35" rx="22" ry="32" fill="#152c17" clipPath="url(#fresia-clip)" />
+
+      {/* Black hair oval */}
+      <ellipse cx="50" cy="55" rx="37" ry="43" fill="#0d0907" clipPath="url(#fresia-clip)" />
+
+      {/* Face */}
+      <ellipse cx="50" cy="46" rx="21" ry="25" fill="#c07840" />
+
+      {/* Eyebrows */}
+      <path d="M 38 37.5 Q 42.5 34 47 36.5" stroke="#1a0800" strokeWidth="1.9" strokeLinecap="round" fill="none" />
+      <path d="M 53 36.5 Q 57.5 34 62 37.5" stroke="#1a0800" strokeWidth="1.9" strokeLinecap="round" fill="none" />
+
+      {/* Eyes */}
+      <ellipse cx="42" cy="43.5" rx="3.8" ry="2.8" fill="#120800" />
+      <ellipse cx="58" cy="43.5" rx="3.8" ry="2.8" fill="#120800" />
+      <circle cx="43.8" cy="42.2" r="1.1" fill="white" opacity="0.85" />
+      <circle cx="59.8" cy="42.2" r="1.1" fill="white" opacity="0.85" />
+
+      {/* Cheek blush */}
+      <ellipse cx="35" cy="51" rx="5.5" ry="3.5" fill="#c84020" opacity="0.28" />
+      <ellipse cx="65" cy="51" rx="5.5" ry="3.5" fill="#c84020" opacity="0.28" />
+
+      {/* Nose */}
+      <ellipse cx="50" cy="54.5" rx="2.5" ry="1.8" fill="#a06030" opacity="0.45" />
+
+      {/* Smile */}
+      <path d="M 44.5 60.5 Q 50 65 55.5 60.5" stroke="#8a4020" strokeWidth="1.6" strokeLinecap="round" fill="none" />
+
+      {/* Neck shadow */}
+      <ellipse cx="50" cy="75" rx="11" ry="8" fill="#0d0907" />
+
+      {/* Green manta / garment */}
+      <rect x="10" y="81" width="80" height="20" fill="#2d5c1e" clipPath="url(#fresia-clip)" />
+
+      {/* Gold necklace center medallion */}
+      <circle cx="50" cy="71" r="3.5" fill="#c8a030" />
+      {/* Pendant stems */}
+      <line x1="47.5" y1="74.5" x2="45.5" y2="79" stroke="#c8a030" strokeWidth="0.9" />
+      <line x1="50"   y1="74.5" x2="50"   y2="79" stroke="#c8a030" strokeWidth="0.9" />
+      <line x1="52.5" y1="74.5" x2="54.5" y2="79" stroke="#c8a030" strokeWidth="0.9" />
+      {/* Pendant charms */}
+      <polygon points="43.8,79 46.8,78.2 47.6,81.8 44.6,82.6" fill="#c8a030" />
+      <polygon points="48.5,79 51.5,79 51.5,82.5 48.5,82.5" fill="#c8a030" />
+      <polygon points="53.4,79 56.4,78.2 57.2,81.8 54.2,82.6" fill="#c8a030" />
+
+      {/* Gold diamond patterns on manta */}
+      <polygon points="27,87 31,83.5 35,87 31,90.5" fill="#c8a030" />
+      <polygon points="39,87 43,83.5 47,87 43,90.5" fill="#c8a030" />
+      <polygon points="51,87 55,83.5 59,87 55,90.5" fill="#c8a030" />
+      <polygon points="63,87 67,83.5 71,87 67,90.5" fill="#c8a030" clipPath="url(#fresia-clip)" />
+
+      {/* Star in hair (upper right) */}
+      <path d="M 65.5 22 L 66.8 18 L 68.1 22 L 72 22 L 68.9 24.4 L 70.2 28.4 L 66.8 26 L 63.4 28.4 L 64.7 24.4 L 61.6 22 Z" fill="#c8a030" />
+      <circle cx="61" cy="28.5" r="1.4" fill="#c8a030" />
+
+      {/* Gold crescent / shooting-star arc in hair */}
+      <path d="M 57 17 Q 73 29 70 45" stroke="#c8a030" strokeWidth="1.4" strokeLinecap="round" fill="none" opacity="0.6" />
     </svg>
   )
 }
