@@ -1,0 +1,43 @@
+# Rukka — robots.txt
+
+# Motores de búsqueda tradicionales
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+# Bots de IA con capacidad de citar (PERMITIR)
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: cohere-ai
+Allow: /
+
+# Rastreadores de entrenamiento masivo (BLOQUEAR — no citan, solo entrenan)
+User-agent: CCBot
+Disallow: /
+
+User-agent: FacebookBot
+Disallow: /
+
+# Regla general
+User-agent: *
+Allow: /
+
+Sitemap: https://rukka.cl/sitemap.xml

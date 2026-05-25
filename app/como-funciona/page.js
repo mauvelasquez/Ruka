@@ -33,6 +33,7 @@ function FaqItem({ q, a }) {
       <button
         onClick={() => setOpen(!open)}
         className="w-full flex items-center justify-between p-5 text-left bg-white hover:bg-gray-50 transition-colors"
+        aria-expanded={open}
       >
         <span className="font-bold text-gray-900 pr-4">{q}</span>
         {open
@@ -40,11 +41,13 @@ function FaqItem({ q, a }) {
           : <ChevronDown className="w-5 h-5 text-gray-400 flex-shrink-0" />
         }
       </button>
-      {open && (
-        <div className="px-5 pb-5 text-gray-600 text-sm leading-relaxed bg-white border-t border-gray-100">
-          {a}
-        </div>
-      )}
+      {/* Siempre en el DOM para que los crawlers indexen las respuestas */}
+      <div
+        className={`px-5 text-gray-600 text-sm leading-relaxed bg-white border-t border-gray-100 overflow-hidden transition-all duration-200 ${open ? 'pb-5 max-h-96' : 'max-h-0 border-t-0'}`}
+        aria-hidden={!open}
+      >
+        {a}
+      </div>
     </div>
   )
 }
