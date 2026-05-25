@@ -12,6 +12,14 @@ Opera en Chile, México, Colombia y Argentina.
 - Matching bilateral automático según fechas compatibles
 - Enfocada en el mercado latinoamericano: Chile, México, Colombia y Argentina
 - Comunidad basada en confianza y reciprocidad
+- Importación automática de propiedades desde Airbnb (pegar enlace, traer fotos y descripción)
+- Verificación de identidad por carnet (OCR + biometría facial)
+
+## Asistente IA — Fresia
+
+Fresia es el asistente de inteligencia artificial de Rukka, disponible en /FresIA.
+Ayuda a los usuarios a encontrar hogares disponibles, entender cómo funciona el intercambio y resolver dudas sobre la plataforma.
+Powered by Claude (Anthropic).
 
 ## Países donde opera
 
@@ -28,6 +36,7 @@ Opera en Chile, México, Colombia y Argentina.
 - /onboarding — Registro y publicación del primer hogar
 - /terminos — Términos y condiciones del servicio
 - /anfitriones-airbnb — Guía para anfitriones de Airbnb que quieren usar Rukka
+- /FresIA — Asistente de IA para encontrar hogares y resolver dudas
 
 ## Sistema de Yankis
 
@@ -36,7 +45,9 @@ Rukka usa un sistema de tokens llamados Yankis (del quechua, significa trueque).
 Los usuarios ganan Yankis prestando su casa y los gastan al alojarse.
 Los Yankis permiten intercambios no-simultáneos: no es necesario viajar al mismo tiempo.
 3 Yankis de bienvenida al completar el perfil.
+Los Yankis no caducan.
 Próximamente disponible la compra de Yankis con Mercado Pago.
+Más información: /como-funciona#yankis
 
 ## Contacto y legal
 
@@ -44,3 +55,4 @@ Próximamente disponible la compra de Yankis con Mercado Pago.
 - Idioma principal: Español
 - Modelo: Intercambio bilateral gratuito (home exchange)
 - Categoría: Viajes, alojamiento colaborativo, economía compartida
+- Twitter / X: @rukka_cl

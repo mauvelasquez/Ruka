@@ -1,14 +1,29 @@
 # Rukka — robots.txt
 
-# Motores de búsqueda tradicionales
+# ── Rutas privadas — bloquear todos los bots ──────────────────────────────────
+User-agent: *
+Disallow: /api/
+Disallow: /dashboard/
+Disallow: /auth/
+Disallow: /admin/
+Disallow: /verificar/
+Allow: /
+
+# ── Motores de búsqueda tradicionales ────────────────────────────────────────
 User-agent: Googlebot
 Allow: /
 
 User-agent: Bingbot
 Allow: /
 
-# Bots de IA con capacidad de citar (PERMITIR)
+User-agent: Applebot
+Allow: /
+
+# ── Bots de IA con capacidad de citar (PERMITIR) ─────────────────────────────
 User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
 Allow: /
 
 User-agent: ChatGPT-User
@@ -29,15 +44,14 @@ Allow: /
 User-agent: cohere-ai
 Allow: /
 
-# Rastreadores de entrenamiento masivo (BLOQUEAR — no citan, solo entrenan)
+# ── Rastreadores de entrenamiento masivo (BLOQUEAR — no citan, solo entrenan) ─
 User-agent: CCBot
 Disallow: /
 
 User-agent: FacebookBot
 Disallow: /
 
-# Regla general
-User-agent: *
-Allow: /
+User-agent: Bytespider
+Disallow: /
 
 Sitemap: https://rukka.cl/sitemap.xml

@@ -4,15 +4,15 @@ const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://rukka.cl'
 
 export default async function sitemap() {
   const staticRoutes = [
-    { url: baseUrl,                         lastModified: new Date(), changeFrequency: 'weekly',  priority: 1.0 },
-    { url: `${baseUrl}/como-funciona`,      lastModified: new Date(), changeFrequency: 'monthly', priority: 0.9 },
-    { url: `${baseUrl}/homes`,              lastModified: new Date(), changeFrequency: 'daily',   priority: 0.8 },
-    { url: `${baseUrl}/matches`,            lastModified: new Date(), changeFrequency: 'daily',   priority: 0.7 },
-    { url: `${baseUrl}/onboarding`,         lastModified: new Date(), changeFrequency: 'monthly', priority: 0.6 },
-    { url: `${baseUrl}/anfitriones-airbnb`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
-    { url: `${baseUrl}/terminos`,           lastModified: new Date(), changeFrequency: 'yearly',  priority: 0.3 },
-    { url: `${baseUrl}/dashboard/yankis`,  lastModified: new Date(), changeFrequency: 'weekly',  priority: 0.6 },
-    { url: `${baseUrl}/como-funciona#yankis`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.8 },
+    { url: baseUrl,                            lastModified: new Date(), changeFrequency: 'weekly',  priority: 1.0 },
+    { url: `${baseUrl}/como-funciona`,         lastModified: new Date(), changeFrequency: 'monthly', priority: 0.9 },
+    { url: `${baseUrl}/homes`,                 lastModified: new Date(), changeFrequency: 'daily',   priority: 0.8 },
+    { url: `${baseUrl}/matches`,               lastModified: new Date(), changeFrequency: 'daily',   priority: 0.7 },
+    { url: `${baseUrl}/onboarding`,            lastModified: new Date(), changeFrequency: 'monthly', priority: 0.6 },
+    { url: `${baseUrl}/anfitriones-airbnb`,    lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
+    { url: `${baseUrl}/terminos`,              lastModified: new Date(), changeFrequency: 'yearly',  priority: 0.3 },
+    { url: `${baseUrl}/FresIA`,                lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
+    { url: `${baseUrl}/como-funciona#yankis`,  lastModified: new Date(), changeFrequency: 'monthly', priority: 0.8 },
   ]
 
   let homeRoutes = []
