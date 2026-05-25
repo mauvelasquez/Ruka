@@ -29,6 +29,15 @@ Opera en Chile, México, Colombia y Argentina.
 - /terminos — Términos y condiciones del servicio
 - /anfitriones-airbnb — Guía para anfitriones de Airbnb que quieren usar Rukka
 
+## Sistema de Yankis
+
+Rukka usa un sistema de tokens llamados Yankis (del quechua, significa trueque).
+1 Yanki = 1 noche de alojamiento.
+Los usuarios ganan Yankis prestando su casa y los gastan al alojarse.
+Los Yankis permiten intercambios no-simultáneos: no es necesario viajar al mismo tiempo.
+3 Yankis de bienvenida al completar el perfil.
+Próximamente disponible la compra de Yankis con Mercado Pago.
+
 ## Contacto y legal
 
 - Sede: Chile (operación en Chile, México, Colombia y Argentina)

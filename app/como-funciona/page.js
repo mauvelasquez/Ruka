@@ -235,7 +235,67 @@ export default function ComoFuncionaPage() {
         </div>
       </section>
 
-      {/* ── SECCIÓN 5: FAQ ─────────────────────────────────────────────────── */}
+      {/* ── SECCIÓN 5: YANKIS ─────────────────────────────────────────────── */}
+      <section id="yankis" className="py-20 bg-white">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-14">
+            <p className="text-xs font-bold uppercase tracking-widest text-terra mb-3">Sistema de tokens</p>
+            <h2 className="text-3xl sm:text-4xl font-black text-gray-900 mb-4">¿Qué son los Yankis?</h2>
+            <p className="text-gray-600 max-w-2xl mx-auto leading-relaxed">
+              <strong>Yanki</strong> es una palabra en quechua que significa <em>trueque o intercambio</em>.
+              Es la moneda interna de Rukka: un sistema simple y justo donde cada noche de hospitalidad
+              se convierte en una noche de viaje.
+            </p>
+            <p className="mt-4 text-xl font-black text-terra">1 Yanki = 1 noche de alojamiento en cualquier hogar de Rukka.</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            <div className="bg-terra-50 border-2 border-terra/20 rounded-3xl p-8">
+              <div className="text-4xl mb-4">🏠</div>
+              <h3 className="font-black text-terra text-xl mb-3">¿Cómo ganas Yankis?</h3>
+              <ul className="text-gray-600 text-sm leading-relaxed space-y-2">
+                <li className="flex items-start gap-2"><span className="text-terra font-bold mt-0.5">•</span> 1 noche hospedada = 1 Yanki acreditado automáticamente</li>
+                <li className="flex items-start gap-2"><span className="text-terra font-bold mt-0.5">•</span> 3 Yankis de bienvenida al completar tu perfil</li>
+                <li className="flex items-start gap-2"><span className="text-terra font-bold mt-0.5">•</span> Los Yankis no caducan</li>
+              </ul>
+            </div>
+
+            <div className="bg-forest-50 border-2 border-forest/20 rounded-3xl p-8">
+              <div className="text-4xl mb-4">✈️</div>
+              <h3 className="font-black text-forest text-xl mb-3">¿Cómo usas tus Yankis?</h3>
+              <ul className="text-gray-600 text-sm leading-relaxed space-y-2">
+                <li className="flex items-start gap-2"><span className="text-forest font-bold mt-0.5">•</span> 1 Yanki = 1 noche en el hogar que elijas</li>
+                <li className="flex items-start gap-2"><span className="text-forest font-bold mt-0.5">•</span> Los Yankis se descuentan automáticamente al confirmar</li>
+                <li className="flex items-start gap-2"><span className="text-forest font-bold mt-0.5">•</span> Si cancelas, tus Yankis se devuelven íntegros</li>
+              </ul>
+            </div>
+
+            <div className="bg-andean-50 border-2 border-andean/20 rounded-3xl p-8">
+              <div className="text-4xl mb-4">💳</div>
+              <h3 className="font-black text-andean text-xl mb-3">¿Puedo comprar Yankis?</h3>
+              <p className="text-gray-600 text-sm leading-relaxed">
+                Próximamente podrás adquirir Yankis directamente con tu tarjeta de crédito
+                o débito, a través de Mercado Pago. Esto te permite viajar incluso si aún
+                no has podido prestar tu hogar.
+              </p>
+              <span className="mt-3 inline-block text-xs font-bold bg-andean/10 text-andean px-3 py-1 rounded-full">Próximamente</span>
+            </div>
+          </div>
+
+          {/* Explicación del modelo no-simultáneo */}
+          <div className="bg-gradient-to-r from-forest-dark to-forest rounded-3xl p-8 sm:p-10 text-white text-center">
+            <div className="text-3xl mb-4">🔄</div>
+            <h3 className="font-black text-2xl mb-3">Intercambia sin coincidir en el tiempo</h3>
+            <p className="text-white/80 max-w-xl mx-auto leading-relaxed">
+              Los Yankis rompen la restricción del intercambio simultáneo. No necesitas
+              viajar al mismo tiempo que tu anfitrión. Presta tu casa cuando puedas,
+              acumula Yankis y úsalos cuando quieras viajar.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* ── SECCIÓN 6: FAQ ─────────────────────────────────────────────────── */}
       <section className="py-20" style={{ background: '#F8F4EE' }}>
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
@@ -248,7 +308,7 @@ export default function ComoFuncionaPage() {
         </div>
       </section>
 
-      {/* ── SECCIÓN 6: CTA FINAL ───────────────────────────────────────────── */}
+      {/* ── SECCIÓN 7: CTA FINAL ───────────────────────────────────────────── */}
       <section className="py-24 bg-white">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <div className="bg-forest-dark rounded-3xl p-12 sm:p-16">

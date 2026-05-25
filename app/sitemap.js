@@ -11,6 +11,8 @@ export default async function sitemap() {
     { url: `${baseUrl}/onboarding`,         lastModified: new Date(), changeFrequency: 'monthly', priority: 0.6 },
     { url: `${baseUrl}/anfitriones-airbnb`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
     { url: `${baseUrl}/terminos`,           lastModified: new Date(), changeFrequency: 'yearly',  priority: 0.3 },
+    { url: `${baseUrl}/dashboard/yankis`,  lastModified: new Date(), changeFrequency: 'weekly',  priority: 0.6 },
+    { url: `${baseUrl}/como-funciona#yankis`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.8 },
   ]
 
   let homeRoutes = []

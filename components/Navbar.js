@@ -7,6 +7,7 @@ import { Menu, X, Globe, User, LogOut, PlusCircle, LayoutDashboard, ChevronDown,
 import RukkaLogo from './RukkaLogo'
 import { FresiaAvatar } from './fresia/ChatInterface'
 import { analytics } from '../lib/analytics'
+import YankiBalance from './yankis/YankiBalance'
 
 export default function Navbar() {
   const router = useRouter()
@@ -57,6 +58,7 @@ export default function Navbar() {
             </Link>
             {user ? (
               <div className="flex items-center gap-3 relative">
+                <YankiBalance size="sm" showLabel linkable />
                 <Link href="/matches" className="flex items-center gap-1.5 text-sm font-semibold text-terra-dark bg-terra-50 px-4 py-2 rounded-full hover:bg-terra/10 transition-colors border border-terra/20">
                   <Sparkles className="w-4 h-4 text-terra" /> Buscar match
                 </Link>
@@ -133,6 +135,9 @@ export default function Navbar() {
           </Link>
           {user ? (
             <>
+              <div className="px-3 py-2">
+                <YankiBalance size="md" showLabel linkable />
+              </div>
               <Link href="/matches" onClick={() => setMenuOpen(false)} className="flex items-center gap-2 p-3 rounded-xl text-gray-700 hover:bg-terra-50">
                 <Sparkles className="w-4 h-4 text-terra" /> Buscar match
               </Link>

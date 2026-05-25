@@ -103,6 +103,22 @@ const faqSchema = {
         'text': 'Sí. Puedes definir fechas específicas para intercambio en Rukka y mantener tu propiedad disponible en Airbnb el resto del tiempo. Son modelos compatibles.',
       },
     },
+    {
+      '@type': 'Question',
+      'name': '¿Qué son los Yankis de Rukka?',
+      'acceptedAnswer': {
+        '@type': 'Answer',
+        'text': 'Los Yankis son la moneda interna de Rukka. La palabra "Yanki" viene del quechua y significa trueque. 1 Yanki equivale a 1 noche de alojamiento. Puedes ganar Yankis prestando tu casa y usarlos para alojarte en cualquier otro hogar de Rukka.',
+      },
+    },
+    {
+      '@type': 'Question',
+      'name': '¿Cómo gano Yankis en Rukka?',
+      'acceptedAnswer': {
+        '@type': 'Answer',
+        'text': 'Por cada noche que prestas tu hogar a otro usuario de Rukka, recibes 1 Yanki automáticamente. También recibes 3 Yankis de bienvenida al completar tu perfil.',
+      },
+    },
   ],
 }
 
