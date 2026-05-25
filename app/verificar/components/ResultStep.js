@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react'
 import { CheckCircle, XCircle, Loader, AlertCircle, ArrowRight, MessageCircle } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { useApp } from '../../../lib/store'
 
 const ACTION_LABELS = {
   publish: 'Publicar tu hogar',
@@ -17,14 +18,17 @@ const ACTION_ROUTES = {
 
 export default function ResultStep({ ocrResult, faceResult, action, onRetry, attemptsLeft }) {
   const router  = useRouter()
+  const { syncSession } = useApp()
   const [status, setStatus] = useState('saving') // saving | verified | failed | pending | error
   const [errorMsg, setErrorMsg] = useState(null)
+
+  const navigate = (path) => { window.location.href = path }
 
   useEffect(() => {
     if (!faceResult) return
     // OCR-only mode: profile already marked verified by the extract API route
     if (faceResult.ocr_only) {
-      setStatus('verified')
+      syncSession().catch(() => {}).finally(() => setStatus('verified'))
       return
     }
     async function save() {
@@ -45,6 +49,7 @@ export default function ResultStep({ ocrResult, faceResult, action, onRetry, att
         })
         const data = await res.json()
         if (data.success) {
+          await syncSession().catch(() => {})
           setStatus('verified')
         } else if (data.status === 'pending') {
           setStatus('pending')
@@ -85,7 +90,7 @@ export default function ResultStep({ ocrResult, faceResult, action, onRetry, att
 
         {action && ACTION_ROUTES[action] && (
           <button
-            onClick={() => router.push(ACTION_ROUTES[action])}
+            onClick={() => navigate(ACTION_ROUTES[action])}
             className="w-full flex items-center justify-center gap-2 bg-forest text-white py-3.5 rounded-xl font-bold text-sm hover:bg-forest-dark transition-colors"
           >
             {ACTION_LABELS[action] || 'Continuar'}
@@ -94,7 +99,7 @@ export default function ResultStep({ ocrResult, faceResult, action, onRetry, att
         )}
 
         <button
-          onClick={() => router.push('/dashboard')}
+          onClick={() => navigate('/dashboard')}
           className="w-full text-sm text-gray-500 hover:text-gray-700 transition-colors py-1"
         >
           Ir al dashboard
@@ -117,7 +122,7 @@ export default function ResultStep({ ocrResult, faceResult, action, onRetry, att
           Te contactaremos por email en los próximos días hábiles para completar el proceso.
         </div>
         <button
-          onClick={() => router.push('/dashboard')}
+          onClick={() => navigate('/dashboard')}
           className="w-full bg-forest text-white py-3 rounded-xl font-bold text-sm hover:bg-forest-dark transition-colors"
         >
           Ir al dashboard

@@ -11,11 +11,11 @@ export async function POST() {
 
     const { data: profile } = await supabase
       .from('profiles')
-      .select('rut, full_name')
+      .select('identification_number, full_name')
       .eq('id', user.id)
       .single()
 
-    if (!profile?.rut || !profile?.full_name) {
+    if (!profile?.identification_number || !profile?.full_name) {
       return Response.json({ success: false, error: 'Sin datos de OCR previos' }, { status: 400 })
     }
 

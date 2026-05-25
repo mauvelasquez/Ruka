@@ -7,9 +7,10 @@ import Navbar from '../../components/Navbar'
 import MessageThread from '../../components/MessageThread'
 import {
   Home, Heart, ArrowLeftRight, Plus, MapPin, Users, Calendar,
-  CheckCircle, XCircle, Clock, Trash2, Eye, Star, Sparkles, AlertCircle, ScrollText, MessageSquare, User
+  CheckCircle, XCircle, Clock, Trash2, Eye, Star, Sparkles, AlertCircle, ScrollText, MessageSquare, User, Lock
 } from 'lucide-react'
 import { COMUNAS_RUKKA } from '../../lib/comunas'
+import { COUNTRY_ID_CONFIG } from '../../lib/identification'
 import { useVerificationGate } from '../../hooks/useVerificationGate'
 import VerificationRequiredModal from '../../components/VerificationRequiredModal'
 
@@ -515,10 +516,11 @@ export default function DashboardPage() {
                   <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1.5">
                     Nombre completo
                   </label>
-                  <div className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-700 select-none">
-                    {currentUser.name || '—'}
+                  <div className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-700 select-none flex items-center gap-2">
+                    <span className="flex-1">{currentUser.name || '—'}</span>
+                    {currentUser.identification_verified && <Lock className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />}
                   </div>
-                  {currentUser.rut && (
+                  {currentUser.identification_verified && (
                     <p className="text-xs text-gray-400 mt-1">El nombre no puede modificarse una vez verificada la identidad.</p>
                   )}
                 </div>
@@ -533,13 +535,14 @@ export default function DashboardPage() {
                   </div>
                 </div>
 
-                {/* RUT */}
+                {/* Documento de identidad */}
                 <div>
                   <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1.5">
-                    RUT
+                    {COUNTRY_ID_CONFIG[currentUser.identification_country]?.label || 'Documento de identidad'}
                   </label>
-                  <div className={`w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm select-none ${currentUser.rut ? 'text-gray-700' : 'text-gray-400 italic'}`}>
-                    {currentUser.rut || 'No verificado'}
+                  <div className={`w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm select-none flex items-center gap-2 ${currentUser.identification_number ? 'text-gray-700' : 'text-gray-400 italic'}`}>
+                    <span className="flex-1">{currentUser.identification_number || 'No verificado'}</span>
+                    {currentUser.identification_verified && <Lock className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />}
                   </div>
                 </div>
 

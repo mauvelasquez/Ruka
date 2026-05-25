@@ -2,6 +2,7 @@
 import { Suspense, useState, useEffect } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { createBrowserClient } from '@supabase/ssr'
+import { useApp } from '../../lib/store'
 import Navbar from '../../components/Navbar'
 import ConsentStep  from './components/ConsentStep'
 import IdCaptureStep from './components/IdCaptureStep'
@@ -70,7 +71,7 @@ const ACTION_ROUTES = {
   match:   '/homes',
 }
 
-function ExistingProfileStep({ profile, action, onSkip }) {
+function ExistingProfileStep({ profile, action, onSkip, onVerified }) {
   const router = useRouter()
   const [status, setStatus] = useState('idle') // idle | saving | done | error
 
@@ -80,6 +81,7 @@ function ExistingProfileStep({ profile, action, onSkip }) {
       const res = await fetch('/api/verify-id/confirm-existing', { method: 'POST' })
       const data = await res.json()
       if (data.success) {
+        await onVerified()
         setStatus('done')
       } else {
         setStatus('error')
@@ -88,6 +90,8 @@ function ExistingProfileStep({ profile, action, onSkip }) {
       setStatus('error')
     }
   }
+
+  const navigate = (path) => { window.location.href = path }
 
   if (status === 'done') {
     return (
@@ -103,7 +107,7 @@ function ExistingProfileStep({ profile, action, onSkip }) {
         </div>
         {action && ACTION_ROUTES[action] && (
           <button
-            onClick={() => router.push(ACTION_ROUTES[action])}
+            onClick={() => navigate(ACTION_ROUTES[action])}
             className="w-full flex items-center justify-center gap-2 bg-forest text-white py-3.5 rounded-xl font-bold text-sm hover:bg-forest-dark transition-colors"
           >
             Continuar
@@ -111,7 +115,7 @@ function ExistingProfileStep({ profile, action, onSkip }) {
           </button>
         )}
         <button
-          onClick={() => router.push('/dashboard')}
+          onClick={() => navigate('/dashboard')}
           className="w-full text-sm text-gray-500 hover:text-gray-700 transition-colors py-1"
         >
           Ir al dashboard
@@ -135,10 +139,10 @@ function ExistingProfileStep({ profile, action, onSkip }) {
             <p className="text-sm font-semibold text-gray-800">{profile.full_name}</p>
           </div>
         )}
-        {profile.rut && (
+        {profile.identification_number && (
           <div>
-            <p className="text-xs text-gray-400">RUT</p>
-            <p className="text-sm font-semibold text-gray-800">{profile.rut}</p>
+            <p className="text-xs text-gray-400">Número de documento</p>
+            <p className="text-sm font-semibold text-gray-800">{profile.identification_number}</p>
           </div>
         )}
       </div>
@@ -172,13 +176,14 @@ function ExistingProfileStep({ profile, action, onSkip }) {
 function VerificarContent() {
   const searchParams = useSearchParams()
   const action = searchParams.get('action')
+  const { syncSession } = useApp()
 
   const [step, setStep]             = useState(1)
   const [ocrResult, setOcrResult]   = useState(null)   // { extracted_data, idImageBase64 }
   const [faceResult, setFaceResult] = useState(null)   // { match, distance, confidence }
   const [attemptsLeft, setAttemptsLeft] = useState(3)
   const [idImageBase64, setIdImageBase64] = useState(null)
-  const [existingProfile, setExistingProfile] = useState(null) // profile with rut+full_name
+  const [existingProfile, setExistingProfile] = useState(null) // profile with identification_number+full_name
   const [forceUpload, setForceUpload] = useState(false) // user wants to re-upload carnet
 
   useEffect(() => {
@@ -192,10 +197,10 @@ function VerificarContent() {
         if (!user) return
         const { data: profile } = await supabase
           .from('profiles')
-          .select('full_name, rut, birth_date')
+          .select('full_name, identification_number, birth_date')
           .eq('id', user.id)
           .single()
-        if (profile?.rut && profile?.full_name) {
+        if (profile?.identification_number && profile?.full_name) {
           setExistingProfile(profile)
         }
       } catch {
@@ -246,6 +251,7 @@ function VerificarContent() {
                 profile={existingProfile}
                 action={action}
                 onSkip={() => setForceUpload(true)}
+                onVerified={syncSession}
               />
             )}
 

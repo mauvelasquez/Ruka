@@ -2,6 +2,7 @@ import './globals.css'
 import Providers from './providers'
 import FresiaWidget from '../components/fresia/FresiaWidget'
 import GoogleAnalytics from '../components/GoogleAnalytics'
+import WelcomePopup from '../components/WelcomePopup'
 
 export const metadata = {
   metadataBase: new URL('https://rukka.cl'),
@@ -83,6 +84,7 @@ export default function RootLayout({ children }) {
         <Providers>
           {children}
           <FresiaWidget />
+          <WelcomePopup />
         </Providers>
       </body>
     </html>

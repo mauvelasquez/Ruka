@@ -141,16 +141,16 @@ export async function POST(request) {
           process.env.SUPABASE_SERVICE_ROLE_KEY
         )
 
-        // Block if this RUT is already registered by a different user
+        // Block if this identification number is already registered by a different user
         if (extracted.rut) {
-          const { data: rutConflict } = await admin
+          const { data: idConflict } = await admin
             .from('profiles')
             .select('id')
-            .eq('rut', extracted.rut)
+            .eq('identification_number', extracted.rut.replace(/[.\-\s]/g, ''))
             .neq('id', user.id)
             .maybeSingle()
 
-          if (rutConflict) {
+          if (idConflict) {
             return Response.json({
               success: false,
               error: 'Este RUT ya se encuentra inscrito en Rukka. Si crees que es un error, contáctanos.',
@@ -162,23 +162,30 @@ export async function POST(request) {
           verified:                  true,
           verification_status:       'id_verified',
           verification_completed_at: new Date().toISOString(),
+          identification_country:    'CL',
+          identification_type:       'rut',
+          identification_verified:   true,
         }
         if (extracted.nombre_completo) {
           profileUpdate.full_name = extracted.nombre_completo
           profileUpdate.name = extracted.nombre_completo
         }
-        if (extracted.rut) profileUpdate.rut = extracted.rut
+        if (extracted.rut) profileUpdate.identification_number = extracted.rut.replace(/[.\-\s]/g, '')
         const birthDate = parseBirthDate(extracted.fecha_nacimiento)
         if (birthDate) profileUpdate.birth_date = birthDate
-        await admin.from('profiles').update(profileUpdate).eq('id', user.id)
+        const { error: updateErr } = await admin.from('profiles').update(profileUpdate).eq('id', user.id)
+        if (updateErr) console.error('[verify-id/extract] profile update failed:', updateErr.message, '| fields:', Object.keys(profileUpdate))
       } catch (saveErr) {
-        console.error('[verify-id/extract] profile update failed:', saveErr.message)
+        console.error('[verify-id/extract] profile update threw:', saveErr.message)
       }
     }
 
     return Response.json({
       success: true,
-      extracted_data: extracted,
+      extracted_data: {
+        ...extracted,
+        identification_number: extracted.rut ? extracted.rut.replace(/[.\-\s]/g, '') : null,
+      },
       rut_valid: rutValid,
     })
   } catch (err) {

@@ -179,8 +179,8 @@ export default function IdCaptureStep({ onSuccess }) {
               {result.extracted_data.nombre_completo && (
                 <p className="text-sm text-gray-700"><span className="text-gray-400 text-xs">Nombre:</span> {result.extracted_data.nombre_completo}</p>
               )}
-              {result.extracted_data.rut && (
-                <p className="text-sm text-gray-700"><span className="text-gray-400 text-xs">RUT:</span> {result.extracted_data.rut}</p>
+              {result.extracted_data.identification_number && (
+                <p className="text-sm text-gray-700"><span className="text-gray-400 text-xs">N° documento:</span> {result.extracted_data.identification_number}</p>
               )}
             </div>
           )}
