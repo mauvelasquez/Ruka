@@ -4,40 +4,13 @@ const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://rukka.cl'
 
 export default async function sitemap() {
   const staticRoutes = [
-    { url: baseUrl,                            lastModified: new Date(), changeFrequency: 'weekly',  priority: 1.0 },
-    { url: `${baseUrl}/como-funciona`,         lastModified: new Date(), changeFrequency: 'monthly', priority: 0.9 },
-    { url: `${baseUrl}/homes`,                 lastModified: new Date(), changeFrequency: 'daily',   priority: 0.8 },
-    { url: `${baseUrl}/matches`,               lastModified: new Date(), changeFrequency: 'daily',   priority: 0.7 },
-    { url: `${baseUrl}/onboarding`,            lastModified: new Date(), changeFrequency: 'monthly', priority: 0.6 },
-    { url: `${baseUrl}/anfitriones-airbnb`,    lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
-    { url: `${baseUrl}/terminos`,              lastModified: new Date(), changeFrequency: 'yearly',  priority: 0.3 },
-    { url: `${baseUrl}/FresIA`,                lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
-    { url: `${baseUrl}/como-funciona#yankis`,  lastModified: new Date(), changeFrequency: 'monthly', priority: 0.8 },
+    { url: baseUrl,                         lastModified: new Date(), changeFrequency: 'weekly',  priority: 1.0 },
+    { url: `${baseUrl}/homes`,              lastModified: new Date(), changeFrequency: 'daily',   priority: 0.9 },
+    { url: `${baseUrl}/como-funciona`,      lastModified: new Date(), changeFrequency: 'monthly', priority: 0.8 },
+    { url: `${baseUrl}/anfitriones-airbnb`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
+    { url: `${baseUrl}/FresIA`,             lastModified: new Date(), changeFrequency: 'monthly', priority: 0.6 },
+    { url: `${baseUrl}/terminos`,           lastModified: new Date(), changeFrequency: 'yearly',  priority: 0.3 },
   ]
-
-  let homeRoutes = []
-  try {
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-    )
-    const { data: homes } = await supabase
-      .from('homes')
-      .select('id, created_at')
-      .order('created_at', { ascending: false })
-      .limit(500)
-
-    if (homes) {
-      homeRoutes = homes.map((home) => ({
-        url: `${baseUrl}/homes/${home.id}`,
-        lastModified: new Date(home.created_at),
-        changeFrequency: 'weekly',
-        priority: 0.6,
-      }))
-    }
-  } catch (e) {
-    console.error('Sitemap: error fetching homes', e)
-  }
 
   const countryRoutes = ['CL', 'MX', 'CO', 'AR'].map(code => ({
     url: `${baseUrl}/homes?country=${code}`,
@@ -46,5 +19,47 @@ export default async function sitemap() {
     priority: 0.8,
   }))
 
-  return [...staticRoutes, ...countryRoutes, ...homeRoutes]
+  let homeRoutes = []
+  let profileRoutes = []
+
+  try {
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    )
+
+    const { data: homes } = await supabase
+      .from('homes')
+      .select('id, updated_at, created_at')
+      .order('created_at', { ascending: false })
+      .limit(5000)
+
+    if (homes) {
+      homeRoutes = homes.map(home => ({
+        url: `${baseUrl}/homes/${home.id}`,
+        lastModified: new Date(home.updated_at || home.created_at),
+        changeFrequency: 'weekly',
+        priority: 0.8,
+      }))
+    }
+
+    const { data: profiles } = await supabase
+      .from('profiles')
+      .select('id, updated_at, created_at')
+      .order('created_at', { ascending: false })
+      .limit(2000)
+
+    if (profiles) {
+      profileRoutes = profiles.map(profile => ({
+        url: `${baseUrl}/profile/${profile.id}`,
+        lastModified: new Date(profile.updated_at || profile.created_at),
+        changeFrequency: 'monthly',
+        priority: 0.5,
+      }))
+    }
+  } catch (e) {
+    console.error('Sitemap: error fetching dynamic routes', e)
+  }
+
+  return [...staticRoutes, ...countryRoutes, ...homeRoutes, ...profileRoutes]
 }
