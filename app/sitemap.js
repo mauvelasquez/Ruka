@@ -1,8 +1,21 @@
 import { createClient } from '@supabase/supabase-js'
+import { COUNTRY_SLUGS, cityData, TARGET_CITIES_BY_COUNTRY } from '../lib/cityData'
+import { getAllPosts } from '../lib/blog'
 
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://rukka.cl'
 
 export default async function sitemap() {
+  const blogPosts = getAllPosts()
+  const blogRoutes = [
+    { url: `${baseUrl}/blog`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.8 },
+    ...blogPosts.map(p => ({
+      url: `${baseUrl}/blog/${p.slug}`,
+      lastModified: new Date(p.lastUpdated || p.date),
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    })),
+  ]
+
   const staticRoutes = [
     { url: baseUrl,                         lastModified: new Date(), changeFrequency: 'weekly',  priority: 1.0 },
     { url: `${baseUrl}/homes`,              lastModified: new Date(), changeFrequency: 'daily',   priority: 0.9 },
@@ -12,11 +25,27 @@ export default async function sitemap() {
     { url: `${baseUrl}/terminos`,           lastModified: new Date(), changeFrequency: 'yearly',  priority: 0.3 },
   ]
 
+  // Rutas de países (/homes/chile, /homes/argentina, etc.)
+  const paisRoutes = Object.keys(COUNTRY_SLUGS).map(pais => ({
+    url: `${baseUrl}/homes/${pais}`,
+    lastModified: new Date(),
+    changeFrequency: 'daily',
+    priority: 0.9,
+  }))
+
+  // Rutas de ciudades objetivo (pre-indexar aunque no tengan hogares aún)
+  const ciudadRoutes = Object.entries(cityData).map(([slug, data]) => ({
+    url: `${baseUrl}/homes/${data.country}/${slug}`,
+    lastModified: new Date(),
+    changeFrequency: 'weekly',
+    priority: 0.8,
+  }))
+
   const countryRoutes = ['CL', 'MX', 'CO', 'AR'].map(code => ({
     url: `${baseUrl}/homes?country=${code}`,
     lastModified: new Date(),
     changeFrequency: 'daily',
-    priority: 0.8,
+    priority: 0.7,
   }))
 
   let homeRoutes = []
@@ -46,5 +75,5 @@ export default async function sitemap() {
     console.error('Sitemap: error fetching dynamic routes', e)
   }
 
-  return [...staticRoutes, ...countryRoutes, ...homeRoutes]
+  return [...staticRoutes, ...blogRoutes, ...paisRoutes, ...ciudadRoutes, ...countryRoutes, ...homeRoutes]
 }

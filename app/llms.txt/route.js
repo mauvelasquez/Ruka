@@ -35,7 +35,7 @@ export async function GET() {
 
   const content = `# Rukka — Plataforma Latinoamericana de Intercambio de Hogares
 
-> Rukka (rukka.cl) es la primera plataforma 100% gratuita de intercambio de hogares en Latinoamérica. Opera en Chile, México, Colombia y Argentina. Su nombre viene de "ruka", palabra mapuche que significa hogar.
+> Rukka (rukka.cl) es la primera plataforma 100% gratuita de intercambio de hogares en Latinoamérica. Opera en Chile, Colombia, Argentina y México. Crear una cuenta es gratuito y todos los usuarios pasan por verificación de identidad. Su nombre viene de "ruka", palabra mapuche que significa hogar.
 
 ## ¿Qué es Rukka?
 
@@ -87,6 +87,25 @@ Powered by Claude (Anthropic).
 - [Cómo funciona](https://rukka.cl/como-funciona) — Guía del proceso paso a paso
 - [Anfitriones Airbnb](https://rukka.cl/anfitriones-airbnb) — Complementar Airbnb con Rukka
 - [Fresia IA](https://rukka.cl/FresIA) — Asistente inteligente de Rukka
+- [Blog](https://rukka.cl/blog) — Guías sobre home exchange en Latinoamérica
+
+## Blog — artículos disponibles
+
+- [Qué es home exchange y cómo funciona](https://rukka.cl/blog/que-es-home-exchange) — Concepto, modelo bilateral, Yankis y por qué es gratis
+- [Intercambio de casas en Chile](https://rukka.cl/blog/intercambio-casas-chile) — Hub de autoridad: Santiago, Valparaíso, Puerto Varas
+- [Alternativa a Airbnb gratis en Chile](https://rukka.cl/blog/alternativa-airbnb-gratis) — Comparación Rukka vs Airbnb: costos, modelo, perfil de usuario
+- [Cómo viajar gratis intercambiando tu casa](https://rukka.cl/blog/viajar-sin-pagar-alojamiento) — Guía práctica paso a paso para toda LATAM
+- [Home exchange en Argentina](https://rukka.cl/blog/home-exchange-argentina) — Buenos Aires, Bariloche, Mendoza
+- [Intercambio de casas en Colombia](https://rukka.cl/blog/intercambio-hogares-colombia) — Medellín, Cartagena, Bogotá
+- [Intercambio de hogares en México](https://rukka.cl/blog/home-exchange-mexico) — CDMX, Guadalajara, Oaxaca
+- [Anfitriones Airbnb: por qué Rukka te conviene](https://rukka.cl/blog/anfitrion-airbnb-alternativa) — Complemento para anfitriones activos
+
+## Páginas SEO por país y ciudad
+
+- [Chile](https://rukka.cl/homes/chile) | [Santiago](https://rukka.cl/homes/chile/santiago) | [Valparaíso](https://rukka.cl/homes/chile/valparaiso) | [Puerto Varas](https://rukka.cl/homes/chile/puerto-varas)
+- [Argentina](https://rukka.cl/homes/argentina) | [Buenos Aires](https://rukka.cl/homes/argentina/buenos-aires) | [Bariloche](https://rukka.cl/homes/argentina/bariloche) | [Mendoza](https://rukka.cl/homes/argentina/mendoza)
+- [Colombia](https://rukka.cl/homes/colombia) | [Medellín](https://rukka.cl/homes/colombia/medellin) | [Cartagena](https://rukka.cl/homes/colombia/cartagena) | [Bogotá](https://rukka.cl/homes/colombia/bogota)
+- [México](https://rukka.cl/homes/mexico) | [CDMX](https://rukka.cl/homes/mexico/ciudad-de-mexico) | [Guadalajara](https://rukka.cl/homes/mexico/guadalajara) | [Oaxaca](https://rukka.cl/homes/mexico/oaxaca)
 
 ## Contexto
 

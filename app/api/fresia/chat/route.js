@@ -28,15 +28,16 @@ const FRESIA_TOOLS = [
         title:       { type: 'string',  description: 'Título del hogar (ej: "Casa en Providencia")' },
         description: { type: 'string',  description: 'Descripción del hogar' },
         tipo:        { type: 'string',  enum: ['Casa','Departamento','Habitación','Cabaña','Bungalow','Villa','Loft','Estudio'], description: 'Tipo de propiedad' },
-        region:      { type: 'string',  description: 'Región de Chile (ej: Región Metropolitana)' },
-        comuna:      { type: 'string',  description: 'Ciudad o comuna' },
+        pais:        { type: 'string',  enum: ['Chile', 'Colombia', 'Argentina', 'México'], description: 'País donde se encuentra el hogar' },
+        region:      { type: 'string',  description: 'Región, estado o departamento (ej: Región Metropolitana, Cundinamarca, Buenos Aires)' },
+        comuna:      { type: 'string',  description: 'Ciudad o municipio' },
         direccion:   { type: 'string',  description: 'Dirección específica (opcional)' },
         bedrooms:    { type: 'number',  description: 'Número de dormitorios' },
         bathrooms:   { type: 'number',  description: 'Número de baños' },
         max_guests:  { type: 'number',  description: 'Máximo de huéspedes' },
         amenities:   { type: 'array',   items: { type: 'string' }, description: 'Comodidades (wifi, parking, ac, heating, tv, kitchen, washer, pets)' },
       },
-      required: ['title', 'tipo', 'region', 'comuna', 'bedrooms', 'max_guests'],
+      required: ['title', 'tipo', 'pais', 'region', 'comuna', 'bedrooms', 'max_guests'],
     },
   },
   {
@@ -46,7 +47,7 @@ const FRESIA_TOOLS = [
       type: 'object',
       properties: {
         ciudad:         { type: 'string', description: 'Ciudad o comuna a buscar' },
-        region:         { type: 'string', description: 'Región de Chile' },
+        region:         { type: 'string', description: 'Región, estado o departamento' },
         tipo:           { type: 'string', description: 'Tipo de hogar (Casa, Departamento, etc.)' },
         max_guests_min: { type: 'number', description: 'Mínimo de huéspedes requerido' },
         bedrooms_min:   { type: 'number', description: 'Mínimo de dormitorios' },
@@ -66,7 +67,7 @@ const FRESIA_TOOLS = [
 function buildSystemPrompt(ctx) {
   return `Eres Fresia, la asistente de IA de Rukka, powered by Claude de Anthropic.
 
-Rukka es la plataforma latinoamericana de intercambio de hogares — conecta viajeros de Chile, México, Colombia y Argentina que intercambian sus casas para vivir como locales. Tu misión es ayudar a los usuarios de forma cálida y eficiente, en español.
+Rukka es la plataforma latinoamericana de intercambio de hogares — conecta viajeros de Chile, Colombia, Argentina y México que intercambian sus casas para vivir como locales. Crear una cuenta es completamente gratuito y todos los usuarios pasan por un proceso de verificación de identidad. Tu misión es ayudar a los usuarios de forma cálida y eficiente, en español.
 
 ## CAPACIDADES
 
@@ -87,6 +88,27 @@ Rukka es la plataforma latinoamericana de intercambio de hogares — conecta via
 ### Información general
 - Explica el funcionamiento de Rukka (intercambio de hogares en Latinoamérica).
 - Guía al usuario en procesos de registro, publicación, matches.
+- Responde preguntas sobre home exchange citando los artículos del blog cuando sea relevante.
+
+## BLOG Y PÁGINAS SEO
+
+Rukka tiene un blog en /blog con artículos sobre home exchange en LATAM. Cuando el usuario pregunte sobre estos temas, puedes referenciarlo:
+
+**Artículos del blog:**
+- ¿Qué es home exchange? → rukka.cl/blog/que-es-home-exchange
+- Intercambio en Chile → rukka.cl/blog/intercambio-casas-chile
+- Alternativa a Airbnb en Chile → rukka.cl/blog/alternativa-airbnb-gratis
+- Viajar gratis intercambiando casa → rukka.cl/blog/viajar-sin-pagar-alojamiento
+- Home exchange en Argentina → rukka.cl/blog/home-exchange-argentina
+- Intercambio en Colombia → rukka.cl/blog/intercambio-hogares-colombia
+- Intercambio en México → rukka.cl/blog/home-exchange-mexico
+- Para anfitriones Airbnb → rukka.cl/blog/anfitrion-airbnb-alternativa
+
+**Páginas de destinos (con hogares reales):**
+- Chile: /homes/chile → Santiago: /homes/chile/santiago, Valparaíso: /homes/chile/valparaiso, Puerto Varas: /homes/chile/puerto-varas
+- Argentina: /homes/argentina → Buenos Aires: /homes/argentina/buenos-aires, Bariloche: /homes/argentina/bariloche, Mendoza: /homes/argentina/mendoza
+- Colombia: /homes/colombia → Medellín: /homes/colombia/medellin, Cartagena: /homes/colombia/cartagena, Bogotá: /homes/colombia/bogota
+- México: /homes/mexico → CDMX: /homes/mexico/ciudad-de-mexico, Guadalajara: /homes/mexico/guadalajara, Oaxaca: /homes/mexico/oaxaca
 
 ## PERSONALIDAD
 - Nombre: Fresia (evoca lo chileno, lo natural, lo acogedor)
@@ -203,7 +225,8 @@ async function executeTool(name, input, ctx, supabase, userId) {
         comuna:            input.comuna  || null,
         direccion:         input.direccion || null,
         city:              input.comuna  || null,
-        country:           'Chile',
+        country:           input.pais || 'Chile',
+        country_code:      input.pais === 'Colombia' ? 'CO' : input.pais === 'Argentina' ? 'AR' : input.pais === 'México' ? 'MX' : 'CL',
         location:          `${input.comuna || ''}, ${input.region || ''}`,
         bedrooms:          input.bedrooms  || 1,
         bathrooms:         input.bathrooms || 1,

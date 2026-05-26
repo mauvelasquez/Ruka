@@ -40,6 +40,9 @@ export default function Navbar() {
             <Link href="/como-funciona" onClick={() => analytics.navClick('como_funciona')} className="text-gray-600 hover:text-forest font-medium text-sm transition-colors">
               ¿Cómo funciona?
             </Link>
+            <Link href="/blog" onClick={() => analytics.navClick('blog')} className="text-gray-600 hover:text-forest font-medium text-sm transition-colors">
+              Blog
+            </Link>
             <Link href="/anfitriones-airbnb" onClick={() => analytics.navClick('anfitriones_airbnb')} className="flex items-center gap-1.5 text-sm font-bold text-[#ff5a5f] hover:text-[#e0484d] transition-colors">
               <span className="text-base leading-none">🏠</span> Para anfitriones Airbnb
             </Link>
@@ -117,6 +120,9 @@ export default function Navbar() {
           </Link>
           <Link href="/como-funciona" onClick={() => setMenuOpen(false)} className="flex items-center gap-2 p-3 rounded-xl text-gray-700 hover:bg-forest-50 hover:text-forest">
             ¿Cómo funciona?
+          </Link>
+          <Link href="/blog" onClick={() => setMenuOpen(false)} className="flex items-center gap-2 p-3 rounded-xl text-gray-700 hover:bg-forest-50 hover:text-forest">
+            📖 Blog
           </Link>
           <Link href="/anfitriones-airbnb" onClick={() => setMenuOpen(false)} className="flex items-center gap-2 p-3 rounded-xl text-[#ff5a5f] hover:bg-[#ff5a5f]/8 font-bold">
             🏠 Para anfitriones de Airbnb

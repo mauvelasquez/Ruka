@@ -52,6 +52,7 @@ export default function Footer() {
                 ['Cómo funciona', '/como-funciona'],
                 ['Registrarse', '/auth/register'],
                 ['Explorar hogares', '/homes'],
+                ['Blog', '/blog'],
               ].map(([label, href]) => (
                 <li key={label}>
                   <Link href={href} className="text-gray-300 hover:text-forest-light transition-colors">{label}</Link>
