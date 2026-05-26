@@ -82,7 +82,7 @@ function HomesContent() {
       if (search) analytics.homesSearch(search)
     }, 300)
     return () => clearTimeout(timer)
-  }, [search, type, region, city, minBeds, sort])
+  }, [search, country, type, region, city, minBeds, sort])
 
   const clear = () => {
     setSearch('')

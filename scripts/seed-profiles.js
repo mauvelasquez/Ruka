@@ -811,6 +811,7 @@ async function main() {
         review_count:         homeData.review_count || 0,
         featured:             homeData.featured || false,
         private_bathroom:     true,
+        is_demo:              true,
       })
       if (homeErr) {
         console.error(`\n  ❌ insert home: ${homeErr.message}`)

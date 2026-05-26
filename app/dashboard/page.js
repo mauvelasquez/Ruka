@@ -40,6 +40,7 @@ export default function DashboardPage() {
   const [wishForm, setWishForm] = useState({ toCity: '', startDate: '', endDate: '', guests: 2 })
   const [showWishForm, setShowWishForm] = useState(false)
   const [showNoHomeAlert, setShowNoHomeAlert] = useState(false)
+  const [wishBlockReason, setWishBlockReason] = useState(null) // 'unverified' | 'no_home'
   const [activeThread, setActiveThread] = useState(null) // { requestId, otherUser }
 
   useEffect(() => {
@@ -194,11 +195,46 @@ export default function DashboardPage() {
           <div>
             <div className="flex justify-between items-center mb-4">
               <h2 className="font-black text-gray-800 text-lg">¿Cuándo te gustaría ir de vacaciones?</h2>
-              <button onClick={() => { setShowWishForm(!showWishForm); setShowNoHomeAlert(false) }}
+              <button onClick={() => {
+                const isVerified = currentUser?.verification_status === 'verified' || currentUser?.verification_status === 'id_verified'
+                if (!isVerified) { setWishBlockReason('unverified'); setShowNoHomeAlert(false); setShowWishForm(false); return }
+                if (myHomes.length === 0) { setWishBlockReason('no_home'); setShowNoHomeAlert(false); setShowWishForm(false); return }
+                setWishBlockReason(null)
+                setShowWishForm(!showWishForm)
+                setShowNoHomeAlert(false)
+              }}
                 className="flex items-center gap-1.5 bg-andean text-white px-4 py-2 rounded-xl font-bold text-sm hover:bg-blue-700 transition-colors">
                 <Plus className="w-4 h-4" /> Nuevo destino
               </button>
             </div>
+
+            {wishBlockReason === 'unverified' && (
+              <div className="bg-purple-50 border border-purple-200 rounded-2xl p-4 flex items-start gap-3 mb-4">
+                <AlertCircle className="w-5 h-5 text-purple-500 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-bold text-purple-900 text-sm mb-1">Verificación requerida</p>
+                  <p className="text-purple-700 text-xs mb-2">Debes verificarte para agregar destinos de viaje.</p>
+                  <Link href="/onboarding"
+                    className="inline-flex items-center gap-1.5 bg-forest text-white text-xs font-bold px-3 py-1.5 rounded-lg hover:bg-forest-dark transition-colors">
+                    Verificar mi identidad →
+                  </Link>
+                </div>
+              </div>
+            )}
+
+            {wishBlockReason === 'no_home' && (
+              <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-start gap-3 mb-4">
+                <AlertCircle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-bold text-amber-900 text-sm mb-1">Debes registrar tu hogar primero</p>
+                  <p className="text-amber-700 text-xs mb-2">Para agregar destinos de viaje, primero publica tu hogar en Rukka.</p>
+                  <button onClick={() => gate('publish', () => router.push('/dashboard/property/new'))}
+                    className="inline-flex items-center gap-1.5 bg-forest text-white text-xs font-bold px-3 py-1.5 rounded-lg hover:bg-forest-dark transition-colors">
+                    <Plus className="w-3.5 h-3.5" /> Publicar mi hogar
+                  </button>
+                </div>
+              </div>
+            )}
 
             {showNoHomeAlert && (
               <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-start gap-3 mb-4">

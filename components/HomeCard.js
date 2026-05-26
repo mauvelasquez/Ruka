@@ -33,7 +33,14 @@ export default function HomeCard({ home, user, compact = false }) {
           <div className="absolute top-3 left-3">
             <span className={`text-xs font-bold px-2.5 py-1 rounded-full border ${badge}`}>{home.type}</span>
           </div>
-          {home.featured && (
+          {home.is_demo && (
+            <div className="absolute top-3 right-3">
+              <span className="text-xs font-bold px-2 py-1 rounded-full bg-purple-100 text-purple-700 border border-purple-200 leading-tight">
+                Perfil de ejemplo
+              </span>
+            </div>
+          )}
+          {!home.is_demo && home.featured && (
             <div className="absolute top-3 right-3">
               <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-terra text-white">✦ Destacado</span>
             </div>
@@ -79,15 +86,8 @@ export default function HomeCard({ home, user, compact = false }) {
                 </div>
               </div>
             )}
-            {home.rating > 0 ? (
-              <div className="flex items-center gap-1 bg-amber-50 rounded-lg px-2 py-1 border border-amber-100">
-                <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
-                <span className="text-xs font-bold text-gray-800">{home.rating.toFixed(1)}</span>
-                {home.reviewCount > 0 && <span className="text-xs text-gray-400">({home.reviewCount})</span>}
-              </div>
-            ) : (
-              <span className="text-xs text-gray-400 italic">Nuevo</span>
-            )}
+            {/* TODO: re-habilitar valoraciones */}
+            <span className="text-xs text-gray-400 italic ml-auto">Intercambio</span>
           </div>
         </div>
       </div>
