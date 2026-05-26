@@ -6,9 +6,23 @@ import WelcomePopup from '../components/WelcomePopup'
 
 export const metadata = {
   metadataBase: new URL('https://rukka.cl'),
-  title: 'Rukka — Intercambio de casas en Latinoamérica',
+  title: {
+    default: 'Rukka — Intercambio de casas en Latinoamérica',
+    template: '%s | Rukka',
+  },
   description: 'La plataforma latinoamericana de home exchange. Intercambia tu hogar con viajeros de Chile, México, Colombia y Argentina. Matching automático y bilateral.',
   keywords: ['intercambio de casas', 'home exchange latinoamerica', 'intercambio hogar Chile', 'intercambio hogar México', 'intercambio hogar Colombia', 'intercambio hogar Argentina', 'rukka', 'viajes intercambio latinoamérica'],
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
   openGraph: {
     title: 'Rukka — Intercambio de casas en Latinoamérica',
     description: 'Viaja intercambiando tu hogar. Chile · México · Colombia · Argentina. Matching automático.',

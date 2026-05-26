@@ -7,6 +7,8 @@ Disallow: /dashboard/
 Disallow: /auth/
 Disallow: /admin/
 Disallow: /verificar/
+Disallow: /onboarding/
+Disallow: /profile/
 Allow: /
 
 # ── Motores de búsqueda tradicionales ────────────────────────────────────────
@@ -35,10 +37,16 @@ Allow: /
 User-agent: ClaudeBot
 Allow: /
 
+User-agent: Claude-SearchBot
+Allow: /
+
 User-agent: anthropic-ai
 Allow: /
 
 User-agent: Google-Extended
+Allow: /
+
+User-agent: Perplexity-User
 Allow: /
 
 User-agent: cohere-ai

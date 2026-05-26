@@ -20,7 +20,6 @@ export default async function sitemap() {
   }))
 
   let homeRoutes = []
-  let profileRoutes = []
 
   try {
     const supabase = createClient(
@@ -43,23 +42,9 @@ export default async function sitemap() {
       }))
     }
 
-    const { data: profiles } = await supabase
-      .from('profiles')
-      .select('id, updated_at, created_at')
-      .order('created_at', { ascending: false })
-      .limit(2000)
-
-    if (profiles) {
-      profileRoutes = profiles.map(profile => ({
-        url: `${baseUrl}/profile/${profile.id}`,
-        lastModified: new Date(profile.updated_at || profile.created_at),
-        changeFrequency: 'monthly',
-        priority: 0.5,
-      }))
-    }
   } catch (e) {
     console.error('Sitemap: error fetching dynamic routes', e)
   }
 
-  return [...staticRoutes, ...countryRoutes, ...homeRoutes, ...profileRoutes]
+  return [...staticRoutes, ...countryRoutes, ...homeRoutes]
 }
