@@ -24,6 +24,7 @@ export async function GET(req) {
   const { searchParams } = new URL(req.url)
   const isDebug     = searchParams.get("debug") === "1"
   const isTestEmail = searchParams.get("test_email") === "1"
+  const isForce     = searchParams.get("force") === "1"
   const supabase = getServiceClient()
 
   // Cargar URLs ya vistas en los últimos 7 días para no re-alertar
@@ -44,7 +45,7 @@ export async function GET(req) {
   const foroPosts   = isDebug ? foroResult.posts   : foroResult
 
   const newPosts = [...redditPosts, ...foroPosts].filter(
-    p => p.url && !seenUrls.has(p.url)
+    p => p.url && (isForce || !seenUrls.has(p.url))
   )
 
   if (isTestEmail) {
