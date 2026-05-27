@@ -23,7 +23,7 @@ export default function YankisRecibidos({
   return (
     <Html lang="es">
       <Head />
-      <Preview>¡Recibiste {yanquisRecibidos} {labelRecibidos}! Tu saldo ahora es {yanquisTotal}.</Preview>
+      <Preview>{`¡Recibiste ${yanquisRecibidos} ${labelRecibidos}! Tu saldo ahora es ${yanquisTotal}.`}</Preview>
       <Body style={{ backgroundColor: '#ffffff', margin: 0, padding: 0, fontFamily: 'system-ui, sans-serif' }}>
         <Container style={{ maxWidth: '600px', margin: '0 auto' }}>
           <RukkaHeader />

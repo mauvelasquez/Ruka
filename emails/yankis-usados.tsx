@@ -26,7 +26,7 @@ export default function YankisUsados({
   return (
     <Html lang="es">
       <Head />
-      <Preview>Usaste {yanquisUsados} {labelUsados} para tu estadía en {destino}.</Preview>
+      <Preview>{`Usaste ${yanquisUsados} ${labelUsados} para tu estadía en ${destino}.`}</Preview>
       <Body style={{ backgroundColor: '#ffffff', margin: 0, padding: 0, fontFamily: 'system-ui, sans-serif' }}>
         <Container style={{ maxWidth: '600px', margin: '0 auto' }}>
           <RukkaHeader />
