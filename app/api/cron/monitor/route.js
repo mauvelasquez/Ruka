@@ -21,6 +21,7 @@ export async function GET(req) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
+  const isDebug = new URL(req.url).searchParams.get("debug") === "1"
   const supabase = getServiceClient()
 
   // Cargar URLs ya vistas en los últimos 7 días para no re-alertar
@@ -32,11 +33,13 @@ export async function GET(req) {
 
   const seenUrls = new Set((seen ?? []).map(r => r.url))
 
-  // Ambos scans en paralelo para no agotar el timeout
-  const [redditPosts, foroPosts] = await Promise.all([
-    scanReddit(),
-    scanForosHispanicos(),
+  const [redditResult, foroResult] = await Promise.all([
+    scanReddit({ debug: isDebug }),
+    scanForosHispanicos({ debug: isDebug }),
   ])
+
+  const redditPosts = isDebug ? redditResult.posts : redditResult
+  const foroPosts   = isDebug ? foroResult.posts   : foroResult
 
   const newPosts = [...redditPosts, ...foroPosts].filter(
     p => p.url && !seenUrls.has(p.url)
@@ -55,9 +58,15 @@ export async function GET(req) {
     await sendAlertEmail(newPosts)
   }
 
-  return NextResponse.json({
-    scanned: redditPosts.length + foroPosts.length + seenUrls.size,
+  const response = {
+    scanned_raw: isDebug
+      ? Object.values({ ...redditResult.stats, ...foroResult.stats }).reduce((a, s) => a + (s.fetched ?? 0), 0)
+      : undefined,
+    matched: redditPosts.length + foroPosts.length,
     new_alerts: newPosts.length,
     timestamp: new Date().toISOString(),
-  })
+    ...(isDebug && { reddit: redditResult.stats, foros: foroResult.stats }),
+  }
+
+  return NextResponse.json(response)
 }
