@@ -1,14 +1,18 @@
 'use client'
-import { useState, useEffect, useCallback, Suspense } from 'react'
+import { useState, useEffect, useCallback, useMemo, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Navbar from '../../components/Navbar'
 import Footer from '../../components/Footer'
 import HomeCard from '../../components/HomeCard'
+import CountrySelector from '../../components/CountrySelector'
 import { SlidersHorizontal, X, ChevronDown, MapPin, ChevronLeft, ChevronRight } from 'lucide-react'
 import { COMUNAS_RUKKA } from '../../lib/comunas'
 import { getRandomBanner } from '../../lib/chile-banners'
 import { analytics } from '../../lib/analytics'
 import { COUNTRIES, getRegions, getCities } from '../../lib/geo/latam'
+import { useApp } from '../../lib/store'
+import { useCountry } from '../../hooks/useCountry'
+import { curateHomesForUser } from '../../lib/editorial'
 
 const TYPES = ['Todos', 'Casa', 'Departamento', 'Cabaña', 'Estudio', 'Loft', 'Villa', 'Habitación']
 const LIMIT = 24
@@ -30,6 +34,12 @@ function HomesContent() {
   const searchParams  = useSearchParams()
   const initialSearch = searchParams.get('search') || searchParams.get('location') || ''
   const [banner]      = useState(() => getRandomBanner())
+
+  const { user }       = useApp()
+  const ipCountry      = useCountry()
+  const [exploringFrom, setExploringFrom] = useState(null)
+  const displayFrom    = exploringFrom ?? user?.country_code ?? ipCountry ?? 'CL'
+  const userCity       = user?.city ?? ''
 
   const [search,      setSearch]      = useState(initialSearch)
   const [country,     setCountry]     = useState(searchParams.get('country') || '')
@@ -100,6 +110,11 @@ function HomesContent() {
   const latamCities     = (country && region !== 'Todas') ? getCities(country, region) : []
   const sortLabels = { rating: 'Mejor valorados', reviews: 'Más reseñas', newest: 'Más recientes' }
 
+  const curatedHomes = useMemo(
+    () => curateHomesForUser(homes, displayFrom, userCity),
+    [homes, displayFrom, userCity]
+  )
+
   const goToPage = (p) => {
     setPage(p)
     fetchHomes(p)
@@ -154,6 +169,11 @@ function HomesContent() {
               {c.flag} {c.name}
             </button>
           ))}
+        </div>
+
+        {/* Exploro desde */}
+        <div className="mb-3">
+          <CountrySelector value={displayFrom} onChange={setExploringFrom} />
         </div>
 
         {/* Chips tipo */}
@@ -279,7 +299,7 @@ function HomesContent() {
         ) : homes.length > 0 ? (
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-              {homes.map(h => <HomeCard key={h.id} home={h} />)}
+              {curatedHomes.map(h => <HomeCard key={h.id} home={h} />)}
             </div>
 
             {/* Paginación */}

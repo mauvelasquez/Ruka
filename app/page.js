@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Navbar from '../components/Navbar'
@@ -14,6 +14,8 @@ import { COUNTRIES } from '../lib/geo/latam'
 import { getDestinations, DESTINATIONS } from '../lib/geo/destinations'
 import { useCountry } from '../hooks/useCountry'
 import { ArrowRight, Zap, Heart, Gift } from 'lucide-react'
+import CountrySelector from '../components/CountrySelector'
+import { curateHomesForUser } from '../lib/editorial'
 
 const LATAM_COUNTRIES = [
   { code: 'CL', flag: '🇨🇱', name: 'Chile',     img: 'https://images.unsplash.com/photo-1591378603223-e15b45a81640?w=800', alt: 'Santiago de Chile' },
@@ -66,16 +68,22 @@ function AdBanner({ variant = 'primary', className = '', heroBanner = null }) {
 // ── PAGE ──────────────────────────────────────────────────────────────────────
 export default function HomePage() {
   const router = useRouter()
-  const { homes, users } = useApp()
-  const featured = homes.filter(h => h.featured).slice(0, 3)
+  const { homes, users, user } = useApp()
+  const [exploringFrom, setExploringFrom] = useState(null)
 
   const [heroBanner,      setHeroBanner]      = useState(null)
   const [countryCounts,   setCountryCounts]   = useState({ CL: 0, MX: 0, CO: 0, AR: 0 })
   const [localHomeCount,  setLocalHomeCount]  = useState(-1)
 
-  const userCountry   = useCountry()
-  const displayCountry = userCountry || 'CL'
+  const userCountry    = useCountry()
+  const displayCountry = exploringFrom ?? user?.country_code ?? userCountry ?? 'CL'
   const destData       = getDestinations(displayCountry)
+  const userCity       = user?.city ?? ''
+
+  const featured = useMemo(
+    () => curateHomesForUser(homes.filter(h => h.featured), displayCountry, userCity).slice(0, 3),
+    [homes, displayCountry, userCity]
+  )
 
   // Redirect OAuth errors that Supabase sends to the site root
   useEffect(() => {
@@ -165,7 +173,7 @@ export default function HomePage() {
       {/* ── 4 PAÍSES LATAM ───────────────────────────────────────────────────── */}
       <section className="py-16" style={{ background: '#F8F4EE' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center justify-between mb-4">
             <div>
               <p className="text-xs font-bold uppercase tracking-widest text-terra mb-1">🌎 Destinos LATAM</p>
               <h2 className="text-2xl font-extrabold text-gray-900">¿A qué país quieres ir?</h2>
@@ -173,6 +181,9 @@ export default function HomePage() {
             <Link href="/homes" className="text-forest font-semibold text-sm hover:text-forest-dark flex items-center gap-1">
               Ver todos <ArrowRight className="w-4 h-4" />
             </Link>
+          </div>
+          <div className="mb-8">
+            <CountrySelector value={displayCountry} onChange={setExploringFrom} label="Explorando desde" />
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-10">
             {LATAM_COUNTRIES.map(c => (
