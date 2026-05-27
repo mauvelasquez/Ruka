@@ -3,6 +3,10 @@
     {
       "path": "/api/cron/monitor",
       "schedule": "0 12 * * *"
+    },
+    {
+      "path": "/api/cron/reservas-proximas",
+      "schedule": "0 10 * * *"
     }
   ]
 }
