@@ -90,14 +90,14 @@ export async function GET(request) {
         if (upsertErr) {
           console.error('[auth/callback] profile upsert failed:', upsertErr.message)
         }
-      } else if (isGoogleLogin && user.email && profile.email !== user.email) {
-        // Existing profile — Google email is always source of truth
+      } else if (user.email && !profile.email) {
+        // Existing profile missing email (OAuth users created before email sync) — backfill
         const { error: emailErr } = await supabase
           .from('profiles')
           .update({ email: user.email })
           .eq('id', user.id)
         if (emailErr) {
-          console.error('[auth/callback] Google email sync failed:', emailErr.message)
+          console.error('[auth/callback] email backfill failed:', emailErr.message)
         }
       }
       // Always land on dashboard — onboarding is no longer mandatory
