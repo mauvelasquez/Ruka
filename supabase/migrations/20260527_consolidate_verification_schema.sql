@@ -57,7 +57,15 @@ ALTER TABLE profiles
   DROP COLUMN IF EXISTS id_document_country,
   DROP COLUMN IF EXISTS id_document_number;
 
--- ── 6. Update indexes ────────────────────────────────────────────────────────
+-- ── 6. Ensure verification_status constraint includes 'id_verified' ──────────
+-- Migration 20260520_id_verified_status.sql may not have been applied to prod.
+
+ALTER TABLE public.profiles
+  DROP CONSTRAINT IF EXISTS profiles_verification_status_check,
+  ADD CONSTRAINT profiles_verification_status_check
+    CHECK (verification_status IN ('unverified', 'pending', 'verified', 'id_verified', 'rejected'));
+
+-- ── 7. Update indexes ────────────────────────────────────────────────────────
 
 DROP INDEX IF EXISTS idx_profiles_id_verified;
 CREATE INDEX IF NOT EXISTS idx_profiles_verified ON profiles(verified);
