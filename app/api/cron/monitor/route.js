@@ -21,7 +21,9 @@ export async function GET(req) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
-  const isDebug = new URL(req.url).searchParams.get("debug") === "1"
+  const { searchParams } = new URL(req.url)
+  const isDebug     = searchParams.get("debug") === "1"
+  const isTestEmail = searchParams.get("test_email") === "1"
   const supabase = getServiceClient()
 
   // Cargar URLs ya vistas en los últimos 7 días para no re-alertar
@@ -44,6 +46,21 @@ export async function GET(req) {
   const newPosts = [...redditPosts, ...foroPosts].filter(
     p => p.url && !seenUrls.has(p.url)
   )
+
+  if (isTestEmail) {
+    try {
+      await sendAlertEmail([{
+        source: "test",
+        title: "Test: intercambio de casas en Santiago",
+        url: "https://rukka.cl",
+        snippet: "Este es un email de prueba para verificar que Resend está configurado correctamente.",
+        date: new Date().toISOString(),
+      }])
+      return NextResponse.json({ email: "test_sent", to: process.env.ALERT_EMAIL })
+    } catch (e) {
+      return NextResponse.json({ email: "test_failed", error: e.message }, { status: 500 })
+    }
+  }
 
   let emailStatus = null
   if (newPosts.length > 0) {
