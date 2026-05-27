@@ -561,9 +561,9 @@ export default function DashboardPage() {
                   </label>
                   <div className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-700 select-none flex items-center gap-2">
                     <span className="flex-1">{currentUser.name || '—'}</span>
-                    {currentUser.identification_verified && <Lock className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />}
+                    {currentUser.verified && <Lock className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />}
                   </div>
-                  {currentUser.identification_verified && (
+                  {currentUser.verified && (
                     <p className="text-xs text-gray-400 mt-1">El nombre no puede modificarse una vez verificada la identidad.</p>
                   )}
                 </div>
@@ -585,7 +585,7 @@ export default function DashboardPage() {
                   </label>
                   <div className={`w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm select-none flex items-center gap-2 ${currentUser.identification_number ? 'text-gray-700' : 'text-gray-400 italic'}`}>
                     <span className="flex-1">{currentUser.identification_number || 'No verificado'}</span>
-                    {currentUser.identification_verified && <Lock className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />}
+                    {currentUser.verified && <Lock className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />}
                   </div>
                 </div>
 

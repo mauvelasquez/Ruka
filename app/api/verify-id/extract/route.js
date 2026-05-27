@@ -197,17 +197,16 @@ export async function POST(request) {
           verification_completed_at: new Date().toISOString(),
           identification_country:    extracted.pais_emisor,
           identification_type:       identificationType,
-          identification_verified:   true,
         }
-        if (extracted.nombre_completo) {
-          profileUpdate.full_name = extracted.nombre_completo
-          profileUpdate.name = extracted.nombre_completo
-        }
+        if (extracted.nombre_completo) profileUpdate.id_full_name = extracted.nombre_completo
         if (idNumber) profileUpdate.identification_number = idNumber
         const birthDate = parseBirthDate(extracted.fecha_nacimiento)
         if (birthDate) profileUpdate.birth_date = birthDate
         const { error: updateErr } = await admin.from('profiles').update(profileUpdate).eq('id', user.id)
-        if (updateErr) console.error('[verify-id/extract] profile update failed:', updateErr.message, '| fields:', Object.keys(profileUpdate))
+        if (updateErr) {
+          console.error('[verify-id/extract] profile update failed:', updateErr.message, '| fields:', Object.keys(profileUpdate))
+          return Response.json({ success: false, error: 'Error al guardar la verificación. Intenta nuevamente.' })
+        }
       } catch (saveErr) {
         console.error('[verify-id/extract] profile update threw:', saveErr.message)
       }

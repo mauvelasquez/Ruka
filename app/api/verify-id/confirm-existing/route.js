@@ -11,11 +11,11 @@ export async function POST() {
 
     const { data: profile } = await supabase
       .from('profiles')
-      .select('identification_number, full_name')
+      .select('identification_number, id_full_name')
       .eq('id', user.id)
       .single()
 
-    if (!profile?.identification_number || !profile?.full_name) {
+    if (!profile?.identification_number || !profile?.id_full_name) {
       return Response.json({ success: false, error: 'Sin datos de OCR previos' }, { status: 400 })
     }
 
@@ -24,11 +24,15 @@ export async function POST() {
       process.env.SUPABASE_SERVICE_ROLE_KEY
     )
 
-    await admin.from('profiles').update({
+    const { error: updateErr } = await admin.from('profiles').update({
       verified:                  true,
       verification_status:       'id_verified',
       verification_completed_at: new Date().toISOString(),
     }).eq('id', user.id)
+    if (updateErr) {
+      console.error('[verify-id/confirm-existing] update failed:', updateErr.message)
+      return Response.json({ success: false, error: 'Error al guardar la verificación.' }, { status: 500 })
+    }
 
     return Response.json({ success: true })
   } catch (err) {

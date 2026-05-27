@@ -133,10 +133,10 @@ function ExistingProfileStep({ profile, action, onSkip, onVerified }) {
 
       <div className="bg-forest/5 border border-forest/20 rounded-xl p-4 space-y-2">
         <p className="text-xs font-bold text-forest uppercase tracking-wide mb-3">Datos del documento</p>
-        {profile.full_name && (
+        {profile.id_full_name && (
           <div>
             <p className="text-xs text-gray-400">Nombre</p>
-            <p className="text-sm font-semibold text-gray-800">{profile.full_name}</p>
+            <p className="text-sm font-semibold text-gray-800">{profile.id_full_name}</p>
           </div>
         )}
         {profile.identification_number && (
@@ -197,10 +197,10 @@ function VerificarContent() {
         if (!user) return
         const { data: profile } = await supabase
           .from('profiles')
-          .select('full_name, identification_number, birth_date')
+          .select('id_full_name, identification_number, birth_date')
           .eq('id', user.id)
           .single()
-        if (profile?.identification_number && profile?.full_name) {
+        if (profile?.identification_number && profile?.id_full_name) {
           setExistingProfile(profile)
         }
       } catch {

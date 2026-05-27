@@ -170,7 +170,6 @@ export default function OnboardingPage() {
       identification_number:    idResult.identification_number,
       identification_type:      idResult.document_type,
       identification_country:   idResult.country,
-      identification_verified:  true,
       verified:                 true,
       verification_status:      'id_verified',
       verification_completed_at: new Date().toISOString(),

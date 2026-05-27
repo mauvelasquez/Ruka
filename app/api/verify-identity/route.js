@@ -88,13 +88,14 @@ export async function POST(request) {
 
   // Persist only extracted metadata — never the image
   const updateData = {
-    id_document_type:    result.document_type    ?? null,
-    id_document_country: result.document_country ?? null,
-    id_document_number:  result.id_number        ?? null,
-    id_full_name:        result.full_name         ?? null,
-    id_verified:         result.verified          ?? false,
-    id_verified_at:      result.verified ? new Date().toISOString() : null,
-    id_rejection_reason: result.rejection_reason  ?? null,
+    id_document_type:          result.document_type    ?? null,
+    id_document_country:       result.document_country ?? null,
+    id_document_number:        result.id_number        ?? null,
+    id_full_name:              result.full_name         ?? null,
+    id_rejection_reason:       result.rejection_reason  ?? null,
+    verified:                  result.verified          ?? false,
+    verification_status:       result.verified ? 'id_verified' : 'unverified',
+    verification_completed_at: result.verified ? new Date().toISOString() : null,
   }
 
   const { error: dbError } = await supabase
