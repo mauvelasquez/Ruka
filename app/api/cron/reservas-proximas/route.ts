@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { createClient } from '../../../../lib/supabase/server'
 import { Resend } from 'resend'
 import ReservaProximaSemana from '@/emails/reserva-proxima-semana'
+import AnfitrionProximaSemana from '@/emails/anfitrion-proxima-semana'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
@@ -25,8 +26,9 @@ export async function GET(req: Request) {
       fecha_inicio,
       fecha_fin,
       destino,
+      personas,
       guest:profiles!guest_id (id, nombre, email),
-      host:profiles!host_id (nombre)
+      host:profiles!host_id (nombre, email)
     `)
     .eq('status', 'accepted')
     .eq('fecha_inicio', fechaObjetivo)
@@ -45,30 +47,50 @@ export async function GET(req: Request) {
       const guest = reserva.guest
       const host = reserva.host
 
-      if (!guest?.email || !guest?.nombre) return null
-
       const fechaInicio = new Date(reserva.fecha_inicio).toLocaleDateString('es-CL', { day: 'numeric', month: 'short' })
       const fechaFin = new Date(reserva.fecha_fin).toLocaleDateString('es-CL', { day: 'numeric', month: 'short' })
 
-      const { data, error } = await resend.emails.send({
-        from: 'Rukka <hola@rukka.cl>',
-        to: guest.email,
-        subject: `Tu intercambio en ${reserva.destino} comienza en 7 días 🗓️`,
-        react: ReservaProximaSemana({
-          nombre: guest.nombre,
-          destino: reserva.destino,
-          fechaInicio,
-          fechaFin,
-          nombreAnfitrion: host?.nombre || 'tu anfitrión',
-        }),
-      })
+      const enviados: string[] = []
 
-      if (error) throw new Error(`Error enviando a ${guest.email}: ${error.message}`)
-      return data?.id
+      if (guest?.email && guest?.nombre) {
+        const { data, error: errGuest } = await resend.emails.send({
+          from: 'Rukka <hola@rukka.cl>',
+          to: guest.email,
+          subject: `Tu intercambio en ${reserva.destino} comienza en 7 días 🗓️`,
+          react: ReservaProximaSemana({
+            nombre: guest.nombre,
+            destino: reserva.destino,
+            fechaInicio,
+            fechaFin,
+            nombreAnfitrion: host?.nombre || 'tu anfitrión',
+          }),
+        })
+        if (errGuest) throw new Error(`Error enviando a viajero ${guest.email}: ${errGuest.message}`)
+        if (data?.id) enviados.push(data.id)
+      }
+
+      if (host?.email && host?.nombre) {
+        const { data, error: errHost } = await resend.emails.send({
+          from: 'Rukka <hola@rukka.cl>',
+          to: host.email,
+          subject: `Prepara tu hogar, ${guest?.nombre || 'tu viajero'} llega en 7 días 🗓️`,
+          react: AnfitrionProximaSemana({
+            nombre: host.nombre,
+            nombreViajero: guest?.nombre || 'tu viajero',
+            fechaLlegada: fechaInicio,
+            fechaSalida: fechaFin,
+            personas: reserva.personas ?? 1,
+          }),
+        })
+        if (errHost) throw new Error(`Error enviando a anfitrión ${host.email}: ${errHost.message}`)
+        if (data?.id) enviados.push(data.id)
+      }
+
+      return enviados
     })
   )
 
-  const exitosos = resultados.filter(r => r.status === 'fulfilled' && r.value).length
+  const exitosos = resultados.filter(r => r.status === 'fulfilled' && (r.value as string[]).length > 0).length
   const fallidos = resultados.filter(r => r.status === 'rejected').length
 
   return NextResponse.json({
