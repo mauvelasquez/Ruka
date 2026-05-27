@@ -4,7 +4,6 @@ import { useSearchParams } from 'next/navigation'
 import Navbar from '../../components/Navbar'
 import Footer from '../../components/Footer'
 import HomeCard from '../../components/HomeCard'
-import CountrySelector from '../../components/CountrySelector'
 import { SlidersHorizontal, X, ChevronDown, MapPin, ChevronLeft, ChevronRight } from 'lucide-react'
 import { COMUNAS_RUKKA } from '../../lib/comunas'
 import { getRandomBanner } from '../../lib/chile-banners'
@@ -37,8 +36,7 @@ function HomesContent() {
 
   const { user }       = useApp()
   const ipCountry      = useCountry()
-  const [exploringFrom, setExploringFrom] = useState(null)
-  const displayFrom    = exploringFrom ?? user?.country_code ?? ipCountry ?? 'CL'
+  const displayFrom    = user?.country_code ?? ipCountry ?? 'CL'
   const userCity       = user?.city ?? ''
 
   const [search,      setSearch]      = useState(initialSearch)
@@ -169,11 +167,6 @@ function HomesContent() {
               {c.flag} {c.name}
             </button>
           ))}
-        </div>
-
-        {/* Exploro desde */}
-        <div className="mb-3">
-          <CountrySelector value={displayFrom} onChange={setExploringFrom} />
         </div>
 
         {/* Chips tipo */}
