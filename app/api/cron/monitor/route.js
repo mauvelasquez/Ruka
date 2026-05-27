@@ -45,6 +45,7 @@ export async function GET(req) {
     p => p.url && !seenUrls.has(p.url)
   )
 
+  let emailStatus = null
   if (newPosts.length > 0) {
     await supabase.from("monitor_seen_posts").insert(
       newPosts.map(p => ({
@@ -55,10 +56,17 @@ export async function GET(req) {
       }))
     )
 
-    await sendAlertEmail(newPosts)
+    try {
+      await sendAlertEmail(newPosts)
+      emailStatus = "sent"
+    } catch (e) {
+      emailStatus = e.message
+      console.error("[monitor] Email falló:", e.message)
+    }
   }
 
   const response = {
+    email: emailStatus,
     scanned_raw: isDebug
       ? Object.values({ ...redditResult.stats, ...foroResult.stats }).reduce((a, s) => a + (s.fetched ?? 0), 0)
       : undefined,
