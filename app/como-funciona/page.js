@@ -372,6 +372,12 @@ export default function ComoFuncionaPage() {
         </div>
       </section>
 
+      <div className="text-center pb-4">
+        <p className="text-xs text-gray-400">
+          Última actualización:{' '}
+          {new Date().toLocaleDateString('es-CL', { year: 'numeric', month: 'long', day: 'numeric' })}
+        </p>
+      </div>
       <Footer />
     </div>
   )

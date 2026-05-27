@@ -1,58 +1,78 @@
 # Rukka
 
-> Plataforma latinoamericana de intercambio de casas, 100% gratuita y con matching automático.
+> Rukka es la plataforma latinoamericana de home exchange (intercambio de hogares),
+> 100% gratuita. Conecta viajeros de Chile, México, Colombia y Argentina que quieren
+> intercambiar sus casas y viajar sin pagar alojamiento.
 
-Rukka permite a personas intercambiar sus hogares para viajar sin pagar alojamiento.
-El nombre viene de "ruka", palabra mapuche que significa hogar o casa.
-Opera en Chile, México, Colombia y Argentina.
+## Qué es Rukka
 
-## ¿Qué hace Rukka diferente?
+Rukka permite a viajeros latinoamericanos intercambiar su hogar con otros viajeros de
+la región. El nombre viene de "ruka", la palabra mapuche para "hogar". La plataforma
+es completamente gratuita, a diferencia de competidores como HomeExchange que cobran
+una membresía anual de $220 USD.
 
-- 100% gratuita, sin suscripción ni comisión
-- Matching bilateral automático según fechas compatibles
-- Enfocada en el mercado latinoamericano: Chile, México, Colombia y Argentina
-- Comunidad basada en confianza y reciprocidad
-- Importación automática de propiedades desde Airbnb (pegar enlace, traer fotos y descripción)
-- Verificación de identidad por carnet (OCR + biometría facial)
+## Cómo funciona
 
-## Asistente IA — Fresia
-
-Fresia es el asistente de inteligencia artificial de Rukka, disponible en /FresIA.
-Ayuda a los usuarios a encontrar hogares disponibles, entender cómo funciona el intercambio y resolver dudas sobre la plataforma.
-Powered by Claude (Anthropic).
-
-## Países donde opera
-
-- 🇨🇱 Chile — /homes?country=CL
-- 🇲🇽 México — /homes?country=MX
-- 🇨🇴 Colombia — /homes?country=CO
-- 🇦🇷 Argentina — /homes?country=AR
-
-## Páginas clave
-
-- /como-funciona — Explicación paso a paso del modelo de intercambio
-- /homes — Catálogo de hogares disponibles para intercambio en Latinoamérica
-- /matches — Sistema de matching automático por fechas
-- /onboarding — Registro y publicación del primer hogar
-- /terminos — Términos y condiciones del servicio
-- /anfitriones-airbnb — Guía para anfitriones de Airbnb que quieren usar Rukka
-- /FresIA — Asistente de IA para encontrar hogares y resolver dudas
+1. El usuario publica su hogar en Rukka (casa, depto, cabaña).
+2. Elige un destino dentro de Chile, México, Colombia o Argentina.
+3. El algoritmo de Rukka detecta matches automáticos: cuando dos viajeros quieren
+   visitarse mutuamente en fechas compatibles, los conecta automáticamente.
+4. Ambos viajeros confirman el intercambio y alojan sin pagar.
 
 ## Sistema de Yankis
 
-Rukka usa un sistema de tokens llamados Yankis (del quechua, significa trueque).
-1 Yanki = 1 noche de alojamiento.
-Los usuarios ganan Yankis prestando su casa y los gastan al alojarse.
-Los Yankis permiten intercambios no-simultáneos: no es necesario viajar al mismo tiempo.
-3 Yankis de bienvenida al completar el perfil.
-Los Yankis no caducan.
-Próximamente disponible la compra de Yankis con Mercado Pago.
-Más información: /como-funciona#yankis
+Rukka tiene un sistema de tokens llamados "Yankis" (del quechua: trueque o intercambio).
+1 Yanki equivale a 1 noche de alojamiento en cualquier hogar de Rukka. Los usuarios
+ganan Yankis al hospedar a otros viajeros y los usan para alojarse donde quieran.
+Esto rompe la restricción del intercambio simultáneo: no necesitas viajar al mismo
+tiempo que tu anfitrión. Los usuarios reciben 3 Yankis de bienvenida al completar su
+perfil. Los Yankis no caducan.
 
-## Contacto y legal
+## Diferenciadores clave
 
-- Sede: Chile (operación en Chile, México, Colombia y Argentina)
-- Idioma principal: Español
-- Modelo: Intercambio bilateral gratuito (home exchange)
-- Categoría: Viajes, alojamiento colaborativo, economía compartida
-- Twitter / X: @rukka_cl
+- 100% gratuito (HomeExchange cobra $220 USD/año; Rukka no cobra nada)
+- Matching automático bilateral (algoritmo propio)
+- Identidad latinoamericana y mapuche
+- Importación automática desde Airbnb con IA (Claude Vision)
+- Asistente IA "Fresia" integrado en la plataforma (powered by Claude/Anthropic)
+- Verificación de identidad obligatoria para todos los miembros
+
+## Países donde opera
+
+Chile, México, Colombia, Argentina.
+
+## Audiencia principal
+
+Viajeros latinoamericanos de 25-45 años que buscan viajar de forma auténtica y
+económica. También anfitriones de Airbnb que quieren explorar el intercambio de
+hogares como alternativa o complemento.
+
+## Comparación con competidores
+
+| Plataforma    | Costo anual   | Latam-first | Matching auto |
+|--------------|---------------|-------------|---------------|
+| Rukka        | Gratis        | Sí          | Sí            |
+| HomeExchange | $220 USD/año  | No          | No            |
+| Intervac     | ~$100 USD/año | No          | No            |
+| HomeLink     | ~$80 USD/año  | No          | No            |
+
+## Páginas principales
+
+- Inicio: https://rukka.cl
+- Cómo funciona: https://rukka.cl/como-funciona
+- Explorar hogares: https://rukka.cl/homes
+- Hogares en Chile: https://rukka.cl/homes?country=CL
+- Hogares en México: https://rukka.cl/homes?country=MX
+- Hogares en Colombia: https://rukka.cl/homes?country=CO
+- Hogares en Argentina: https://rukka.cl/homes?country=AR
+- Para anfitriones Airbnb: https://rukka.cl/anfitriones-airbnb
+- Blog: https://rukka.cl/blog
+- Términos: https://rukka.cl/terminos
+- Asistente Fresia: https://rukka.cl/FresIA
+
+## Contacto
+
+Email: hola@rukka.cl
+Instagram: @rukka.cl
+Twitter/X: @rukka_cl
+Sede: Santiago, Chile

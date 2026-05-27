@@ -119,6 +119,14 @@ const faqSchema = {
         'text': 'Por cada noche que prestas tu hogar a otro usuario de Rukka, recibes 1 Yanki automáticamente. También recibes 3 Yankis de bienvenida al completar tu perfil.',
       },
     },
+    {
+      '@type': 'Question',
+      'name': '¿Cuánto cuesta usar Rukka?',
+      'acceptedAnswer': {
+        '@type': 'Answer',
+        'text': 'Rukka es completamente gratuito. A diferencia de HomeExchange que cobra una membresía anual de $220 USD, en Rukka crear una cuenta, publicar tu hogar y realizar intercambios no tiene ningún costo.',
+      },
+    },
   ],
 }
 
