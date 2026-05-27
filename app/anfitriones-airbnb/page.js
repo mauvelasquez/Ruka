@@ -140,7 +140,7 @@ export default function AnfitrionesAirbnbPage() {
                 <span className="text-base">🏠</span> Para anfitriones de Airbnb
               </span>
               <span className="inline-flex items-center gap-1.5 bg-white/15 backdrop-blur-sm border border-white/25 text-white rounded-full px-4 py-1.5 text-sm font-bold">
-                🇨🇱 Solo Chile
+                🌎 Chile · Colombia · Argentina · México
               </span>
             </div>
 
@@ -150,8 +150,8 @@ export default function AnfitrionesAirbnbPage() {
             </h1>
 
             <p className="text-lg sm:text-xl text-white/80 leading-relaxed mb-8 max-w-xl">
-              Rukka es la comunidad chilena de anfitriones que intercambian sus propiedades entre sí.
-              Importa tu Airbnb en segundos y empieza a viajar sin gastar en alojamiento.
+              Rukka es la comunidad latinoamericana de anfitriones de Chile, Colombia, Argentina y México que intercambian sus propiedades entre sí.
+              Cuenta gratuita, verificación de identidad, sin comisiones.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-3">
@@ -176,7 +176,7 @@ export default function AnfitrionesAirbnbPage() {
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
             {[
               { n: '$0',    label: 'Costo por usar Rukka' },
-              { n: '13',    label: 'Regiones de Chile' },
+              { n: '4',     label: 'Países de Latinoamérica' },
               { n: '1 clic', label: 'Para importar tu Airbnb' },
               { n: '100%',  label: 'Anfitriones verificados' },
             ].map((s, i) => (
@@ -200,10 +200,10 @@ export default function AnfitrionesAirbnbPage() {
                 <span className="text-gray-400"> Pero cuando tú viajas, ¿cuánto pagas?</span>
               </h2>
               <p className="text-gray-600 leading-relaxed mb-6">
-                Tienes una propiedad que le da alojamiento a cientos de personas al año. Sin embargo, cuando tú quieres conocer Puerto Varas, la Costa o el Norte Chico, terminas pagando hotel o buscando en el mismo Airbnb que usas para trabajar.
+                Tienes una propiedad que le da alojamiento a cientos de personas al año. Sin embargo, cuando tú quieres explorar otro destino, terminas pagando hotel o buscando en el mismo Airbnb que usas para trabajar.
               </p>
               <p className="text-gray-600 leading-relaxed">
-                <strong className="text-gray-900">Hay otra forma.</strong> Otros anfitriones en Chile tienen exactamente el mismo problema, y tienen exactamente lo que tú necesitas: una propiedad en el destino donde quieres ir.
+                <strong className="text-gray-900">Hay otra forma.</strong> Otros anfitriones en Chile, Colombia, Argentina y México tienen exactamente el mismo problema, y tienen exactamente lo que tú necesitas: una propiedad en el destino donde quieres ir.
               </p>
             </div>
 
@@ -313,7 +313,7 @@ export default function AnfitrionesAirbnbPage() {
                   color: 'text-andean',
                   bg: 'bg-andean/10',
                   title: 'Ya eres parte de la comunidad',
-                  desc: 'Tu propiedad aparece disponible para otros anfitriones de Chile que buscan intercambio.',
+                  desc: 'Tu propiedad aparece disponible para anfitriones de toda Latinoamérica que buscan intercambio.',
                 },
               ].map(({ icon: Icon, color, bg, title, desc }, i) => (
                 <div key={i} className="flex items-start gap-4">
@@ -397,14 +397,14 @@ export default function AnfitrionesAirbnbPage() {
               {
                 emoji: '🏙️',
                 title: 'Anfitriones urbanos',
-                desc: 'Tienes depto en Santiago, Valparaíso o Concepción y quieres escapar al sur o a la costa.',
+                desc: 'Tienes depto en Santiago, Bogotá, Buenos Aires o Ciudad de México y quieres explorar otros destinos.',
                 tag: 'El más común',
                 tagColor: 'bg-forest/10 text-forest',
               },
               {
                 emoji: '🌊',
                 title: 'Anfitriones de costa',
-                desc: 'Tu propiedad está en Pichilemu, La Serena o Puerto Montt y quieres visitar la capital.',
+                desc: 'Tu propiedad está en una zona de playa o naturaleza y quieres visitar capitales o ciudades de Latinoamérica.',
                 tag: 'Muy solicitado',
                 tagColor: 'bg-[#ff5a5f]/10 text-[#ff5a5f]',
               },
@@ -486,7 +486,7 @@ export default function AnfitrionesAirbnbPage() {
                 {[
                   ['Costo por noche',      '🔄 Intercambio',   '$80k-300k',       '$50k-200k'],
                   ['Import de propiedad',  '✓ 1 clic',         '—',               '—'],
-                  ['Comunidad verificada', '✓ Chile',          '—',               'Parcial'],
+                  ['Comunidad verificada', '✓ LATAM',          '—',               'Parcial'],
                   ['Match automático',     '✓ Bilateral',      '—',               '—'],
                   ['Comisión',             '✓ 0%',             'Fija',            '3–15%'],
                   ['Experiencia local',    '✓ Casa real',      'No',              'Parcial'],
@@ -558,7 +558,7 @@ export default function AnfitrionesAirbnbPage() {
 
             <div className="space-y-4">
               {[
-                { icon: Shield, color: 'text-forest', bg: 'bg-forest/8', title: 'Perfiles verificados', desc: 'Email verificado y perfil completo obligatorio para todos los miembros.' },
+                { icon: Shield, color: 'text-forest', bg: 'bg-forest/8', title: 'Identidad verificada', desc: 'Verificación de identidad obligatoria y perfil completo para todos los miembros.' },
                 { icon: Star, color: 'text-amber-600', bg: 'bg-amber-50', title: 'Historial de intercambios', desc: 'Puedes ver el historial y valoraciones de cada anfitrión antes de aceptar.' },
                 { icon: Users, color: 'text-andean', bg: 'bg-andean/10', title: 'Solo anfitriones', desc: 'Para publicar debes tener una propiedad real. No hay perfiles sin hogar.' },
                 { icon: Gift, color: 'text-[#ff5a5f]', bg: 'bg-[#ff5a5f]/8', title: 'Sin presión económica', desc: 'El intercambio crea simetría: ambos tienen algo que perder si el trato sale mal.' },

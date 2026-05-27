@@ -14,7 +14,9 @@ export async function GET(request) {
   try {
     const supabase = await createServerClient()
     const { data: { user } } = await supabase.auth.getUser()
-    if (!user || user.email !== process.env.NEXT_PUBLIC_ADMIN_EMAIL) {
+    // SECURITY FIX #5: usar ADMIN_EMAIL (sin NEXT_PUBLIC_) para no exponer el email del admin en el bundle JS del cliente
+    const adminEmail = process.env.ADMIN_EMAIL || process.env.NEXT_PUBLIC_ADMIN_EMAIL
+    if (!user || user.email !== adminEmail) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
   } catch {

@@ -141,14 +141,14 @@ export default function HomePage() {
               <span className="text-sand">está lleno de puertas abiertas.</span>
             </h1>
             <p className="text-base text-sand/90 font-medium leading-relaxed max-w-lg mx-auto">
-              Intercambia tu casa con viajeros de Chile, México, Colombia y Argentina.<br className="hidden sm:block" /> Sin intermediarios, con matching automático.
+              Intercambia tu casa con viajeros de Chile, Colombia, Argentina y México.<br className="hidden sm:block" /> Cuenta gratuita, matching automático, identidad verificada.
             </p>
           </div>
 
           <FresiaSearchModule />
 
           <div className="flex flex-wrap gap-3 justify-center text-white/80 text-sm">
-            {['✓ Chile · México · Colombia · Argentina', '✓ Matches automáticos', '✓ Comunidad verificada'].map(t => (
+            {['✓ Chile · Colombia · Argentina · México', '✓ Cuenta gratuita', '✓ Identidad verificada'].map(t => (
               <span key={t} className="bg-white/10 backdrop-blur-sm px-3 py-1.5 rounded-full">{t}</span>
             ))}
           </div>
@@ -177,9 +177,10 @@ export default function HomePage() {
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-10">
             {LATAM_COUNTRIES.map(c => (
               <Link key={c.code} href={`/homes?country=${c.code}`}
-                className="group relative rounded-2xl overflow-hidden h-44 block shadow-sm hover:shadow-lg transition-shadow">
+                className="group relative rounded-2xl overflow-hidden h-44 block shadow-sm hover:shadow-lg transition-shadow" style={{ background: 'linear-gradient(135deg, #2A5C45 0%, #3d7a5e 100%)' }}>
                 <img src={c.img} alt={c.alt} loading="lazy"
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  onError={(e) => { e.currentTarget.style.display = 'none' }} />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
                 <div className="absolute bottom-0 left-0 right-0 p-4">
                   <p className="text-2xl mb-0.5">{c.flag}</p>
@@ -200,9 +201,10 @@ export default function HomePage() {
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
             {destData.cities.map(b => (
               <Link key={b.id} href={`/homes?search=${encodeURIComponent(b.city)}`}
-                className="group relative rounded-2xl overflow-hidden h-32 block shadow-sm hover:shadow-md transition-shadow">
+                className="group relative rounded-2xl overflow-hidden h-32 block shadow-sm hover:shadow-md transition-shadow" style={{ background: 'linear-gradient(135deg, #2A5C45 0%, #3d7a5e 100%)' }}>
                 <img src={b.image} alt={b.city} loading="lazy"
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" />
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                  onError={(e) => { e.currentTarget.style.display = 'none' }} />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
                 <div className="absolute bottom-0 left-0 right-0 p-3">
                   <p className="text-lg mb-0.5">{b.emoji}</p>

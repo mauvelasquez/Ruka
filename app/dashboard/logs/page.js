@@ -30,13 +30,20 @@ export default function LogsPage() {
 
   const [filters, setFilters] = useState({ level: '', source: '', hours: '24' })
 
-  const isAdmin = ready && currentUser?.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL
+  // SECURITY FIX: isAdmin se verifica server-side para no exponer el email del admin en el bundle JS
+  const [isAdmin, setIsAdmin] = useState(false)
 
   useEffect(() => {
     if (!ready) return
     if (!currentUser) { router.push('/auth/login'); return }
-    if (!isAdmin)     { router.push('/dashboard'); return }
-  }, [ready, currentUser, isAdmin])
+    fetch('/api/admin/me')
+      .then(r => r.json())
+      .then(({ isAdmin: admin }) => {
+        if (!admin) router.push('/dashboard')
+        else setIsAdmin(true)
+      })
+      .catch(() => router.push('/dashboard'))
+  }, [ready, currentUser])
 
   const fetchLogs = useCallback(async (reset = false) => {
     setLoading(true)

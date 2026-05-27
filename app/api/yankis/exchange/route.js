@@ -27,9 +27,15 @@ export async function POST(req) {
     return NextResponse.json({ error: 'Intercambio no encontrado' }, { status: 404 })
   }
 
-  // Only to_user can confirm/cancel as host
-  if (exchange.to_user_id !== user.id && exchange.from_user_id !== user.id) {
+  // SECURITY FIX #6: solo el anfitrión (to_user) puede confirmar; ambos pueden cancelar
+  const isHost     = exchange.to_user_id   === user.id
+  const isTraveler = exchange.from_user_id === user.id
+
+  if (!isHost && !isTraveler) {
     return NextResponse.json({ error: 'Sin permisos' }, { status: 403 })
+  }
+  if (action === 'confirm' && !isHost) {
+    return NextResponse.json({ error: 'Solo el anfitrión puede confirmar el intercambio' }, { status: 403 })
   }
 
   try {

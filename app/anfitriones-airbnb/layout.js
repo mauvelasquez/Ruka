@@ -1,10 +1,10 @@
 export const metadata = {
   title: 'Anfitriones de Airbnb — Usa tu propiedad también en Rukka',
-  description: 'Si ya tienes tu propiedad en Airbnb, impórtala a Rukka en segundos y empieza a intercambiarla cuando viajas. Sin dejar Airbnb.',
+  description: 'Importa tu Airbnb a Rukka en segundos. Disponible en Chile, Colombia, Argentina y México. Cuenta gratuita con verificación de identidad. Sin comisiones.',
   keywords: ['airbnb chile intercambio', 'anfitriones airbnb rukka', 'importar airbnb', 'home exchange airbnb', 'propiedad airbnb intercambio'],
   openGraph: {
     title: 'Anfitriones de Airbnb — Usa tu propiedad también en Rukka',
-    description: 'Importa tu propiedad de Airbnb a Rukka en segundos. Viaja intercambiando tu hogar sin pagar alojamiento.',
+    description: 'Importa tu Airbnb a Rukka en segundos. Comunidad latinoamericana en Chile, Colombia, Argentina y México. Gratuito, con verificación de identidad.',
     url: 'https://rukka.cl/anfitriones-airbnb',
     siteName: 'Rukka',
     locale: 'es_419',

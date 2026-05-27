@@ -82,11 +82,26 @@ export async function POST(req) {
         )
       }
 
-      const base64 = buffer.toString('base64')
-      let mediaType = file.type || 'image/jpeg'
-      if (!['image/jpeg','image/png','image/gif','image/webp'].includes(mediaType)) {
-        mediaType = 'image/jpeg'
+      // SECURITY FIX #8: validar MIME type por magic bytes reales, no por el campo client-provided
+      const MAGIC = {
+        jpeg: [0xFF, 0xD8, 0xFF],
+        png:  [0x89, 0x50, 0x4E, 0x47],
+        gif:  [0x47, 0x49, 0x46],
+        webp: [0x52, 0x49, 0x46, 0x46],
       }
+      const header = [...buffer.slice(0, 4)]
+      let mediaType
+      if (MAGIC.png.every((b, i)  => header[i] === b)) mediaType = 'image/png'
+      else if (MAGIC.jpeg.every((b, i) => header[i] === b)) mediaType = 'image/jpeg'
+      else if (MAGIC.gif.every((b, i)  => header[i] === b)) mediaType = 'image/gif'
+      else if (MAGIC.webp.every((b, i) => header[i] === b)) mediaType = 'image/webp'
+      else {
+        return NextResponse.json(
+          { error: `La imagen ${file.name || idx} no es un formato soportado (JPEG, PNG, GIF, WebP).` },
+          { status: 415 }
+        )
+      }
+      const base64 = buffer.toString('base64')
 
       imageContent.push({
         type: 'image',

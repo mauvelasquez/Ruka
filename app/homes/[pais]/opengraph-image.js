@@ -20,7 +20,7 @@ export default async function Image({ params }) {
     const { data: home } = await supabase
       .from('homes')
       .select('title, city, location, type, images')
-      .eq('id', params.id)
+      .eq('id', params.pais)
       .single()
 
     if (home) {

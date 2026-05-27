@@ -6,6 +6,7 @@ import Footer from '../../../../components/Footer'
 import HomeCard from '../../../../components/HomeCard'
 import { cityData, countryData, COUNTRY_SLUGS, TARGET_CITIES_BY_COUNTRY } from '../../../../lib/cityData'
 import { MapPin, Calendar, DollarSign, Star, ArrowRight, ArrowLeftRight } from 'lucide-react'
+import CityImage from '../../../../components/CityImage'
 
 export const revalidate = 3600
 
@@ -30,7 +31,7 @@ export async function generateMetadata({ params }) {
   if (!city || !country) return { title: 'Rukka' }
 
   const title = `Intercambio de hogares en ${city.name}, ${country.name} | Rukka`
-  const description = `Intercambia tu casa en ${city.name} y viaja gratis. Encuentra hogares reales en ${city.name} para hacer home exchange con familias locales.`
+  const description = `Conoce ${city.name} intercambiando tu hogar. Rukka es gratuito, con verificación de identidad, disponible en Chile, Colombia, Argentina y México.`
   const url = `https://rukka.cl/homes/${pais}/${ciudad}`
 
   return {
@@ -140,7 +141,7 @@ export default async function CiudadPage({ params }) {
         >
           {/* Imagen de fondo */}
           {city.heroImage && (
-            <img
+            <CityImage
               src={city.heroImage}
               alt={`Vista de ${city.name}`}
               className="absolute inset-0 w-full h-full object-cover"
@@ -166,10 +167,10 @@ export default async function CiudadPage({ params }) {
 
               {/* Título y descripción — se mantienen intactos para SEO */}
               <h1 className="text-4xl font-extrabold mb-3 drop-shadow-sm">
-                Intercambio de hogares en {city.name}
+                Conoce {city.name} intercambiando tu hogar
               </h1>
               <p className="text-white/85 text-lg max-w-2xl mb-6 leading-relaxed">
-                {city.description}
+                Intercambia tu hogar y conoce {city.name} como local. {city.description}
               </p>
 
               {/* Tarjetas de datos turísticos */}
@@ -248,6 +249,8 @@ export default async function CiudadPage({ params }) {
                   El <strong>home exchange en {city.name}</strong> es la forma más
                   económica de conocer la ciudad de verdad. Publica tu hogar y accede
                   a <strong>alojamiento gratis en {city.name}</strong> y en toda Latinoamérica.
+                  Crear una cuenta es <strong>gratuito</strong> y todos los usuarios pasan por
+                  verificación de identidad.
                 </p>
               </div>
             </div>
@@ -375,19 +378,13 @@ export default async function CiudadPage({ params }) {
                       href={`/homes/${pais}/${c.slug}`}
                       className="group block"
                     >
-                      <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-stone-200 mb-2">
-                        {c.thumbnail ? (
-                          <img
-                            src={c.thumbnail}
-                            alt={c.name}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                            loading="lazy"
-                          />
-                        ) : (
-                          <div className="w-full h-full bg-forest/20 flex items-center justify-center">
-                            <MapPin className="w-6 h-6 text-forest/40" />
-                          </div>
-                        )}
+                      <div className="relative aspect-[4/3] rounded-xl overflow-hidden mb-2" style={{ background: 'linear-gradient(135deg, #2A5C45 0%, #3d7a5e 100%)' }}>
+                        <CityImage
+                          src={c.thumbnail}
+                          alt={c.name}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          loading="lazy"
+                        />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" />
                         <p className="absolute bottom-2 left-2.5 text-white font-bold text-xs leading-tight drop-shadow-sm">
                           {c.name}

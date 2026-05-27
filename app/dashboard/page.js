@@ -42,6 +42,13 @@ export default function DashboardPage() {
   const [showNoHomeAlert, setShowNoHomeAlert] = useState(false)
   const [wishBlockReason, setWishBlockReason] = useState(null) // 'unverified' | 'no_home'
   const [activeThread, setActiveThread] = useState(null) // { requestId, otherUser }
+  // SECURITY FIX: isAdmin verificado server-side, no expone el email del admin en el bundle JS
+  const [isAdmin, setIsAdmin] = useState(false)
+
+  useEffect(() => {
+    if (!ready || !currentUser) return
+    fetch('/api/admin/me').then(r => r.json()).then(({ isAdmin: a }) => setIsAdmin(a)).catch(() => {})
+  }, [ready, currentUser])
 
   useEffect(() => {
     if (ready) return
@@ -113,7 +120,7 @@ export default function DashboardPage() {
             <p className="text-gray-500 mt-1">Bienvenido, {currentUser.name?.split(' ')[0]} 👋</p>
           </div>
           <div className="flex items-center gap-2">
-            {currentUser.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL && (
+            {isAdmin && (
               <Link href="/dashboard/logs"
                 className="bg-gray-800 text-white px-4 py-2.5 rounded-xl font-bold text-sm hover:bg-gray-700 transition-colors flex items-center gap-2">
                 <ScrollText className="w-4 h-4" /> Logs
