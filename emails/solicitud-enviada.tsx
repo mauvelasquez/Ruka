@@ -45,7 +45,7 @@ export default function SolicitudEnviada({
             )}
 
             <Section style={{ backgroundColor: '#F5F0E8', borderRadius: '10px', padding: '20px', margin: '0 0 28px' }}>
-              <Text style={{ fontSize: '15px', color: '#666666', margin: '0 0 6px', textTransform: 'uppercase', letterSpacing: '1px', fontSize: '12px' }}>
+              <Text style={{ fontSize: '12px', color: '#666666', margin: '0 0 6px', textTransform: 'uppercase', letterSpacing: '1px' }}>
                 Resumen de tu solicitud
               </Text>
               <Text style={{ fontSize: '20px', color: '#2D5016', fontWeight: 'bold', margin: '0 0 6px', fontFamily: 'Georgia, serif' }}>
