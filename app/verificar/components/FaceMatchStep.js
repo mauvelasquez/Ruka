@@ -183,16 +183,16 @@ export default function FaceMatchStep({ ocrResult, onSuccess }) {
       if (!selfieResult) throw new Error('No se detectó un rostro en la selfie capturada.')
       const selfieDesc = selfieResult.descriptor
 
-      // Load carnet photo image into an HTMLImageElement for face-api
+      // Load document photo image into an HTMLImageElement for face-api
       const idImg = await loadImageFromBase64(ocrResult.idPhotoBase64)
-      if (!idImg) throw new Error('No hay foto del carnet disponible para comparar.')
+      if (!idImg) throw new Error('No hay foto del documento disponible para comparar.')
 
       const idResult = await faceapi
         .detectSingleFace(idImg, new faceapi.SsdMobilenetv1Options({ minConfidence: 0.4 }))
         .withFaceLandmarks()
         .withFaceDescriptor()
 
-      if (!idResult) throw new Error('No se detectó un rostro en la foto del carnet.')
+      if (!idResult) throw new Error('No se detectó un rostro en la foto del documento.')
 
       const distance   = faceapi.euclideanDistance(selfieDesc, idResult.descriptor)
       const match      = distance < MATCH_THRESHOLD

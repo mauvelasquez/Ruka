@@ -15,13 +15,13 @@ const FACIAL_ENABLED = process.env.NEXT_PUBLIC_FACIAL_VERIFICATION_ENABLED !== '
 const STEPS = FACIAL_ENABLED
   ? [
       { id: 1, label: 'Consentimiento', icon: Shield },
-      { id: 2, label: 'Carnet',         icon: FileText },
+      { id: 2, label: 'Documento',       icon: FileText },
       { id: 3, label: 'Selfie',         icon: Camera },
       { id: 4, label: 'Resultado',      icon: CheckCircle },
     ]
   : [
       { id: 1, label: 'Consentimiento', icon: Shield },
-      { id: 2, label: 'Carnet',         icon: FileText },
+      { id: 2, label: 'Documento',       icon: FileText },
       { id: 3, label: 'Resultado',      icon: CheckCircle },
     ]
 
@@ -128,11 +128,11 @@ function ExistingProfileStep({ profile, action, onSkip, onVerified }) {
     <div className="space-y-5">
       <div className="text-center">
         <h2 className="text-xl font-black text-gray-900 mb-1">Datos ya registrados</h2>
-        <p className="text-sm text-gray-500">Ya tenemos tu información del carnet guardada</p>
+        <p className="text-sm text-gray-500">Ya tenemos tu información del documento guardada</p>
       </div>
 
       <div className="bg-forest/5 border border-forest/20 rounded-xl p-4 space-y-2">
-        <p className="text-xs font-bold text-forest uppercase tracking-wide mb-3">Datos del carnet</p>
+        <p className="text-xs font-bold text-forest uppercase tracking-wide mb-3">Datos del documento</p>
         {profile.full_name && (
           <div>
             <p className="text-xs text-gray-400">Nombre</p>
@@ -167,7 +167,7 @@ function ExistingProfileStep({ profile, action, onSkip, onVerified }) {
         onClick={onSkip}
         className="w-full text-xs text-gray-400 hover:text-gray-600 transition-colors py-1"
       >
-        Subir carnet nuevamente
+        Subir documento nuevamente
       </button>
     </div>
   )

@@ -47,20 +47,28 @@ function validateRUT(rut) {
   return dv === expected
 }
 
-const EXTRACT_PROMPT = `Eres un extractor de datos de carnets de identidad chilenos.
-Analiza la imagen y extrae los siguientes campos en JSON.
-Si un campo no es legible, usa null. No inventes datos.
+const EXTRACT_PROMPT = `Eres un extractor de datos de documentos de identidad oficiales.
+Analiza la imagen y determina si es un documento válido emitido por Chile, Argentina, Colombia o México.
 
-Campos a extraer:
+Documentos aceptados:
+- Chile: Cédula de Identidad (RUN/RUT), Pasaporte, Licencia de Conducir
+- Colombia: Cédula de Ciudadanía, Pasaporte, Licencia de Conducción
+- Argentina: DNI, Pasaporte, Licencia de Conducir
+- México: INE/IFE (Credencial para votar), Pasaporte, Licencia de Conducir
+
+Extrae los siguientes campos en JSON. Si un campo no es legible, usa null. No inventes datos.
+
 {
   "nombre_completo": "string",
-  "rut": "string (formato XX.XXX.XXX-X)",
+  "numero_identificacion": "string (número principal del documento, sin puntos ni guiones)",
+  "rut": "string (SOLO si es documento chileno, formato XX.XXX.XXX-X; null en caso contrario)",
+  "pais_emisor": "CL | AR | CO | MX | null (código ISO si lo puedes determinar, null si es de otro país)",
+  "tipo_documento": "national_id | passport | drivers_license | null",
   "fecha_nacimiento": "string (DD/MM/YYYY)",
   "fecha_vencimiento": "string (DD/MM/YYYY)",
-  "numero_documento": "string",
   "tiene_foto_visible": "boolean",
   "calidad_imagen": "buena | regular | mala",
-  "es_carnet_chileno": "boolean"
+  "es_documento_valido": "boolean (true si es un documento oficial de los países aceptados y es legible)"
 }
 
 Retorna SOLO el JSON, sin texto adicional.`
@@ -118,10 +126,17 @@ export async function POST(request) {
       throw new Error('Respuesta no es JSON válido')
     }
 
-    if (!extracted.es_carnet_chileno) {
+    if (!extracted.es_documento_valido) {
       return Response.json({
         success: false,
-        error: 'La imagen no parece ser un carnet de identidad chileno.',
+        error: 'No pudimos verificar tu documento. Asegúrate de que sea legible y esté completo.',
+      })
+    }
+    const SUPPORTED_COUNTRIES = ['CL', 'AR', 'CO', 'MX']
+    if (!extracted.pais_emisor || !SUPPORTED_COUNTRIES.includes(extracted.pais_emisor)) {
+      return Response.json({
+        success: false,
+        error: 'El documento debe ser de Chile, Argentina, Colombia o México.',
       })
     }
     if (extracted.calidad_imagen === 'mala') {
@@ -131,10 +146,19 @@ export async function POST(request) {
       })
     }
 
-    const rutValid = validateRUT(extracted.rut)
+    const isChilean = extracted.pais_emisor === 'CL'
+    const rutValid = isChilean ? validateRUT(extracted.rut) : null
+    // For non-Chilean documents, accept any non-empty identification number
+    const documentValid = isChilean
+      ? rutValid === true
+      : !!(extracted.numero_identificacion && extracted.numero_identificacion.length >= 3)
+
+    const idNumber = isChilean && extracted.rut
+      ? extracted.rut.replace(/[.\-\s]/g, '')
+      : extracted.numero_identificacion ?? null
 
     // Save OCR data to profile and mark as verified
-    if (rutValid) {
+    if (documentValid) {
       try {
         const admin = createAdminClient(
           process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -142,35 +166,44 @@ export async function POST(request) {
         )
 
         // Block if this identification number is already registered by a different user
-        if (extracted.rut) {
+        if (idNumber) {
           const { data: idConflict } = await admin
             .from('profiles')
             .select('id')
-            .eq('identification_number', extracted.rut.replace(/[.\-\s]/g, ''))
+            .eq('identification_number', idNumber)
             .neq('id', user.id)
             .maybeSingle()
 
           if (idConflict) {
             return Response.json({
               success: false,
-              error: 'Este RUT ya se encuentra inscrito en Rukka. Si crees que es un error, contáctanos.',
+              error: 'Este número de documento ya se encuentra inscrito en Rukka. Si crees que es un error, contáctanos.',
             })
           }
         }
+
+        const ID_TYPE_MAP = {
+          CL: { national_id: 'rut', passport: 'passport', drivers_license: 'drivers_license' },
+          CO: { national_id: 'cedula', passport: 'passport', drivers_license: 'drivers_license' },
+          AR: { national_id: 'dni', passport: 'passport', drivers_license: 'drivers_license' },
+          MX: { national_id: 'ine', passport: 'passport', drivers_license: 'drivers_license' },
+        }
+        const identificationType =
+          ID_TYPE_MAP[extracted.pais_emisor]?.[extracted.tipo_documento] ?? extracted.tipo_documento ?? null
 
         const profileUpdate = {
           verified:                  true,
           verification_status:       'id_verified',
           verification_completed_at: new Date().toISOString(),
-          identification_country:    'CL',
-          identification_type:       'rut',
+          identification_country:    extracted.pais_emisor,
+          identification_type:       identificationType,
           identification_verified:   true,
         }
         if (extracted.nombre_completo) {
           profileUpdate.full_name = extracted.nombre_completo
           profileUpdate.name = extracted.nombre_completo
         }
-        if (extracted.rut) profileUpdate.identification_number = extracted.rut.replace(/[.\-\s]/g, '')
+        if (idNumber) profileUpdate.identification_number = idNumber
         const birthDate = parseBirthDate(extracted.fecha_nacimiento)
         if (birthDate) profileUpdate.birth_date = birthDate
         const { error: updateErr } = await admin.from('profiles').update(profileUpdate).eq('id', user.id)
@@ -184,9 +217,10 @@ export async function POST(request) {
       success: true,
       extracted_data: {
         ...extracted,
-        identification_number: extracted.rut ? extracted.rut.replace(/[.\-\s]/g, '') : null,
+        identification_number: idNumber,
       },
       rut_valid: rutValid,
+      document_valid: documentValid,
     })
   } catch (err) {
     console.error('[verify-id/extract]', err.message)

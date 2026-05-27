@@ -20,12 +20,12 @@ export default function ConsentStep({ onAccept }) {
         <InfoRow
           icon={<Eye className="w-4 h-4 text-terra" />}
           title="Qué capturamos"
-          text="Foto de tu carnet de identidad (frente) y una selfie temporal desde tu cámara."
+          text="Foto de tu documento de identidad (frente) y una selfie temporal desde tu cámara."
         />
         <InfoRow
           icon={<CheckCircle className="w-4 h-4 text-forest" />}
           title="Para qué lo usamos"
-          text="Verificar que eres quien dices ser, comparando tu rostro con la foto del carnet."
+          text="Verificar que eres quien dices ser, comparando tu rostro con la foto del documento."
         />
         <InfoRow
           icon={<EyeOff className="w-4 h-4 text-andean" />}

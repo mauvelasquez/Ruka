@@ -82,12 +82,12 @@ export default function IdCaptureStep({ onSuccess }) {
       const data = await res.json()
       if (!data.success) {
         setStatus('error')
-        setError(data.error || 'No se pudo leer el carnet. Intenta con otra foto.')
+        setError(data.error || 'No se pudo verificar el documento. Intenta con otra foto.')
         return
       }
-      if (!data.rut_valid) {
+      if (!data.document_valid) {
         setStatus('error')
-        setError('El RUT extraído no es válido. Verifica que la imagen sea legible.')
+        setError('No pudimos verificar el número de documento. Verifica que la imagen sea legible.')
         return
       }
       setStatus('success')
@@ -111,15 +111,15 @@ export default function IdCaptureStep({ onSuccess }) {
   return (
     <div className="space-y-5">
       <div className="text-center">
-        <h2 className="text-xl font-black text-gray-900 mb-1">Foto de tu carnet</h2>
-        <p className="text-sm text-gray-500">Sube una foto clara de la <strong>parte frontal</strong> de tu carnet de identidad</p>
+        <h2 className="text-xl font-black text-gray-900 mb-1">Foto de tu documento</h2>
+        <p className="text-sm text-gray-500">Sube una foto clara de la <strong>parte frontal</strong> de tu documento de identidad</p>
       </div>
 
       {/* Tips */}
       <div className="grid grid-cols-3 gap-2">
         {[
           { icon: <Sun className="w-4 h-4" />,     label: 'Buena luz' },
-          { icon: <Square className="w-4 h-4" />,  label: 'Carnet completo' },
+          { icon: <Square className="w-4 h-4" />,  label: 'Doc. completo' },
           { icon: <Sparkles className="w-4 h-4" />,label: 'Sin reflejos' },
         ].map(({ icon, label }) => (
           <div key={label} className="flex flex-col items-center gap-1 p-2 bg-gray-50 rounded-xl text-gray-500">
@@ -156,7 +156,7 @@ export default function IdCaptureStep({ onSuccess }) {
       ) : (
         <div className="space-y-4">
           <div className="relative rounded-2xl overflow-hidden bg-gray-100 aspect-[1.586/1]">
-            <img src={preview} alt="Carnet preview" className="w-full h-full object-contain" />
+            <img src={preview} alt="Documento preview" className="w-full h-full object-contain" />
             {status === 'success' && (
               <div className="absolute inset-0 bg-forest/20 flex items-center justify-center">
                 <div className="bg-white rounded-full p-3 shadow-lg">
@@ -211,7 +211,7 @@ export default function IdCaptureStep({ onSuccess }) {
               ) : (
                 <>
                   <Camera className="w-4 h-4" />
-                  Analizar carnet
+                  Analizar documento
                 </>
               )}
             </button>
