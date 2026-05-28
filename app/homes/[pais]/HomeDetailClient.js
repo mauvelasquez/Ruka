@@ -1,5 +1,9 @@
 'use client'
 import { useState, useEffect } from 'react'
+import dynamic from 'next/dynamic'
+import 'yet-another-react-lightbox/styles.css'
+
+const Lightbox = dynamic(() => import('yet-another-react-lightbox'), { ssr: false })
 
 const AMENITY_LABEL = {
   wifi:    'WiFi',
@@ -28,6 +32,8 @@ export default function HomeDetailClient({ id }) {
   const [imgIdx, setImgIdx] = useState(0)
   const [liked, setLiked] = useState(false)
   const [sent, setSent] = useState(false)
+  const [lightboxOpen, setLightboxOpen] = useState(false)
+  const [lightboxIdx,  setLightboxIdx]  = useState(0)
   const [form, setForm] = useState({ start: '', end: '', message: '' })
   const [err, setErr] = useState('')
   const [validationBlock, setValidationBlock] = useState(null) // 'unverified' | 'no_home'
@@ -119,7 +125,8 @@ export default function HomeDetailClient({ id }) {
         {/* Gallery */}
         <div className="relative rounded-2xl overflow-hidden h-64 sm:h-96 mb-8 group bg-gray-200">
           <img src={imgs[imgIdx] || `https://picsum.photos/seed/${home.id}/800/500`} alt={home.title}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover cursor-zoom-in"
+            onClick={() => { setLightboxIdx(imgIdx); setLightboxOpen(true) }}
             onError={e => { e.target.src = `https://picsum.photos/seed/home${home.id}/800/500` }} />
           {imgs.length > 1 && <>
             <button onClick={() => setImgIdx(i => (i - 1 + imgs.length) % imgs.length)}
@@ -162,7 +169,11 @@ export default function HomeDetailClient({ id }) {
                   <Link href={`/profile/${host.id}`} className="relative flex-shrink-0">
                     <img src={host.avatar} alt={host.name} className="w-16 h-16 rounded-2xl object-cover"
                       onError={e => { e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(host.name || '')}&background=2d6a4f&color=fff&size=150` }} />
-                    {host.verified && <div className="absolute -bottom-1 -right-1 bg-forest rounded-full p-1 border-2 border-white"><CheckCircle className="w-3.5 h-3.5 text-white" /></div>}
+                    {(host.verification_status === 'verified' || host.verification_status === 'id_verified') && (
+                      <div className="absolute -bottom-1 -right-1 bg-forest rounded-full p-1 border-2 border-white" aria-label="Perfil verificado">
+                        <CheckCircle className="w-3.5 h-3.5 text-white" />
+                      </div>
+                    )}
                   </Link>
                   <div className="flex-1">
                     <Link href={`/profile/${host.id}`} className="font-bold text-gray-900 hover:text-forest transition-colors">{host.name}</Link>
@@ -329,6 +340,14 @@ export default function HomeDetailClient({ id }) {
         </div>
       </div>
       <Footer />
+      {lightboxOpen && imgs.length > 0 && (
+        <Lightbox
+          open={lightboxOpen}
+          close={() => setLightboxOpen(false)}
+          index={lightboxIdx}
+          slides={imgs.map(src => ({ src }))}
+        />
+      )}
     </div>
   )
 }
