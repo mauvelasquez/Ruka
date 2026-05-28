@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { Resend } from 'resend'
 import YankisRecibidos from '@/emails/yankis-recibidos'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+const resend = new Resend(process.env.RESEND_API_KEY || "no-key")
 
 export async function POST(req: Request) {
   try {

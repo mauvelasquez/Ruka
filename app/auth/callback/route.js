@@ -1,5 +1,6 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
+import { sendVerificationSuccessEmail } from '../../../lib/emails'
 
 export const runtime = 'nodejs'
 
@@ -56,6 +57,17 @@ export async function GET(request) {
     }
 
     user = data.session.user
+
+    // Send welcome email on fresh email confirmation (not OAuth logins).
+    // Heuristic: email provider + email_confirmed_at set within the last 5 minutes.
+    if (user.app_metadata?.provider === 'email' && user.email_confirmed_at) {
+      const confirmedAt = new Date(user.email_confirmed_at)
+      if (Date.now() - confirmedAt.getTime() < 5 * 60 * 1000) {
+        const userName = user.user_metadata?.name || user.user_metadata?.full_name || 'Usuario'
+        sendVerificationSuccessEmail(user.email, userName)
+          .catch(e => console.error('[auth/callback] verification email:', e.message))
+      }
+    }
   } catch (err) {
     console.error('[auth/callback] exchangeCodeForSession threw:', err?.message)
     return redirect(`${base}/auth/login?error=auth_error`, pendingCookies)
