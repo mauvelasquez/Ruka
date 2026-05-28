@@ -1,4 +1,5 @@
 import { createClient } from '../../../lib/supabase/server'
+import { sendHomeSavedEmail } from '../../../lib/emails'
 
 export const runtime = 'nodejs'
 
@@ -48,6 +49,15 @@ export async function POST(req) {
       console.error('[api/homes POST]', error.message, error.code)
       return Response.json({ error: error.message, code: error.code }, { status: 400 })
     }
+
+    // Fire-and-forget: don't block the response waiting for the email
+    supabase.from('profiles').select('email,name').eq('id', user.id).maybeSingle()
+      .then(({ data: profile }) => {
+        if (profile?.email) {
+          sendHomeSavedEmail(profile.email, newHome.title, newHome.id)
+            .catch(e => console.error('[api/homes] sendHomeSavedEmail:', e.message))
+        }
+      })
 
     return Response.json({ home: newHome })
   } catch (err) {
@@ -103,7 +113,11 @@ export async function GET(req) {
     if (minBeds > 0) query = query.gte('bedrooms', minBeds)
 
     const orderCol = sort === 'reviews' ? 'review_count' : sort === 'newest' ? 'created_at' : 'rating'
-    query = query.order(orderCol, { ascending: false }).range(offset, offset + limit - 1)
+    // is_demo homes always appear last — false/NULL (real homes) before true (demo)
+    query = query
+      .order('is_demo', { ascending: true, nullsFirst: true })
+      .order(orderCol, { ascending: false })
+      .range(offset, offset + limit - 1)
 
     const { data, count, error } = await query
 

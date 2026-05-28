@@ -212,7 +212,10 @@ function MatchesContent() {
         isPerfectMatch: ownerWishes.length > 0,
         ownerWish: ownerWishes[0] || null,
       }
-    }).sort((a, b) => b.isPerfectMatch - a.isPerfectMatch)
+    }).sort((a, b) => {
+      if (b.isPerfectMatch !== a.isPerfectMatch) return b.isPerfectMatch - a.isPerfectMatch
+      return (a.home.is_demo ? 1 : 0) - (b.home.is_demo ? 1 : 0)
+    })
 
     setResults(matched)
     setSearched(true)
