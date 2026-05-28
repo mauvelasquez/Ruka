@@ -82,7 +82,11 @@ export default function HomeCard({ home, user, compact = false }) {
                 />
                 <div>
                   <p className="text-xs font-semibold text-gray-700">{user.name.split(' ')[0]}</p>
-                  {user.verified && <p className="text-xs text-forest">✓ Verificado</p>}
+                  {(user.verification_status === 'verified' || user.verification_status === 'id_verified') && (
+                    <p className="text-xs text-forest flex items-center gap-0.5" aria-label="Perfil verificado">
+                      <CheckCircle className="w-3 h-3" /> Verificado
+                    </p>
+                  )}
                 </div>
               </div>
             )}
