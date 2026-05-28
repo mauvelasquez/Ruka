@@ -8,7 +8,7 @@ export function useVerificationGate() {
   const [modalAction, setModalAction] = useState(null)
 
   const gate = (action, callback) => {
-    if (user?.verification_status === 'verified') {
+    if (user?.verification_status === 'verified' || user?.verification_status === 'id_verified') {
       callback()
     } else {
       setModalAction(action)
