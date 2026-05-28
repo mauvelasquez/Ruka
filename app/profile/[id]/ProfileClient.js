@@ -2,7 +2,34 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useApp } from '../../../lib/store'
+import { supabase } from '../../../lib/supabase'
 import { MapPin, Home, Calendar, Star, ArrowLeft, Gift, Camera, CheckCircle } from 'lucide-react'
+
+// Compress image to maxSize×maxSize JPEG at the given quality using Canvas API (no extra libs)
+async function compressImage(file, maxSize = 400, quality = 0.8) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = ev => {
+      const img = new Image()
+      img.onload = () => {
+        const scale = Math.min(maxSize / img.width, maxSize / img.height, 1)
+        const canvas = document.createElement('canvas')
+        canvas.width  = Math.round(img.width  * scale)
+        canvas.height = Math.round(img.height * scale)
+        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height)
+        canvas.toBlob(
+          blob => (blob ? resolve(blob) : reject(new Error('canvas.toBlob failed'))),
+          'image/jpeg',
+          quality
+        )
+      }
+      img.onerror = reject
+      img.src = ev.target.result
+    }
+    reader.onerror = reject
+    reader.readAsDataURL(file)
+  })
+}
 
 function AdBanner() {
   return (
@@ -23,6 +50,7 @@ export default function ProfileClient({ id }) {
   const { users, homes, wishes, user, updateProfile, ready } = useApp()
   const [uploadingAvatar, setUploadingAvatar] = useState(false)
   const [avatarSaved,     setAvatarSaved]     = useState(false)
+  const [previewUrl,      setPreviewUrl]      = useState(null)
 
   const profileUser = users.find(u => u.id === id)
   const uHomes  = homes.filter(h => h.userId === id)
@@ -34,15 +62,38 @@ export default function ProfileClient({ id }) {
     const file = e.target.files[0]
     if (!file) return
     if (file.size > 1024 * 1024) { alert('La foto debe pesar menos de 1MB'); return }
+
+    // Show local preview immediately while uploading
+    const localUrl = URL.createObjectURL(file)
+    setPreviewUrl(localUrl)
     setUploadingAvatar(true)
-    const reader = new FileReader()
-    reader.onload = async (ev) => {
-      await updateProfile({ avatar: ev.target.result })
-      setUploadingAvatar(false)
+
+    try {
+      // Compress to max 400×400 JPEG 0.8 using Canvas API (no extra libraries)
+      const compressed = await compressImage(file)
+
+      // Upload to Supabase Storage bucket "avatars" — requires bucket + RLS policy:
+      // allow authenticated users to upload to their own folder: auth.uid()::text = (storage.foldername(name))[1]
+      const path = `${profileUser.id}/avatar.jpg`
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(path, compressed, { contentType: 'image/jpeg', upsert: true })
+
+      if (uploadError) throw uploadError
+
+      const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(path)
+
+      await updateProfile({ avatar: publicUrl })
       setAvatarSaved(true)
       setTimeout(() => setAvatarSaved(false), 3000)
+    } catch (err) {
+      console.error('[avatar upload]', err)
+      alert('No se pudo subir la foto. Intenta de nuevo.')
+      setPreviewUrl(null)
+    } finally {
+      setUploadingAvatar(false)
+      URL.revokeObjectURL(localUrl)
     }
-    reader.readAsDataURL(file)
   }
 
   if (!profileUser) {
@@ -74,8 +125,8 @@ export default function ProfileClient({ id }) {
             {/* Avatar con opción de cambio */}
             <div className="relative flex-shrink-0">
               <div className="w-20 h-20 rounded-2xl bg-forest flex items-center justify-center text-white text-3xl font-black overflow-hidden">
-                {profileUser.avatar
-                  ? <img src={profileUser.avatar} alt={profileUser.name} className="w-full h-full object-cover" />
+                {(previewUrl || profileUser.avatar)
+                  ? <img src={previewUrl || profileUser.avatar} alt={profileUser.name} className="w-full h-full object-cover" />
                   : initial
                 }
               </div>
@@ -102,8 +153,8 @@ export default function ProfileClient({ id }) {
                     {profileUser.region ? `, ${profileUser.region}` : ''}
                   </span>
                 )}
-                {profileUser.verified && (
-                  <span className="inline-flex items-center gap-1 bg-forest/10 text-forest text-xs font-bold px-2 py-0.5 rounded-full border border-forest/20">
+                {(profileUser.verification_status === 'verified' || profileUser.verification_status === 'id_verified') && (
+                  <span className="inline-flex items-center gap-1 bg-forest/10 text-forest text-xs font-bold px-2 py-0.5 rounded-full border border-forest/20" aria-label="Perfil verificado">
                     <CheckCircle className="w-3 h-3" /> Verificado
                   </span>
                 )}
