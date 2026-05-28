@@ -26,8 +26,8 @@ const nextConfig = {
           // Nota: Next.js usa scripts inline para hidratación — se necesita 'unsafe-inline' hasta migrar a nonces.
           { key: 'Content-Security-Policy-Report-Only', value: [
             "default-src 'self'",
-            "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com",
-            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+            "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://unpkg.com",
+            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com",
             "font-src 'self' https://fonts.gstatic.com",
             "img-src 'self' data: https: blob:",
             "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.anthropic.com https://www.google-analytics.com",

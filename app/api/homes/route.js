@@ -2,6 +2,60 @@ import { createClient } from '../../../lib/supabase/server'
 
 export const runtime = 'nodejs'
 
+export async function POST(req) {
+  try {
+    const supabase = await createClient()
+
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    if (authError || !user) {
+      return Response.json({ error: 'No autorizado' }, { status: 401 })
+    }
+
+    const data = await req.json()
+
+    const { data: newHome, error } = await supabase.from('homes').insert({
+      user_id:           user.id,
+      title:             data.title,
+      description:       data.description || '',
+      short_description: (data.description || '').slice(0, 120),
+      type:              data.subtype || data.type || 'Casa',
+      category:          data.category || 'full_home',
+      subtype:           data.subtype || null,
+      region:            data.region || null,
+      comuna:            data.comuna || null,
+      direccion:         data.direccion || null,
+      coords:            data.coords || null,
+      city:              data.city || data.comuna || null,
+      country:           data.country || 'Chile',
+      country_code:      data.country_code || 'CL',
+      region_code:       data.region_code || null,
+      location:          data.location || `${data.city || data.comuna || ''}, ${data.region || ''}`,
+      bedrooms:          data.bedrooms || 1,
+      bathrooms:         data.bathrooms || 1,
+      max_guests:        data.maxGuests || data.max_guests || 2,
+      amenities:         data.amenities || [],
+      images:            data.images?.length
+        ? data.images
+        : [`https://picsum.photos/seed/${Date.now()}/800/500`],
+      availability_periods: data.availabilityPeriods || [],
+      private_bathroom:  data.private_bathroom || false,
+      bed_type:          data.bed_type || null,
+      shared_with:       data.shared_with || null,
+      featured:          false,
+    }).select().single()
+
+    if (error) {
+      console.error('[api/homes POST]', error.message, error.code)
+      return Response.json({ error: error.message, code: error.code }, { status: 400 })
+    }
+
+    return Response.json({ home: newHome })
+  } catch (err) {
+    console.error('[api/homes POST] unexpected error:', err.message)
+    return Response.json({ error: err.message }, { status: 500 })
+  }
+}
+
 function normalizeText(str) {
   if (!str) return ''
   return str
