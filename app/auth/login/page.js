@@ -4,9 +4,11 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useApp } from '../../../lib/store'
 import { Eye, EyeOff, ArrowRight } from 'lucide-react'
-import { getRandomBanner } from '../../../lib/chile-banners'
 import RukkaLogo from '../../../components/RukkaLogo'
 import { analytics } from '../../../lib/analytics'
+import { useCountry } from '../../../hooks/useCountry'
+import { getRandomCountryBanner } from '../../../lib/country-banners'
+import { COUNTRY_NAMES } from '../../../lib/country-detection'
 
 const ERROR_MESSAGES = {
   auth_error:       'Error al iniciar sesión con Google. Intenta de nuevo.',
@@ -19,6 +21,7 @@ const ERROR_MESSAGES = {
 export default function LoginPage() {
   const router = useRouter()
   const { login, loginWithGoogle } = useApp()
+  const { country } = useCountry()
   const [email,    setEmail]    = useState('')
   const [password, setPassword] = useState('')
   const [showPw,   setShowPw]   = useState(false)
@@ -26,7 +29,8 @@ export default function LoginPage() {
   const [loading,  setLoading]  = useState(false)
   const [banner,   setBanner]   = useState(null)
 
-  useEffect(() => { setBanner(getRandomBanner()) }, [])
+  // geo: use country-specific banner and copy
+  useEffect(() => { setBanner(getRandomCountryBanner(country)) }, [country])
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
@@ -70,7 +74,7 @@ export default function LoginPage() {
                   {banner.emoji} {banner.tagline}
                 </div>
                 <h2 className="text-4xl font-black text-white mb-4 leading-tight">
-                  Chile te está<br />esperando.<br />Sin pagar hotel.
+                  {COUNTRY_NAMES[country] ?? 'Latinoamérica'} te está<br />esperando.<br />Sin pagar hotel.
                 </h2>
                 <p className="text-white/80 text-lg mb-10">{banner.description}</p>
 
@@ -83,13 +87,13 @@ export default function LoginPage() {
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
-                  {['✓ Sin costo de alojamiento', '✓ Sin comisiones ocultas', '✓ Matches automáticos', '✓ Solo en Chile 🇨🇱'].map((b, i) => (
+                  {['✓ Sin costo de alojamiento', '✓ Sin comisiones ocultas', '✓ Matches automáticos', '✓ Chile · México · Colombia · Argentina'].map((b, i) => (
                     <p key={i} className="text-white/70 text-xs">{b}</p>
                   ))}
                 </div>
               </div>
 
-              <p className="text-white/40 text-sm">© 2026 Rukka — Intercambio de hogares en Chile</p>
+              <p className="text-white/40 text-sm">© 2026 Rukka — Intercambio de hogares en {COUNTRY_NAMES[country] ?? 'Latinoamérica'}</p>
             </div>
           </>
         )}
@@ -104,7 +108,7 @@ export default function LoginPage() {
 
           <div className="mb-6">
             <h1 className="text-2xl sm:text-3xl font-black text-gray-900 mb-2">Bienvenido de vuelta</h1>
-            <p className="text-gray-500 text-sm">Inicia sesión para ver tus matches en Chile</p>
+            <p className="text-gray-500 text-sm">Inicia sesión para ver tus matches en {COUNTRY_NAMES[country] ?? 'Latinoamérica'}</p>
           </div>
 
           {error && (

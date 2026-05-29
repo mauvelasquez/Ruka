@@ -35,12 +35,14 @@ function HomesContent() {
   const [banner]      = useState(() => getRandomBanner())
 
   const { user }       = useApp()
-  const ipCountry      = useCountry()
+  const { country: ipCountry } = useCountry()
   const displayFrom    = user?.country_code ?? ipCountry ?? 'CL'
   const userCity       = user?.city ?? ''
 
   const [search,      setSearch]      = useState(initialSearch)
-  const [country,     setCountry]     = useState(searchParams.get('country') || '')
+  // geo: default to user's country; URL param overrides (allows cross-country browsing)
+  const hasUrlCountry = !!searchParams.get('country')
+  const [country,     setCountry]     = useState(searchParams.get('country') || displayFrom)
   const [type,        setType]        = useState('Todos')
   const [region,      setRegion]      = useState('Todas')
   const [city,        setCity]        = useState('Todas')
@@ -92,9 +94,14 @@ function HomesContent() {
     return () => clearTimeout(timer)
   }, [search, country, type, region, city, minBeds, sort])
 
+  // geo: sync country filter when user's detected country resolves (no URL override)
+  useEffect(() => {
+    if (!hasUrlCountry && displayFrom) setCountry(displayFrom)
+  }, [displayFrom, hasUrlCountry])
+
   const clear = () => {
     setSearch('')
-    setCountry('')
+    setCountry(displayFrom)
     setType('Todos')
     setRegion('Todas')
     setCity('Todas')
@@ -151,14 +158,13 @@ function HomesContent() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        {/* Chips país */}
-        <div className="flex gap-2 mb-3 flex-wrap">
-          <button onClick={() => { setCountry(''); setRegion('Todas'); setCity('Todas') }}
-            className={`px-3 py-1.5 rounded-full text-xs font-bold border transition-all ${
-              !country ? 'bg-forest text-white border-forest' : 'bg-white text-gray-600 border-gray-200 hover:border-forest/50'
-            }`}>
-            🌎 Latinoamérica
-          </button>
+        {/* Chips país — local-first: muestra país activo primero */}
+        <div className="flex gap-2 mb-3 flex-wrap items-center">
+          {country && selectedCountry && (
+            <span className="text-xs text-gray-500 font-medium mr-1">
+              Mostrando en {selectedCountry.flag} {selectedCountry.name}
+            </span>
+          )}
           {COUNTRIES.map(c => (
             <button key={c.code} onClick={() => { setCountry(c.code); setRegion('Todas'); setCity('Todas') }}
               className={`px-3 py-1.5 rounded-full text-xs font-bold border transition-all ${
@@ -167,6 +173,12 @@ function HomesContent() {
               {c.flag} {c.name}
             </button>
           ))}
+          <button onClick={() => { setCountry(''); setRegion('Todas'); setCity('Todas') }}
+            className={`px-3 py-1.5 rounded-full text-xs font-bold border transition-all ${
+              !country ? 'bg-forest text-white border-forest' : 'bg-white text-gray-600 border-gray-200 hover:border-forest/50'
+            }`}>
+            🌎 Ver todos
+          </button>
         </div>
 
         {/* Chips tipo */}
