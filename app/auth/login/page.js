@@ -158,9 +158,15 @@ export default function LoginPage() {
                   autoComplete="current-password" enterKeyHint="go"
                   className="w-full border border-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-forest bg-white pr-12" />
                 <button type="button" onClick={() => setShowPw(!showPw)}
+                  aria-label={showPw ? 'Ocultar contraseña' : 'Mostrar contraseña'}
                   className="absolute right-0 top-0 h-full w-12 flex items-center justify-center text-gray-400 hover:text-gray-600">
                   {showPw ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
+              </div>
+              <div className="flex justify-end mt-1.5">
+                <Link href="/auth/reset-password" className="text-xs text-forest hover:text-forest-dark font-medium">
+                  ¿Olvidaste tu contraseña?
+                </Link>
               </div>
             </div>
 

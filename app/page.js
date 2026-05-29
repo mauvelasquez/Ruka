@@ -131,9 +131,9 @@ export default function HomePage() {
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0">
           {heroBanner && (
-            <img src={heroBanner.image} alt={heroBanner.city} className="w-full h-full object-cover" />
+            <img src={heroBanner.image} alt={`Vista panorámica de ${heroBanner.city}`} className="w-full h-full object-cover" />
           )}
-          <div className="absolute inset-0 hero-rukka" />
+          <div className="absolute inset-0 hero-rukka" aria-hidden="true" />
         </div>
 
         <div className="relative w-full px-4 sm:px-6 lg:px-8 py-8 sm:py-12 flex flex-col items-center gap-6 overflow-y-auto h-full justify-center">
@@ -167,6 +167,18 @@ export default function HomePage() {
       <section className="py-8 bg-white border-y border-stone-200/60">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <AdBanner variant="primary" />
+          {/* Yankis welcome callout */}
+          <div className="mt-4 flex items-center gap-3 bg-terra/10 border border-terra/20 rounded-2xl px-5 py-3.5">
+            <span className="text-2xl leading-none flex-shrink-0">🪙</span>
+            <p className="text-terra font-semibold text-sm sm:text-base">
+              <span className="font-black">Regístrate hoy</span> y recibe{' '}
+              <span className="font-black">3 Yankis de bienvenida</span> = 3 noches de alojamiento gratis
+            </p>
+            <Link href="/auth/register"
+              className="flex-shrink-0 ml-auto bg-terra text-white text-xs sm:text-sm font-black px-4 py-2 rounded-xl hover:bg-terra-dark transition-colors whitespace-nowrap hidden sm:block">
+              Crear cuenta gratis
+            </Link>
+          </div>
         </div>
       </section>
 
@@ -189,7 +201,7 @@ export default function HomePage() {
             {LATAM_COUNTRIES.map(c => (
               <Link key={c.code} href={`/homes?country=${c.code}`}
                 className="group relative rounded-2xl overflow-hidden h-44 block shadow-sm hover:shadow-lg transition-shadow" style={{ background: 'linear-gradient(135deg, #2A5C45 0%, #3d7a5e 100%)' }}>
-                <img src={c.img} alt={c.alt} loading="lazy"
+                <img src={c.img} alt={`Fotografía de ${c.alt}`} loading="lazy"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   onError={(e) => { e.currentTarget.style.display = 'none' }} />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
@@ -213,7 +225,7 @@ export default function HomePage() {
             {destData.cities.map(b => (
               <Link key={b.id} href={`/homes?search=${encodeURIComponent(b.city)}`}
                 className="group relative rounded-2xl overflow-hidden h-32 block shadow-sm hover:shadow-md transition-shadow" style={{ background: 'linear-gradient(135deg, #2A5C45 0%, #3d7a5e 100%)' }}>
-                <img src={b.image} alt={b.city} loading="lazy"
+                <img src={b.image} alt={`${b.tipo} en ${b.city}`} loading="lazy"
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                   onError={(e) => { e.currentTarget.style.display = 'none' }} />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />

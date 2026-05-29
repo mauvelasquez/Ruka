@@ -49,8 +49,8 @@ function Stepper({ current }) {
                   : <Icon className="w-4 h-4" />
                 }
               </div>
-              <span className={`text-xs font-medium hidden sm:block ${
-                active ? 'text-terra' : done ? 'text-forest' : 'text-gray-400'
+              <span className={`text-xs font-medium sm:block ${
+                active ? 'text-terra block' : done ? 'text-forest hidden sm:block' : 'text-gray-400 hidden sm:block'
               }`}>{step.label}</span>
             </div>
             {!isLast && (
@@ -329,8 +329,22 @@ function VerificarContent() {
             )}
           </div>
 
+          {step < RESULT_STEP && (
+            <div className="text-center mt-3">
+              <button
+                onClick={() => { window.location.href = '/dashboard' }}
+                className="text-xs text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                Omitir por ahora →
+              </button>
+            </div>
+          )}
+
           <p className="text-center text-xs text-gray-400 mt-4">
-            Datos biométricos procesados solo en tu dispositivo · Rukka
+            Tu documento se procesa de forma segura en nuestros servidores. No almacenamos imágenes de tu documento.
+          </p>
+          <p className="text-center text-xs text-gray-400 mt-1">
+            La verificación de rostro ocurre en tu dispositivo y no se almacena.
           </p>
         </div>
       </div>

@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Navbar from '../../../components/Navbar'
 import { useApp } from '../../../lib/store'
-import { ArrowLeft, TrendingUp, TrendingDown, Wallet, Clock } from 'lucide-react'
+import { ArrowLeft, TrendingUp, TrendingDown, Wallet, Clock, CheckCircle, Share2 } from 'lucide-react'
 
 const TYPE_LABELS = {
   earned:    { label: 'Ganado',      color: 'text-forest',  bg: 'bg-forest-50',  icon: TrendingUp },
@@ -45,11 +45,12 @@ function TxRow({ tx }) {
 
 export default function YankisDashboard() {
   const router = useRouter()
-  const { currentUser, ready } = useApp()
+  const { currentUser, ready, homes } = useApp()
   const [balance, setBalance]           = useState(null)
   const [stats, setStats]               = useState({ total_earned: 0, total_spent: 0 })
   const [transactions, setTransactions] = useState([])
   const [loading, setLoading]           = useState(true)
+  const [showShareTooltip, setShowShareTooltip] = useState(false)
 
   useEffect(() => {
     if (!ready) return
@@ -158,6 +159,56 @@ export default function YankisDashboard() {
             </div>
           ))}
         </div>
+
+        {/* ── ¿Cómo ganar más Yankis? ── */}
+        {(() => {
+          const myHomes = homes.filter(h => h.userId === currentUser?.id)
+          const hasHome = myHomes.length > 0
+
+          const handleShare = async () => {
+            const shareText = '¡Únete a Rukka y viaja gratis intercambiando tu hogar!'
+            const shareUrl  = 'https://rukka.cl'
+            if (navigator.share) {
+              try { await navigator.share({ title: 'Rukka', text: shareText, url: shareUrl }) } catch {}
+            } else {
+              await navigator.clipboard.writeText(`${shareText} ${shareUrl}`)
+              setShowShareTooltip(true)
+              setTimeout(() => setShowShareTooltip(false), 2500)
+            }
+          }
+
+          return (
+            <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 mb-6">
+              <h2 className="font-black text-gray-900 text-lg mb-4 flex items-center gap-2">
+                🪙 ¿Cómo ganar más Yankis?
+              </h2>
+              <div className="flex flex-col sm:flex-row gap-3">
+                {hasHome ? (
+                  <div className="flex items-center gap-2 bg-forest/5 border border-forest/20 rounded-2xl px-4 py-3 flex-1">
+                    <CheckCircle className="w-5 h-5 text-forest flex-shrink-0" />
+                    <p className="text-forest font-bold text-sm">Tu hogar está generando Yankis activamente ✓</p>
+                  </div>
+                ) : (
+                  <Link href="/onboarding"
+                    className="flex items-center justify-center gap-2 bg-forest text-white font-black px-5 py-3 rounded-2xl text-sm hover:bg-forest-dark transition-colors flex-1 text-center">
+                    Agrega tu hogar →
+                  </Link>
+                )}
+                <div className="relative flex-1">
+                  <button onClick={handleShare}
+                    className="w-full flex items-center justify-center gap-2 bg-terra/10 text-terra border border-terra/20 font-black px-5 py-3 rounded-2xl text-sm hover:bg-terra/20 transition-colors">
+                    <Share2 className="w-4 h-4" /> Invita amigos →
+                  </button>
+                  {showShareTooltip && (
+                    <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-xs font-bold px-3 py-1.5 rounded-lg whitespace-nowrap shadow-lg">
+                      ¡Enlace copiado!
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )
+        })()}
 
         {/* Historial */}
         <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-6">

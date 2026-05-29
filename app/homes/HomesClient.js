@@ -126,7 +126,7 @@ function HomesContent() {
       {/* Banner dinámico */}
       <div className="relative overflow-hidden" style={{ background: banner.color }}>
         <div className="absolute inset-0">
-          <img src={banner.image} alt={banner.city} className="w-full h-full object-cover opacity-25" />
+          <img src={banner.image} alt="" aria-hidden="true" className="w-full h-full object-cover opacity-25" />
         </div>
         <div className="relative z-10 py-12 px-4">
           <div className="max-w-7xl mx-auto">
@@ -144,7 +144,7 @@ function HomesContent() {
               <input type="text" placeholder="Ciudad, región o tipo de hogar..."
                 value={search} onChange={e => setSearch(e.target.value)}
                 className="flex-1 outline-none text-sm text-gray-800 font-medium placeholder-gray-400" />
-              {search && <button onClick={() => setSearch('')} className="text-gray-400 hover:text-gray-600"><X className="w-4 h-4" /></button>}
+              {search && <button onClick={() => setSearch('')} aria-label="Limpiar búsqueda" className="text-gray-400 hover:text-gray-600"><X className="w-4 h-4" /></button>}
             </div>
           </div>
         </div>
@@ -183,6 +183,8 @@ function HomesContent() {
           </div>
           <div className="ml-auto flex items-center gap-2">
             <button onClick={() => setShowFilters(!showFilters)}
+              aria-label={showFilters ? 'Ocultar filtros' : 'Mostrar filtros'}
+              aria-expanded={showFilters}
               className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold border transition-colors ${
                 showFilters ? 'bg-gray-900 text-white border-gray-900' : 'bg-white border-gray-200 text-gray-700 hover:border-gray-300'
               }`}>
@@ -191,6 +193,8 @@ function HomesContent() {
             </button>
             <div className="relative">
               <button onClick={() => setShowSort(!showSort)}
+                aria-label="Ordenar resultados"
+                aria-expanded={showSort}
                 className="flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-semibold border border-gray-200 bg-white text-gray-700 hover:border-gray-300 transition-colors">
                 {sortLabels[sort]} <ChevronDown className="w-4 h-4" />
               </button>

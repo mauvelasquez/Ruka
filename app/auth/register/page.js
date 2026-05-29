@@ -80,6 +80,7 @@ export default function RegisterPage() {
                   autoComplete="new-password" enterKeyHint="go"
                   className="w-full border border-gray-200 rounded-xl px-4 py-3 pr-12 text-base focus:outline-none focus:ring-2 focus:ring-forest" />
                 <button type="button" onClick={() => setShowPwd(!showPwd)}
+                  aria-label={showPwd ? 'Ocultar contraseña' : 'Mostrar contraseña'}
                   className="absolute right-0 top-0 h-full w-12 flex items-center justify-center text-gray-400">
                   {showPwd ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
@@ -101,7 +102,11 @@ export default function RegisterPage() {
             </button>
           </form>
 
-          <div className="mt-5 pt-5 border-t border-gray-100 text-center">
+          <p className="mt-4 text-center text-sm text-terra font-medium">
+            🪙 Al completar tu perfil recibes <span className="font-bold">3 Yankis de bienvenida</span>.
+          </p>
+
+          <div className="mt-4 pt-4 border-t border-gray-100 text-center">
             <p className="text-xs text-gray-400">
               Al registrarte aceptas nuestros{' '}
               <a href="/terminos" className="text-forest hover:underline">Términos</a> y{' '}

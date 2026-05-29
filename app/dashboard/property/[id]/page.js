@@ -71,6 +71,7 @@ function PhotoUploader({ photos, onChange, max = 12 }) {
           <img src={src} alt="" className="w-full h-full object-cover" />
           <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
             <button type="button" onClick={() => onChange(photos.filter((_, j) => j !== i))}
+              aria-label="Eliminar foto"
               className="bg-white text-red-500 rounded-full p-1"><X className="w-4 h-4" /></button>
           </div>
           {i === 0 && <span className="absolute bottom-1 left-1 text-[10px] bg-black/60 text-white rounded px-1.5 py-0.5">Portada</span>}

@@ -60,6 +60,8 @@ export default function Navbar() {
                   <button
                     onClick={() => setDropdownOpen(!dropdownOpen)}
                     className="flex items-center gap-2 border border-gray-200 rounded-full py-1.5 px-3 hover:shadow-md transition-shadow bg-white"
+                    aria-label="Menú de usuario"
+                    aria-expanded={dropdownOpen}
                   >
                     <img src={user.avatar} alt={user.name}
                       className="w-8 h-8 rounded-full object-cover"
@@ -107,7 +109,8 @@ export default function Navbar() {
           </div>
 
           {/* Mobile */}
-          <button onClick={() => setMenuOpen(!menuOpen)} className="md:hidden p-2 rounded-xl text-gray-500 hover:bg-gray-100">
+          <button onClick={() => setMenuOpen(!menuOpen)} className="md:hidden p-2 rounded-xl text-gray-500 hover:bg-gray-100"
+            aria-label={menuOpen ? 'Cerrar menú' : 'Abrir menú'}>
             {menuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
         </div>
@@ -132,8 +135,10 @@ export default function Navbar() {
           </Link>
           {user ? (
             <>
-              <div className="px-3 py-2">
-                <YankiBalance size="md" showLabel linkable />
+              <div className="px-3 py-2 border-b border-gray-100 mb-1">
+                <p className="font-bold text-gray-900 text-sm">{user.name}</p>
+                <p className="text-gray-400 text-xs truncate mb-2">{user.email}</p>
+                <YankiBalance size="sm" showLabel linkable />
               </div>
               <Link href="/dashboard" onClick={() => setMenuOpen(false)} className="flex items-center gap-2 p-3 rounded-xl text-gray-700 hover:bg-forest-50">
                 <LayoutDashboard className="w-4 h-4 text-forest" /> Mi Panel

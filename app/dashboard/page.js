@@ -1,6 +1,6 @@
 'use client'
-import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect, Suspense } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { useApp } from '../../lib/store'
 import Navbar from '../../components/Navbar'
@@ -10,6 +10,7 @@ import {
   CheckCircle, XCircle, Clock, Trash2, Eye, Star, Sparkles, AlertCircle, ScrollText, MessageSquare, User, Lock
 } from 'lucide-react'
 import { COMUNAS_RUKKA } from '../../lib/comunas'
+import { COUNTRIES as LATAM_COUNTRIES } from '../../lib/geo/latam'
 import { COUNTRY_ID_CONFIG } from '../../lib/identification'
 import { useVerificationGate } from '../../hooks/useVerificationGate'
 import VerificationRequiredModal from '../../components/VerificationRequiredModal'
@@ -17,6 +18,12 @@ import VerificationRequiredModal from '../../components/VerificationRequiredModa
 const TAB = { WISHES: 'wishes', HOMES: 'homes', RECEIVED: 'received', SENT: 'sent', PROFILE: 'profile' }
 
 const CHILE_CITIES = COMUNAS_RUKKA
+const LATAM_CITIES = LATAM_COUNTRIES.flatMap(country =>
+  country.regions.flatMap(region =>
+    region.cities.map(city => `${city}, ${country.name}`)
+  )
+)
+const ALL_DESTINATIONS = [...CHILE_CITIES, ...LATAM_CITIES]
 
 function StatusBadge({ status }) {
   const map = {
@@ -32,11 +39,24 @@ function StatusBadge({ status }) {
   )
 }
 
-export default function DashboardPage() {
+const VALID_TABS = new Set(Object.values(TAB))
+
+function DashboardContent() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { currentUser, ready, homes, users, wishes, requests, addWish, removeWish, updateRequest, removeHome, syncSession } = useApp()
   const { gate, modalOpen, modalAction, closeModal } = useVerificationGate()
-  const [tab, setTab] = useState(TAB.WISHES)
+
+  const initialTab = (() => {
+    const p = searchParams.get('tab')
+    return p && VALID_TABS.has(p) ? p : TAB.WISHES
+  })()
+  const [tab, setTab] = useState(initialTab)
+
+  const changeTab = (tabId) => {
+    setTab(tabId)
+    router.replace(`/dashboard?tab=${tabId}`)
+  }
   const [wishForm, setWishForm] = useState({ toCity: '', startDate: '', endDate: '', guests: 2 })
   const [showWishForm, setShowWishForm] = useState(false)
   const [showNoHomeAlert, setShowNoHomeAlert] = useState(false)
@@ -142,7 +162,7 @@ export default function DashboardPage() {
             { label: 'Enviadas',        value: sent.length,     color: 'bg-gray-700 text-white',icon: ArrowLeftRight, tabId: TAB.SENT },
           ].map((s, i) => (
             <div key={i} className={`${s.color} rounded-2xl p-4 flex items-center gap-3 cursor-pointer hover:opacity-90 transition-opacity`}
-              onClick={() => setTab(s.tabId)}>
+              onClick={() => changeTab(s.tabId)}>
               <s.icon className="w-6 h-6 opacity-80" />
               <div>
                 <p className="text-2xl font-black">{s.value}</p>
@@ -184,7 +204,7 @@ export default function DashboardPage() {
         {/* Tabs */}
         <div className="flex gap-1 bg-white rounded-2xl p-1.5 mb-6 shadow-sm border border-gray-100">
           {tabs.map(t => (
-            <button key={t.id} onClick={() => setTab(t.id)}
+            <button key={t.id} onClick={() => changeTab(t.id)}
               className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold transition-all ${
                 tab === t.id ? 'bg-forest text-white shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>
               <t.icon className="w-4 h-4" />
@@ -265,13 +285,13 @@ export default function DashboardPage() {
                 <div className="space-y-4">
                   <div>
                     <label className="block text-xs font-bold text-gray-600 mb-1.5 uppercase tracking-wide">
-                      ¿A qué ciudad de Chile quieres ir?
+                      ¿A qué ciudad quieres ir?
                     </label>
-                    <input list="cities-dash" type="text" placeholder="ej. Pichilemu, Puerto Varas, Zapallar..."
+                    <input list="cities-dash" type="text" placeholder="ej. Pichilemu, Buenos Aires, Ciudad de México..."
                       value={wishForm.toCity} onChange={e => setWishForm({...wishForm, toCity: e.target.value})}
                       className="w-full border-2 border-gray-200 focus:border-andean rounded-xl px-4 py-3 text-sm outline-none transition-colors" />
                     <datalist id="cities-dash">
-                      {CHILE_CITIES.map(c => <option key={c} value={c} />)}
+                      {ALL_DESTINATIONS.map(c => <option key={c} value={c} />)}
                     </datalist>
                   </div>
                   <div className="grid grid-cols-2 gap-3">
@@ -340,7 +360,7 @@ export default function DashboardPage() {
                           className="flex items-center gap-1.5 text-xs font-black text-white bg-andean hover:bg-blue-700 px-3 py-2 rounded-xl transition-colors">
                           <Star className="w-3.5 h-3.5" /> Ver matches
                         </Link>
-                        <button onClick={() => removeWish(w.id)} className="p-2 text-gray-300 hover:text-red-500 transition-colors">
+                        <button onClick={() => removeWish(w.id)} aria-label="Eliminar destino" className="p-2 text-gray-300 hover:text-red-500 transition-colors">
                           <Trash2 className="w-4 h-4" />
                         </button>
                       </div>
@@ -388,10 +408,11 @@ export default function DashboardPage() {
                         <h3 className="font-black text-gray-900 text-lg leading-tight">{home.title}</h3>
                         <div className="flex gap-2 flex-shrink-0">
                           <Link href={`/dashboard/property/${home.id}`}
-                            className="p-1.5 text-gray-400 hover:text-forest transition-colors" title="Editar">
+                            className="p-1.5 text-gray-400 hover:text-forest transition-colors"
+                            aria-label={`Ver y editar ${home.title}`}>
                             <Eye className="w-4 h-4" />
                           </Link>
-                          <button onClick={() => removeHome(home.id)} className="p-1.5 text-gray-400 hover:text-red-500 transition-colors">
+                          <button onClick={() => removeHome(home.id)} aria-label={`Eliminar hogar ${home.title}`} className="p-1.5 text-gray-400 hover:text-red-500 transition-colors">
                             <Trash2 className="w-4 h-4" />
                           </button>
                         </div>
@@ -621,5 +642,13 @@ export default function DashboardPage() {
       <VerificationRequiredModal action={modalAction} onClose={closeModal} />
     )}
   </div>
+  )
+}
+
+export default function DashboardPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen" style={{ background: '#F8F4EE' }} />}>
+      <DashboardContent />
+    </Suspense>
   )
 }

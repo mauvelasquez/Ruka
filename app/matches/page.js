@@ -6,6 +6,11 @@ import { useApp } from '../../lib/store'
 import Navbar from '../../components/Navbar'
 import { Search, Star, MapPin, Users, Calendar, ArrowLeftRight, Home, Zap, Info, AlertCircle } from 'lucide-react'
 import { normalizeText } from '../../lib/store'
+import { COMUNAS_RUKKA } from '../../lib/comunas'
+import { COUNTRIES } from '../../lib/geo/latam'
+
+// Todas las ciudades LATAM aplanadas desde lib/geo/latam.js
+const LATAM_CITIES = COUNTRIES.flatMap(c => c.regions.flatMap(r => r.cities))
 
 function MatchCard({ result, myHomes, onRequest }) {
   const { home, owner, isPerfectMatch, ownerWish } = result
@@ -163,6 +168,10 @@ function MatchesContent() {
   const [results, setResults] = useState(null)
   const [searched, setSearched] = useState(false)
 
+  // Validation errors
+  const [dateRangeError, setDateRangeError] = useState('')
+  const [fieldErrors, setFieldErrors] = useState({ city: '', start: '', end: '' })
+
   useEffect(() => {
     if (!currentUser) router.push('/auth/login')
   }, [currentUser])
@@ -188,14 +197,48 @@ function MatchesContent() {
     return periods.some(p => datesOverlap(p.start, p.end, s, e))
   }
 
+  // Clear individual field errors as user fills in each field
+  const handleCityChange = (val) => {
+    setCity(val)
+    if (val) setFieldErrors(prev => ({ ...prev, city: '' }))
+  }
+  const handleStartChange = (val) => {
+    setStart(val)
+    if (val) setFieldErrors(prev => ({ ...prev, start: '' }))
+    // If end is now valid relative to new start, clear date range error
+    if (val && end && new Date(end) > new Date(val)) setDateRangeError('')
+  }
+  const handleEndChange = (val) => {
+    setEnd(val)
+    if (val) setFieldErrors(prev => ({ ...prev, end: '' }))
+    // Clear date range error when end becomes valid
+    if (val && start && new Date(val) > new Date(start)) setDateRangeError('')
+  }
+
   const handleSearch = (e) => {
     e?.preventDefault()
+
+    // Validate required fields
+    const newFieldErrors = {
+      city:  !city  ? 'Este campo es requerido' : '',
+      start: !start ? 'Este campo es requerido' : '',
+      end:   !end   ? 'Este campo es requerido' : '',
+    }
+    setFieldErrors(newFieldErrors)
     if (!city || !start || !end) return
 
+    // Validate date range (ISSUE-007)
+    if (new Date(end) <= new Date(start)) {
+      setDateRangeError('La fecha de salida debe ser posterior a la de llegada')
+      return
+    }
+    setDateRangeError('')
+
+    const normalizedCity = normalizeText(city)
     const candidates = homes.filter(h =>
       h.userId !== currentUser.id &&
       (h.maxGuests || 0) >= guests &&
-      normalizeText(h.city).includes(normalizeText(city)) &&
+      normalizeText(h.city).includes(normalizedCity) &&
       homeIsAvailable(h, start, end)
     )
 
@@ -239,30 +282,69 @@ function MatchesContent() {
 
         {/* Search form */}
         <form onSubmit={handleSearch} className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 mb-8">
+          {/* City autocomplete datalist (ISSUE-009) */}
+          <datalist id="ciudades-rukka">
+            {COMUNAS_RUKKA.map(c => <option key={`cl-${c}`} value={c} />)}
+            {LATAM_CITIES.map(c => <option key={`latam-${c}`} value={c} />)}
+          </datalist>
+
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="lg:col-span-1">
               <label className="block text-xs font-black text-gray-600 mb-1.5 uppercase tracking-wide">Ciudad destino</label>
-              <input type="text" placeholder="ej. Pichilemu, Puerto Varas, Zapallar..." value={city}
-                onChange={e => setCity(e.target.value)}
-                className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-forest" />
+              <input
+                type="text"
+                list="ciudades-rukka"
+                placeholder="ej. Pichilemu, Puerto Varas, Zapallar..."
+                value={city}
+                onChange={e => handleCityChange(e.target.value)}
+                className={`w-full border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-forest ${fieldErrors.city ? 'border-red-400' : 'border-gray-200'}`}
+              />
+              {fieldErrors.city && (
+                <p className="mt-1 text-xs text-red-500">{fieldErrors.city}</p>
+              )}
             </div>
             <div>
               <label className="block text-xs font-black text-gray-600 mb-1.5 uppercase tracking-wide">Llegada</label>
-              <input type="date" value={start} onChange={e => setStart(e.target.value)}
-                className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-forest" />
+              <input
+                type="date"
+                value={start}
+                onChange={e => handleStartChange(e.target.value)}
+                className={`w-full border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-forest ${fieldErrors.start ? 'border-red-400' : 'border-gray-200'}`}
+              />
+              {fieldErrors.start && (
+                <p className="mt-1 text-xs text-red-500">{fieldErrors.start}</p>
+              )}
             </div>
             <div>
               <label className="block text-xs font-black text-gray-600 mb-1.5 uppercase tracking-wide">Salida</label>
-              <input type="date" value={end} onChange={e => setEnd(e.target.value)}
-                className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-forest" />
+              <input
+                type="date"
+                value={end}
+                min={start || undefined}
+                onChange={e => handleEndChange(e.target.value)}
+                className={`w-full border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-forest ${(fieldErrors.end || dateRangeError) ? 'border-red-400' : 'border-gray-200'}`}
+              />
+              {fieldErrors.end && (
+                <p className="mt-1 text-xs text-red-500">{fieldErrors.end}</p>
+              )}
+              {dateRangeError && !fieldErrors.end && (
+                <p className="mt-1 text-xs text-red-500">{dateRangeError}</p>
+              )}
             </div>
             <div>
               <label className="block text-xs font-black text-gray-600 mb-1.5 uppercase tracking-wide">Viajeros</label>
               <div className="flex gap-2">
                 <input type="number" min="1" max="20" value={guests} onChange={e => setGuests(Number(e.target.value))}
                   className="flex-1 border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-forest" />
-                <button type="submit"
-                  className="bg-forest text-white px-4 py-2.5 rounded-xl hover:bg-forest-dark transition-colors flex items-center gap-2 font-bold text-sm">
+                <button
+                  type="submit"
+                  disabled={!city || !start || !end || !!dateRangeError}
+                  className={`bg-forest text-white px-4 py-2.5 rounded-xl transition-colors flex items-center gap-2 font-bold text-sm ${
+                    (!city || !start || !end || !!dateRangeError)
+                      ? 'opacity-50 cursor-not-allowed'
+                      : 'hover:bg-forest-dark'
+                  }`}
+                >
                   <Search className="w-4 h-4" />
                 </button>
               </div>

@@ -25,7 +25,7 @@ export default function HomeCard({ home, user, compact = false }) {
         <div className="relative h-48 overflow-hidden bg-gray-100">
           <img
             src={home.images?.[0] || `https://picsum.photos/seed/${home.id}/800/500`}
-            alt={home.title}
+            alt={`${home.type || 'Hogar'} en ${home.location || home.city || 'Latinoamérica'} — ${home.title}`}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             onError={e => { e.target.src = `https://picsum.photos/seed/home${home.id}/800/500` }}
           />
@@ -76,7 +76,7 @@ export default function HomeCard({ home, user, compact = false }) {
           <div className="flex items-center justify-between pt-3 border-t border-gray-50">
             {user && (
               <div className="flex items-center gap-2">
-                <img src={user.avatar} alt={user.name}
+                <img src={user.avatar} alt={`Foto de perfil de ${user.name}`}
                   className="w-7 h-7 rounded-full object-cover border-2 border-white shadow-sm"
                   onError={e => { e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=2d6a4f&color=fff&size=150` }}
                 />
