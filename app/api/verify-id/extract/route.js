@@ -85,7 +85,7 @@ export async function POST(request) {
 
     if (isRateLimited(user.id)) {
       return Response.json(
-        { success: false, error: 'Demasiados intentos. Espera una hora antes de reintentar.' },
+        { success: false, error_code: 'RATE_LIMITED', error: 'Demasiados intentos. Espera una hora antes de reintentar.' },
         { status: 429 }
       )
     }
@@ -129,6 +129,7 @@ export async function POST(request) {
     if (!extracted.es_documento_valido) {
       return Response.json({
         success: false,
+        error_code: 'DOCUMENT_INVALID',
         error: 'No pudimos verificar tu documento. Asegúrate de que sea legible y esté completo.',
       })
     }
@@ -136,12 +137,14 @@ export async function POST(request) {
     if (!extracted.pais_emisor || !SUPPORTED_COUNTRIES.includes(extracted.pais_emisor)) {
       return Response.json({
         success: false,
+        error_code: 'DOCUMENT_UNSUPPORTED_COUNTRY',
         error: 'El documento debe ser de Chile, Argentina, Colombia o México.',
       })
     }
     if (extracted.calidad_imagen === 'mala') {
       return Response.json({
         success: false,
+        error_code: 'DOCUMENT_INVALID',
         error: 'La imagen es de mala calidad. Intenta con mejor iluminación y sin reflejos.',
       })
     }
@@ -177,6 +180,7 @@ export async function POST(request) {
           if (idConflict) {
             return Response.json({
               success: false,
+              error_code: 'DOCUMENT_DUPLICATE',
               error: 'Este número de documento ya se encuentra inscrito en Rukka. Si crees que es un error, contáctanos.',
             })
           }
@@ -223,6 +227,6 @@ export async function POST(request) {
     })
   } catch (err) {
     console.error('[verify-id/extract]', err.message)
-    return Response.json({ success: false, error: 'Error al procesar la imagen.' }, { status: 500 })
+    return Response.json({ success: false, error_code: 'OCR_ERROR', error: 'Error al procesar la imagen.' }, { status: 500 })
   }
 }

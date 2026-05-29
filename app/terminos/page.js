@@ -40,6 +40,17 @@ export default function TerminosPage() {
                 <span className="text-terra font-bold">II.</span> Términos de Servicio
               </a>
             </li>
+            <li className="pt-2">
+              <a href="#CL" className="text-forest font-semibold hover:underline flex items-center gap-2">
+                <span className="text-terra font-bold">III.</span> Verificación de Identidad por País
+              </a>
+              <ol className="mt-1 ml-5 space-y-1 text-gray-500">
+                <li><a href="#CL" className="hover:text-forest transition-colors">🇨🇱 Chile — Ley 19.628</a></li>
+                <li><a href="#CO" className="hover:text-forest transition-colors">🇨🇴 Colombia — Ley 1581 de 2012</a></li>
+                <li><a href="#AR" className="hover:text-forest transition-colors">🇦🇷 Argentina — Ley 25.326</a></li>
+                <li><a href="#MX" className="hover:text-forest transition-colors">🇲🇽 México — LFPDPPP</a></li>
+              </ol>
+            </li>
           </ol>
         </nav>
 
@@ -251,11 +262,99 @@ export default function TerminosPage() {
 
         </div>
 
+        {/* ══════════════════════════════════════════════════════════════
+            SECCIÓN III — TRATAMIENTO DE DATOS BIOMÉTRICOS POR PAÍS
+        ══════════════════════════════════════════════════════════════ */}
+        <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-8 sm:p-12 space-y-10 text-gray-700 mt-8 scroll-mt-24">
+          <div>
+            <div className="inline-flex items-center gap-2 bg-andean/8 text-andean rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-widest mb-4">
+              Sección III
+            </div>
+            <h2 className="text-2xl font-black text-gray-900 mb-2">Verificación de Identidad por País</h2>
+            <p className="text-sm text-gray-500 leading-relaxed">
+              El proceso de verificación de identidad en Rukka cumple con la legislación de protección de datos vigente en cada país donde opera la plataforma. A continuación se detallan los marcos legales aplicables.
+            </p>
+          </div>
+
+          {/* Chile */}
+          <section id="CL" className="scroll-mt-24 border-t border-gray-100 pt-8">
+            <h3 className="text-lg font-black text-gray-900 mb-3 flex items-center gap-2">
+              <span className="text-xl">🇨🇱</span> Chile
+            </h3>
+            <p className="text-sm leading-relaxed mb-3">
+              Para usuarios verificándose con documento chileno, el tratamiento de datos biométricos se rige por la{' '}
+              <strong>Ley N° 19.628 sobre Protección de la Vida Privada</strong>.
+            </p>
+            <ul className="text-sm space-y-2 leading-relaxed">
+              <li className="flex items-start gap-2"><span className="text-forest font-bold mt-0.5">→</span><span><strong>Documento aceptado:</strong> Cédula de Identidad (RUT/RUN), Pasaporte, Licencia de Conducir.</span></li>
+              <li className="flex items-start gap-2"><span className="text-forest font-bold mt-0.5">→</span><span><strong>Datos que guardamos:</strong> RUT (en formato hash irreversible), nombre completo, fecha de nacimiento y resultado de la verificación.</span></li>
+              <li className="flex items-start gap-2"><span className="text-forest font-bold mt-0.5">→</span><span><strong>Datos que NO guardamos:</strong> imágenes del documento ni de la selfie — la comparación facial ocurre íntegramente en tu dispositivo.</span></li>
+              <li className="flex items-start gap-2"><span className="text-forest font-bold mt-0.5">→</span><span><strong>Tus derechos:</strong> acceso, rectificación, cancelación y oposición al tratamiento de tus datos (derechos ARCO). Escríbenos a <a href="mailto:hola@rukka.cl" className="text-forest underline">hola@rukka.cl</a>.</span></li>
+            </ul>
+          </section>
+
+          {/* Colombia */}
+          <section id="CO" className="scroll-mt-24 border-t border-gray-100 pt-8">
+            <h3 className="text-lg font-black text-gray-900 mb-3 flex items-center gap-2">
+              <span className="text-xl">🇨🇴</span> Colombia
+            </h3>
+            <p className="text-sm leading-relaxed mb-3">
+              Para usuarios verificándose con documento colombiano, el tratamiento de datos biométricos se rige por la{' '}
+              <strong>Ley 1581 de 2012 (Ley de Habeas Data)</strong> y el Decreto 1377 de 2013, supervisados por la Superintendencia de Industria y Comercio (SIC).
+            </p>
+            <ul className="text-sm space-y-2 leading-relaxed">
+              <li className="flex items-start gap-2"><span className="text-forest font-bold mt-0.5">→</span><span><strong>Documento aceptado:</strong> Cédula de Ciudadanía, Cédula de Extranjería, Pasaporte, Licencia de Conducción.</span></li>
+              <li className="flex items-start gap-2"><span className="text-forest font-bold mt-0.5">→</span><span><strong>Datos que guardamos:</strong> número de documento (en formato hash irreversible), nombre completo, fecha de nacimiento y resultado de la verificación.</span></li>
+              <li className="flex items-start gap-2"><span className="text-forest font-bold mt-0.5">→</span><span><strong>Datos que NO guardamos:</strong> imágenes del documento ni de la selfie.</span></li>
+              <li className="flex items-start gap-2"><span className="text-forest font-bold mt-0.5">→</span><span><strong>Finalidad:</strong> verificar la identidad del usuario para garantizar la confianza dentro de la comunidad Rukka.</span></li>
+              <li className="flex items-start gap-2"><span className="text-forest font-bold mt-0.5">→</span><span><strong>Tus derechos (Habeas Data):</strong> conocer, actualizar, rectificar y suprimir tus datos, y revocar la autorización de tratamiento. Escríbenos a <a href="mailto:hola@rukka.cl" className="text-forest underline">hola@rukka.cl</a>.</span></li>
+            </ul>
+          </section>
+
+          {/* Argentina */}
+          <section id="AR" className="scroll-mt-24 border-t border-gray-100 pt-8">
+            <h3 className="text-lg font-black text-gray-900 mb-3 flex items-center gap-2">
+              <span className="text-xl">🇦🇷</span> Argentina
+            </h3>
+            <p className="text-sm leading-relaxed mb-3">
+              Para usuarios verificándose con documento argentino, el tratamiento de datos biométricos se rige por la{' '}
+              <strong>Ley 25.326 de Protección de Datos Personales (PDPA)</strong>, supervisada por la Agencia de Acceso a la Información Pública (AAIP).
+            </p>
+            <ul className="text-sm space-y-2 leading-relaxed">
+              <li className="flex items-start gap-2"><span className="text-forest font-bold mt-0.5">→</span><span><strong>Documento aceptado:</strong> DNI (Documento Nacional de Identidad), Pasaporte, Licencia de Conducir.</span></li>
+              <li className="flex items-start gap-2"><span className="text-forest font-bold mt-0.5">→</span><span><strong>Datos que guardamos:</strong> número de DNI (en formato hash irreversible), nombre completo, fecha de nacimiento y resultado de la verificación.</span></li>
+              <li className="flex items-start gap-2"><span className="text-forest font-bold mt-0.5">→</span><span><strong>Datos que NO guardamos:</strong> imágenes del documento ni de la selfie.</span></li>
+              <li className="flex items-start gap-2"><span className="text-forest font-bold mt-0.5">→</span><span><strong>Consentimiento:</strong> el tratamiento de datos biométricos requiere tu consentimiento explícito, que otorgas al marcar la casilla en el paso de verificación.</span></li>
+              <li className="flex items-start gap-2"><span className="text-forest font-bold mt-0.5">→</span><span><strong>Tus derechos:</strong> acceso, rectificación, supresión y confidencialidad de tus datos. Escríbenos a <a href="mailto:hola@rukka.cl" className="text-forest underline">hola@rukka.cl</a>.</span></li>
+            </ul>
+          </section>
+
+          {/* México */}
+          <section id="MX" className="scroll-mt-24 border-t border-gray-100 pt-8">
+            <h3 className="text-lg font-black text-gray-900 mb-3 flex items-center gap-2">
+              <span className="text-xl">🇲🇽</span> México
+            </h3>
+            <p className="text-sm leading-relaxed mb-3">
+              Para usuarios verificándose con documento mexicano, el tratamiento de datos biométricos se rige por la{' '}
+              <strong>Ley Federal de Protección de Datos Personales en Posesión de los Particulares (LFPDPPP)</strong> y su Reglamento, supervisados por el Instituto Nacional de Transparencia, Acceso a la Información y Protección de Datos Personales (INAI).
+            </p>
+            <ul className="text-sm space-y-2 leading-relaxed">
+              <li className="flex items-start gap-2"><span className="text-forest font-bold mt-0.5">→</span><span><strong>Documento aceptado:</strong> Credencial para Votar (INE/IFE), Pasaporte, Licencia de Conducir.</span></li>
+              <li className="flex items-start gap-2"><span className="text-forest font-bold mt-0.5">→</span><span><strong>Datos que guardamos:</strong> CURP o folio del documento (en formato hash irreversible), nombre completo, fecha de nacimiento y resultado de la verificación.</span></li>
+              <li className="flex items-start gap-2"><span className="text-forest font-bold mt-0.5">→</span><span><strong>Datos que NO guardamos:</strong> imágenes del documento ni de la selfie.</span></li>
+              <li className="flex items-start gap-2"><span className="text-forest font-bold mt-0.5">→</span><span><strong>Aviso de privacidad:</strong> al aceptar los términos en el paso de verificación, otorgas tu consentimiento expreso para el tratamiento de tus datos biométricos conforme a este aviso.</span></li>
+              <li className="flex items-start gap-2"><span className="text-forest font-bold mt-0.5">→</span><span><strong>Tus derechos ARCO:</strong> acceso, rectificación, cancelación y oposición al tratamiento de tus datos. Escríbenos a <a href="mailto:hola@rukka.cl" className="text-forest underline">hola@rukka.cl</a> con el asunto "Derechos ARCO".</span></li>
+            </ul>
+          </section>
+        </div>
+
         {/* Footer links */}
         <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4 text-sm text-gray-400">
           <Link href="#privacidad" className="hover:text-forest transition-colors">↑ Política de Privacidad</Link>
           <span className="hidden sm:inline">·</span>
           <Link href="#terminos" className="hover:text-forest transition-colors">↑ Términos de Servicio</Link>
+          <span className="hidden sm:inline">·</span>
+          <Link href="#CL" className="hover:text-forest transition-colors">↑ Verificación por país</Link>
           <span className="hidden sm:inline">·</span>
           <Link href="/" className="hover:text-forest transition-colors">← Volver al inicio</Link>
         </div>

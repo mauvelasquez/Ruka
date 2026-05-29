@@ -1,8 +1,8 @@
 'use client'
 import { useEffect, useState } from 'react'
-import { CheckCircle, XCircle, Loader, AlertCircle, ArrowRight, MessageCircle } from 'lucide-react'
-import { useRouter } from 'next/navigation'
+import { CheckCircle, XCircle, Loader, AlertCircle, ArrowRight, MessageCircle, Shield } from 'lucide-react'
 import { useApp } from '../../../lib/store'
+import { VERIFICATION_ERRORS } from '../../../lib/verification-errors'
 
 const ACTION_LABELS = {
   publish: 'Publicar tu hogar',
@@ -17,10 +17,10 @@ const ACTION_ROUTES = {
 }
 
 export default function ResultStep({ ocrResult, faceResult, action, onRetry, attemptsLeft }) {
-  const router  = useRouter()
   const { syncSession } = useApp()
-  const [status, setStatus] = useState('saving') // saving | verified | failed | pending | error
-  const [errorMsg, setErrorMsg] = useState(null)
+  const [status, setStatus] = useState('saving') // saving | verified | bypass | failed | pending | error
+  const [errorMsg, setErrorMsg]   = useState(null)
+  const [errorCode, setErrorCode] = useState(null)
 
   const navigate = (path) => { window.location.href = path }
 
@@ -37,30 +37,41 @@ export default function ResultStep({ ocrResult, faceResult, action, onRetry, att
           method:  'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            rut:            ocrResult.extracted_data.rut,
-            match:          faceResult.match,
-            distance:       faceResult.distance,
+            rut:                 ocrResult.extracted_data.rut,
+            identification_number: ocrResult.extracted_data.identification_number,
+            match:               faceResult.match,
+            distance:            faceResult.distance,
             extracted_data: {
-              nombre_completo:  ocrResult.extracted_data.nombre_completo,
-              fecha_nacimiento: ocrResult.extracted_data.fecha_nacimiento,
+              nombre_completo:   ocrResult.extracted_data.nombre_completo,
+              fecha_nacimiento:  ocrResult.extracted_data.fecha_nacimiento,
               fecha_vencimiento: ocrResult.extracted_data.fecha_vencimiento,
             },
           }),
         })
         const data = await res.json()
+
+        if (data.success && data.bypass) {
+          await syncSession().catch(() => {})
+          setStatus('bypass')
+          return
+        }
         if (data.success) {
           await syncSession().catch(() => {})
           setStatus('verified')
-        } else if (data.status === 'pending') {
+          return
+        }
+        if (data.status === 'pending') {
           setStatus('pending')
           setErrorMsg(data.error)
-        } else {
-          setStatus('failed')
-          setErrorMsg(data.error)
+          return
         }
+        setErrorCode(data.error_code ?? null)
+        setStatus('failed')
+        setErrorMsg(data.error ?? 'No pudimos verificar tu identidad.')
       } catch {
+        setErrorCode('NETWORK_ERROR')
         setStatus('error')
-        setErrorMsg('Error de conexión al guardar el resultado.')
+        setErrorMsg(VERIFICATION_ERRORS.NETWORK_ERROR.message)
       }
     }
     save()
@@ -87,7 +98,6 @@ export default function ResultStep({ ocrResult, faceResult, action, onRetry, att
             Tu cuenta ahora está verificada. Ya puedes acceder a todas las funciones de Rukka.
           </p>
         </div>
-
         {action && ACTION_ROUTES[action] && (
           <button
             onClick={() => navigate(ACTION_ROUTES[action])}
@@ -97,12 +107,36 @@ export default function ResultStep({ ocrResult, faceResult, action, onRetry, att
             <ArrowRight className="w-4 h-4" />
           </button>
         )}
-
         <button
           onClick={() => navigate('/dashboard')}
           className="w-full text-sm text-gray-500 hover:text-gray-700 transition-colors py-1"
         >
           Ir al dashboard
+        </button>
+      </div>
+    )
+  }
+
+  if (status === 'bypass') {
+    return (
+      <div className="space-y-5 text-center">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-20 h-20 bg-amber-50 rounded-full flex items-center justify-center">
+            <Shield className="w-10 h-10 text-amber-500" />
+          </div>
+          <h2 className="text-xl font-black text-gray-900">Verificación completada</h2>
+          <p className="text-sm text-gray-500 max-w-xs leading-relaxed">
+            Tu identidad fue verificada con tu documento. Es posible que te contactemos para solicitar documentación adicional.
+          </p>
+        </div>
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm text-amber-800">
+          Revisa tu correo — te hemos enviado más detalles.
+        </div>
+        <button
+          onClick={() => navigate('/dashboard')}
+          className="w-full bg-forest text-white py-3.5 rounded-xl font-bold text-sm hover:bg-forest-dark transition-colors"
+        >
+          Entendido, ir al dashboard
         </button>
       </div>
     )
@@ -132,6 +166,9 @@ export default function ResultStep({ ocrResult, faceResult, action, onRetry, att
   }
 
   // failed or error
+  const canRetry = errorCode ? VERIFICATION_ERRORS[errorCode]?.can_retry !== false : attemptsLeft > 0
+  const suggestedAction = errorCode ? VERIFICATION_ERRORS[errorCode]?.suggested_action : null
+
   return (
     <div className="space-y-5">
       <div className="flex flex-col items-center gap-3 text-center">
@@ -142,7 +179,7 @@ export default function ResultStep({ ocrResult, faceResult, action, onRetry, att
         <p className="text-sm text-gray-500 max-w-xs leading-relaxed">{errorMsg || 'No pudimos verificar tu identidad.'}</p>
       </div>
 
-      {attemptsLeft > 0 && (
+      {canRetry && attemptsLeft > 0 && (
         <div className="bg-gray-50 border border-gray-200 rounded-xl p-3 text-center">
           <p className="text-xs text-gray-500">
             Te quedan <span className="font-bold text-gray-700">{attemptsLeft} {attemptsLeft === 1 ? 'intento' : 'intentos'}</span> disponibles
@@ -151,7 +188,7 @@ export default function ResultStep({ ocrResult, faceResult, action, onRetry, att
       )}
 
       <div className="flex flex-col gap-2">
-        {attemptsLeft > 0 && (
+        {canRetry && attemptsLeft > 0 && (
           <button
             onClick={onRetry}
             className="w-full bg-forest text-white py-3 rounded-xl font-bold text-sm hover:bg-forest-dark transition-colors"
@@ -159,13 +196,24 @@ export default function ResultStep({ ocrResult, faceResult, action, onRetry, att
             Reintentar verificación
           </button>
         )}
-        <a
-          href="mailto:soporte@rukka.cl"
-          className="w-full flex items-center justify-center gap-2 border border-gray-200 py-3 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors"
-        >
-          <MessageCircle className="w-4 h-4" />
-          Contactar soporte
-        </a>
+        {suggestedAction === 'contact_support' && (
+          <a
+            href="mailto:soporte@rukka.cl"
+            className="w-full flex items-center justify-center gap-2 border border-gray-200 py-3 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors"
+          >
+            <MessageCircle className="w-4 h-4" />
+            Contactar soporte
+          </a>
+        )}
+        {!canRetry && suggestedAction !== 'contact_support' && (
+          <a
+            href="mailto:soporte@rukka.cl"
+            className="w-full flex items-center justify-center gap-2 border border-gray-200 py-3 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors"
+          >
+            <MessageCircle className="w-4 h-4" />
+            Contactar soporte
+          </a>
+        )}
       </div>
     </div>
   )

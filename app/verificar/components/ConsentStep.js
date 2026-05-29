@@ -3,8 +3,32 @@ import { useState } from 'react'
 import { Shield, Eye, EyeOff, CheckCircle, FileText } from 'lucide-react'
 import Link from 'next/link'
 
-export default function ConsentStep({ onAccept }) {
+const COUNTRY_LEGAL = {
+  CL: {
+    law:    'Ley 19.628',
+    text:   'Este proceso cumple con la Ley 19.628 sobre Protección de la Vida Privada de Chile.',
+    anchor: '#CL',
+  },
+  CO: {
+    law:    'Ley 1581 de 2012',
+    text:   'Este proceso cumple con la Ley 1581 de 2012 (Habeas Data) de Colombia. Puedes ejercer tus derechos de acceso, corrección, supresión y revocación.',
+    anchor: '#CO',
+  },
+  AR: {
+    law:    'Ley 25.326',
+    text:   'Este proceso cumple con la Ley 25.326 de Protección de Datos Personales de Argentina (PDPA).',
+    anchor: '#AR',
+  },
+  MX: {
+    law:    'LFPDPPP',
+    text:   'Este proceso cumple con la Ley Federal de Protección de Datos Personales en Posesión de los Particulares (LFPDPPP) de México.',
+    anchor: '#MX',
+  },
+}
+
+export default function ConsentStep({ onAccept, country = 'CL' }) {
   const [checked, setChecked] = useState(false)
+  const legal = COUNTRY_LEGAL[country] ?? COUNTRY_LEGAL.CL
 
   return (
     <div className="space-y-6">
@@ -30,7 +54,7 @@ export default function ConsentStep({ onAccept }) {
         <InfoRow
           icon={<EyeOff className="w-4 h-4 text-andean" />}
           title="Qué NO se guarda"
-          text="Las imágenes del carnet y la selfie nunca llegan a nuestros servidores. La comparación facial ocurre completamente en tu dispositivo."
+          text="Las imágenes del documento y la selfie nunca llegan a nuestros servidores. La comparación facial ocurre completamente en tu dispositivo."
           highlight
         />
         <InfoRow
@@ -41,9 +65,9 @@ export default function ConsentStep({ onAccept }) {
       </div>
 
       <div className="bg-forest/5 border border-forest/20 rounded-xl p-4 text-xs text-gray-600 leading-relaxed">
-        Este proceso cumple con la{' '}
-        <span className="font-semibold">Ley 19.628 sobre Protección de la Vida Privada</span>{' '}
-        de Chile. Tus datos biométricos no son almacenados ni compartidos con terceros.
+        <span className="font-semibold">{legal.law}.</span>{' '}
+        {legal.text}{' '}
+        Tus datos biométricos no son almacenados ni compartidos con terceros.
       </div>
 
       <label className="flex items-start gap-3 cursor-pointer group">
@@ -65,7 +89,7 @@ export default function ConsentStep({ onAccept }) {
         <span className="text-sm text-gray-700 leading-relaxed">
           Acepto el tratamiento de mis datos biométricos para la verificación de identidad
           según los términos descritos y los{' '}
-          <Link href="/terminos" target="_blank" className="text-forest underline underline-offset-2 font-medium hover:text-forest-dark">
+          <Link href={`/terminos${legal.anchor}`} target="_blank" className="text-forest underline underline-offset-2 font-medium hover:text-forest-dark">
             Términos de Uso de Rukka
           </Link>
           .

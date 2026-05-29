@@ -1,6 +1,7 @@
 'use client'
 import { useState, useRef, useEffect, useCallback } from 'react'
-import { Camera, AlertCircle, Loader, CheckCircle, Eye, RotateCcw } from 'lucide-react'
+import { Camera, AlertCircle, Loader, CheckCircle, Eye, RotateCcw, ExternalLink } from 'lucide-react'
+import { VERIFICATION_ERRORS } from '../../../lib/verification-errors'
 
 // Eye Aspect Ratio for blink detection
 function eyeAspectRatio(eye) {
@@ -14,26 +15,19 @@ function eyeAspectRatio(eye) {
 const BLINK_THRESHOLD = 0.22
 const MATCH_THRESHOLD = 0.55
 
-function getCamErrorMessage(err) {
+function getCamErrorCode(err) {
   switch (err?.name) {
     case 'NotAllowedError':
     case 'PermissionDeniedError':
-      return 'Acceso a la cámara denegado. Ve a los ajustes de tu navegador y permite el acceso a la cámara para este sitio, luego recarga la página.'
+      return 'CAMERA_DENIED'
     case 'NotFoundError':
     case 'DevicesNotFoundError':
-      return 'No se encontró una cámara en tu dispositivo. Conecta una cámara e intenta nuevamente.'
+      return 'CAMERA_NOT_FOUND'
     case 'NotReadableError':
     case 'TrackStartError':
-      return 'La cámara está siendo usada por otra aplicación. Ciérrala e intenta nuevamente.'
-    case 'OverconstrainedError':
-    case 'ConstraintNotSatisfiedError':
-      return 'La cámara de tu dispositivo no cumple los requisitos mínimos. Intenta con otro dispositivo.'
-    case 'SecurityError':
-      return 'El acceso a la cámara requiere conexión segura (HTTPS). Verifica la URL.'
-    case 'AbortError':
-      return 'El acceso a la cámara fue interrumpido. Intenta nuevamente.'
+      return 'CAMERA_IN_USE'
     default:
-      return 'No se pudo acceder a la cámara. Verifica los permisos en los ajustes de tu navegador.'
+      return 'LIVENESS_FAILED'
   }
 }
 
@@ -45,13 +39,15 @@ export default function FaceMatchStep({ ocrResult, onSuccess }) {
 
   const [phase, setPhase]         = useState('loading_models') // loading_models | camera | liveness | capturing | matching | done | error
   const [modelProgress, setModelProgress] = useState(0)
-  const [camError, setCamError]   = useState(null)
-  const [detection, setDetection] = useState(null) // { centered, score, faceCount }
+  const [camError, setCamError]     = useState(null)
+  const [camErrorCode, setCamErrorCode] = useState(null)
+  const [detection, setDetection]   = useState(null) // { centered, score, faceCount }
   const [blinkCount, setBlinkCount] = useState(0)
   const [livenessOk, setLivenessOk] = useState(false)
   const [selfieDescriptor, setSelfieDescriptor] = useState(null)
   const [matchResult, setMatchResult] = useState(null)
-  const [error, setError]         = useState(null)
+  const [errorCode, setErrorCode]   = useState(null)
+  const [error, setError]           = useState(null)
   const blinkRef = useRef({ wasOpen: true, count: 0 })
   const goodFramesRef = useRef(0)
   const animRef = useRef()
@@ -81,7 +77,11 @@ export default function FaceMatchStep({ ocrResult, onSuccess }) {
         setModelProgress(100)
         if (!cancelled) setPhase('camera')
       } catch (err) {
-        if (!cancelled) { setError('Error al cargar los modelos de reconocimiento facial.'); setPhase('error') }
+        if (!cancelled) {
+          setErrorCode('LIVENESS_FAILED')
+          setError(VERIFICATION_ERRORS.LIVENESS_FAILED.message)
+          setPhase('error')
+        }
       }
     }
     loadModels()
@@ -97,6 +97,7 @@ export default function FaceMatchStep({ ocrResult, onSuccess }) {
       // Check API availability (older Safari / HTTP pages)
       if (!navigator.mediaDevices?.getUserMedia) {
         if (!active) return
+        setCamErrorCode('CAMERA_NOT_FOUND')
         setCamError('Tu navegador no soporta acceso a cámara. Usa Chrome, Safari 11+ o Firefox 36+.')
         setPhase('error')
         return
@@ -118,12 +119,16 @@ export default function FaceMatchStep({ ocrResult, onSuccess }) {
             stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false })
           } catch (fallbackErr) {
             if (!active) return
-            setCamError(getCamErrorMessage(fallbackErr))
+            const code = getCamErrorCode(fallbackErr)
+            setCamErrorCode(code)
+            setCamError(VERIFICATION_ERRORS[code]?.message ?? 'No se pudo acceder a la cámara.')
             setPhase('error')
             return
           }
         } else {
-          setCamError(getCamErrorMessage(primaryErr))
+          const code = getCamErrorCode(primaryErr)
+          setCamErrorCode(code)
+          setCamError(VERIFICATION_ERRORS[code]?.message ?? 'No se pudo acceder a la cámara.')
           setPhase('error')
           return
         }
@@ -238,18 +243,27 @@ export default function FaceMatchStep({ ocrResult, onSuccess }) {
         .withFaceLandmarks()
         .withFaceDescriptor()
 
-      if (!selfieResult) throw new Error('No se detectó un rostro en la selfie capturada.')
+      if (!selfieResult) {
+        setErrorCode('FACE_NOT_DETECTED')
+        throw new Error(VERIFICATION_ERRORS.FACE_NOT_DETECTED.message)
+      }
       const selfieDesc = selfieResult.descriptor
 
       const idImg = await loadImageFromBase64(ocrResult.idPhotoBase64)
-      if (!idImg) throw new Error('No hay foto del documento disponible para comparar.')
+      if (!idImg) {
+        setErrorCode('ID_FACE_NOT_DETECTED')
+        throw new Error(VERIFICATION_ERRORS.ID_FACE_NOT_DETECTED.message)
+      }
 
       const idResult = await faceapi
         .detectSingleFace(idImg, new faceapi.SsdMobilenetv1Options({ minConfidence: 0.4 }))
         .withFaceLandmarks()
         .withFaceDescriptor()
 
-      if (!idResult) throw new Error('No se detectó un rostro en la foto del documento.')
+      if (!idResult) {
+        setErrorCode('ID_FACE_NOT_DETECTED')
+        throw new Error(VERIFICATION_ERRORS.ID_FACE_NOT_DETECTED.message)
+      }
 
       const distance   = faceapi.euclideanDistance(selfieDesc, idResult.descriptor)
       const match      = distance < MATCH_THRESHOLD
@@ -263,10 +277,11 @@ export default function FaceMatchStep({ ocrResult, onSuccess }) {
       streamRef.current?.getTracks().forEach(t => t.stop())
       onSuccess({ match, distance, confidence })
     } catch (err) {
-      setError(err.message || 'Error al comparar los rostros.')
+      if (!errorCode) setErrorCode('LIVENESS_FAILED')
+      setError(err.message || VERIFICATION_ERRORS.LIVENESS_FAILED.message)
       setPhase('error')
     }
-  }, [ocrResult, onSuccess])
+  }, [ocrResult, onSuccess, errorCode])
 
   const handleManualCapture = () => {
     if (!videoRef.current) return
@@ -285,7 +300,9 @@ export default function FaceMatchStep({ ocrResult, onSuccess }) {
     setLivenessOk(false)
     setMatchResult(null)
     setError(null)
+    setErrorCode(null)
     setCamError(null)
+    setCamErrorCode(null)
     setPhase('camera')
   }
 
@@ -377,12 +394,26 @@ export default function FaceMatchStep({ ocrResult, onSuccess }) {
         <div className="space-y-4">
           <div className="flex gap-2 bg-red-50 border border-red-200 rounded-xl p-3">
             <AlertCircle className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
-            <p className="text-sm text-red-700">{error || camError}</p>
+            <div className="min-w-0">
+              <p className="text-sm text-red-700">{error || camError}</p>
+              {(camErrorCode === 'CAMERA_DENIED') && (
+                <p className="text-xs text-red-500 mt-1">
+                  En tu navegador: Configuración → Privacidad → Cámara → Permitir para este sitio.
+                </p>
+              )}
+              {((errorCode ?? camErrorCode) === 'CAMERA_NOT_FOUND') && (
+                <a href="mailto:soporte@rukka.cl" className="inline-flex items-center gap-1 text-xs text-red-600 underline mt-1">
+                  Contactar soporte <ExternalLink className="w-3 h-3" />
+                </a>
+              )}
+            </div>
           </div>
-          <button onClick={retry} className="w-full flex items-center justify-center gap-2 border border-gray-200 py-3 rounded-xl font-medium text-sm text-gray-700 hover:bg-gray-50 transition-colors">
-            <RotateCcw className="w-4 h-4" />
-            Reintentar
-          </button>
+          {VERIFICATION_ERRORS[errorCode ?? camErrorCode]?.can_retry !== false && (
+            <button onClick={retry} className="w-full flex items-center justify-center gap-2 border border-gray-200 py-3 rounded-xl font-medium text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+              <RotateCcw className="w-4 h-4" />
+              Reintentar
+            </button>
+          )}
         </div>
       )}
     </div>

@@ -8,7 +8,8 @@ import ConsentStep  from './components/ConsentStep'
 import IdCaptureStep from './components/IdCaptureStep'
 import FaceMatchStep from './components/FaceMatchStep'
 import ResultStep   from './components/ResultStep'
-import { Shield, FileText, Camera, CheckCircle, Loader, ArrowRight } from 'lucide-react'
+import { detectUserCountry, SUPPORTED_COUNTRIES, COUNTRY_NAMES, COUNTRY_FLAGS } from '../../lib/country-detection'
+import { Shield, FileText, Camera, CheckCircle, Loader, ArrowRight, ChevronDown } from 'lucide-react'
 
 const FACIAL_ENABLED = process.env.NEXT_PUBLIC_FACIAL_VERIFICATION_ENABLED !== 'false'
 
@@ -34,7 +35,6 @@ function Stepper({ current }) {
         const Icon      = step.icon
         const done      = current > step.id
         const active    = current === step.id
-        const pending   = current < step.id
         const isLast    = i === STEPS.length - 1
         return (
           <div key={step.id} className="flex items-center flex-1">
@@ -61,6 +61,36 @@ function Stepper({ current }) {
           </div>
         )
       })}
+    </div>
+  )
+}
+
+function CountrySelector({ country, onChange }) {
+  const [open, setOpen] = useState(false)
+  return (
+    <div className="relative flex justify-center mb-3">
+      <button
+        onClick={() => setOpen(o => !o)}
+        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-gray-200 text-xs font-medium text-gray-600 hover:border-forest/40 transition-colors shadow-sm"
+      >
+        <span>{COUNTRY_FLAGS[country]}</span>
+        <span>{COUNTRY_NAMES[country]}</span>
+        <ChevronDown className="w-3 h-3 text-gray-400" />
+      </button>
+      {open && (
+        <div className="absolute top-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-10 py-1 min-w-[140px]">
+          {SUPPORTED_COUNTRIES.map(c => (
+            <button
+              key={c}
+              onClick={() => { onChange(c); setOpen(false) }}
+              className={`w-full flex items-center gap-2 px-3 py-2 text-xs font-medium hover:bg-gray-50 transition-colors text-left ${c === country ? 'text-forest font-bold' : 'text-gray-700'}`}
+            >
+              <span>{COUNTRY_FLAGS[c]}</span>
+              <span>{COUNTRY_NAMES[c]}</span>
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
@@ -179,12 +209,18 @@ function VerificarContent() {
   const { syncSession } = useApp()
 
   const [step, setStep]             = useState(1)
+  const [country, setCountry]       = useState('CL')
   const [ocrResult, setOcrResult]   = useState(null)   // { extracted_data, idImageBase64 }
   const [faceResult, setFaceResult] = useState(null)   // { match, distance, confidence }
   const [attemptsLeft, setAttemptsLeft] = useState(3)
   const [idImageBase64, setIdImageBase64] = useState(null)
-  const [existingProfile, setExistingProfile] = useState(null) // profile with identification_number+full_name
-  const [forceUpload, setForceUpload] = useState(false) // user wants to re-upload carnet
+  const [existingProfile, setExistingProfile] = useState(null)
+  const [forceUpload, setForceUpload] = useState(false)
+
+  // Detect country by IP on mount
+  useEffect(() => {
+    detectUserCountry().then(setCountry)
+  }, [])
 
   useEffect(() => {
     async function checkProfile() {
@@ -216,7 +252,6 @@ function VerificarContent() {
     setOcrResult(data)
     setIdImageBase64(data.idImageBase64 ?? null)
     if (!FACIAL_ENABLED) {
-      // OCR already saved verified status in the extract route — skip face step
       setFaceResult({ match: true, distance: 0, ocr_only: true })
       setStep(RESULT_STEP)
     } else {
@@ -243,8 +278,13 @@ function VerificarContent() {
         <div className="w-full max-w-md">
           <Stepper current={step} />
 
+          {/* Country selector — visible only on consent step */}
+          {step === 1 && (
+            <CountrySelector country={country} onChange={setCountry} />
+          )}
+
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8">
-            {step === 1 && <ConsentStep onAccept={handleConsent} />}
+            {step === 1 && <ConsentStep onAccept={handleConsent} country={country} />}
 
             {step === 2 && showExistingProfile && (
               <ExistingProfileStep
@@ -258,6 +298,7 @@ function VerificarContent() {
             {step === 2 && !showExistingProfile && (
               <IdCaptureStep
                 onSuccess={handleOcrSuccess}
+                country={country}
               />
             )}
 
@@ -280,7 +321,7 @@ function VerificarContent() {
           </div>
 
           <p className="text-center text-xs text-gray-400 mt-4">
-            Protegido bajo Ley 19.628 · Datos biométricos procesados solo en tu dispositivo
+            Datos biométricos procesados solo en tu dispositivo · Rukka
           </p>
         </div>
       </div>
