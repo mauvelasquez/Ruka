@@ -1,5 +1,5 @@
 'use client'
-import { Suspense, useState, useEffect } from 'react'
+import { Suspense, useState, useEffect, useRef } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { createBrowserClient } from '@supabase/ssr'
 import { useApp } from '../../lib/store'
@@ -67,8 +67,17 @@ function Stepper({ current }) {
 
 function CountrySelector({ country, onChange }) {
   const [open, setOpen] = useState(false)
+  const ref = useRef(null)
+
+  useEffect(() => {
+    if (!open) return
+    const handle = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false) }
+    document.addEventListener('mousedown', handle)
+    return () => document.removeEventListener('mousedown', handle)
+  }, [open])
+
   return (
-    <div className="relative flex justify-center mb-3">
+    <div ref={ref} className="relative flex justify-center mb-3">
       <button
         onClick={() => setOpen(o => !o)}
         className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-gray-200 text-xs font-medium text-gray-600 hover:border-forest/40 transition-colors shadow-sm"
