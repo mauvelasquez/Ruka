@@ -43,20 +43,20 @@ export default async function sitemap() {
     priority: 0.8,
   }))
 
-  const countryRoutes = ['CL', 'MX', 'CO', 'AR'].map(code => ({
-    url: `${baseUrl}/homes?country=${code}`,
-    lastModified: new Date(),
-    changeFrequency: 'daily',
-    priority: 0.7,
-  }))
+  // Las URLs con query string (/homes?country=CL) no deben ir en el sitemap:
+  // Google las trata como "página alternativa con etiqueta canónica adecuada"
+  // porque su canonical apunta a /homes. Usar paisRoutes en su lugar.
 
   let homeRoutes = []
 
   try {
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-    )
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    if (!supabaseUrl || !supabaseKey) {
+      return [...staticRoutes, ...blogRoutes, ...paisRoutes, ...ciudadRoutes]
+    }
+
+    const supabase = createClient(supabaseUrl, supabaseKey)
 
     const { data: homes } = await supabase
       .from('homes')
@@ -77,5 +77,5 @@ export default async function sitemap() {
     console.error('Sitemap: error fetching dynamic routes', e)
   }
 
-  return [...staticRoutes, ...blogRoutes, ...paisRoutes, ...ciudadRoutes, ...countryRoutes, ...homeRoutes]
+  return [...staticRoutes, ...blogRoutes, ...paisRoutes, ...ciudadRoutes, ...homeRoutes]
 }

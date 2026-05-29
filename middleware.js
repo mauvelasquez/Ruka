@@ -49,7 +49,8 @@ export async function middleware(req) {
     return NextResponse.redirect(new URL('/dashboard', req.url))
   }
 
-  // /matches requiere verification_status = 'verified'
+  // /matches requiere identidad verificada (face-match 'verified' u OCR 'id_verified').
+  // Debe coincidir con isVerified() y useVerificationGate en el cliente.
   if (pathname.startsWith('/matches') && user) {
     try {
       const { data: profile } = await supabase
@@ -57,7 +58,7 @@ export async function middleware(req) {
         .select('verification_status')
         .eq('id', user.id)
         .maybeSingle()
-      if (profile?.verification_status !== 'verified') {
+      if (profile?.verification_status !== 'verified' && profile?.verification_status !== 'id_verified') {
         return NextResponse.redirect(new URL('/verificar?action=match', req.url))
       }
     } catch (err) {

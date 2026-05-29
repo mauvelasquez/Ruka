@@ -62,20 +62,20 @@ export default async function CiudadPage({ params }) {
   const cityNameFirst = city.name.split(' ')[0]
 
   let homes = []
-  let priceRows = []
 
   if (supabase) {
-    const [homesRes, priceRes] = await Promise.all([
-      supabase.from('homes').select('id, title, description, city, country, location, images, bedrooms, bathrooms, max_guests, type, amenities, rating, review_count, availability_periods, created_at').eq('country_code', country.code).ilike('city', `%${cityNameFirst}%`).order('rating', { ascending: false }).limit(24),
-      supabase.from('homes').select('price_per_night').eq('country_code', country.code).ilike('city', `%${cityNameFirst}%`).not('price_per_night', 'is', null),
-    ])
+    const homesRes = await supabase
+      .from('homes')
+      .select('id, title, description, city, country, location, images, bedrooms, bathrooms, max_guests, type, amenities, rating, review_count, availability_periods, created_at')
+      .eq('country_code', country.code)
+      .ilike('city', `%${cityNameFirst}%`)
+      .order('rating', { ascending: false })
+      .limit(24)
     homes = homesRes.data || []
-    priceRows = priceRes.data || []
   }
 
-  const avgPrice = priceRows?.length > 0
-    ? Math.round(priceRows.reduce((sum, r) => sum + (r.price_per_night || 0), 0) / priceRows.length)
-    : city.avgPricePerNight
+  // homes no almacena precio por noche; usamos el estimado turístico de la ciudad
+  const avgPrice = city.avgPricePerNight
 
   const normalizedHomes = (homes || []).map(h => ({
     ...h,

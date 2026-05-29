@@ -222,7 +222,7 @@ function MatchesContent() {
   }
 
   const handleRequest = ({ toHomeId, toUserId, fromHomeId, message }) => {
-    sendRequest({ toHomeId, toUserId, fromHomeId, message, startDate: start, endDate: end })
+    sendRequest({ toHomeId, toUserId, fromHomeId, message, startDate: start, endDate: end, guests })
   }
 
   const perfect = (results || []).filter(r => r.isPerfectMatch)

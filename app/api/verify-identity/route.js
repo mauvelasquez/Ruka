@@ -86,11 +86,12 @@ export async function POST(request) {
     }
   }
 
-  // Persist only extracted metadata — never the image
+  // Persist only extracted metadata — never the image.
+  // Columnas canónicas (ver migración 20260527_consolidate_verification_schema).
   const updateData = {
-    id_document_type:          result.document_type    ?? null,
-    id_document_country:       result.document_country ?? null,
-    id_document_number:        result.id_number        ?? null,
+    identification_type:       result.document_type    ?? null,
+    identification_country:    result.document_country ?? null,
+    identification_number:     result.id_number        ?? null,
     id_full_name:              result.full_name         ?? null,
     id_rejection_reason:       result.rejection_reason  ?? null,
     verified:                  result.verified          ?? false,

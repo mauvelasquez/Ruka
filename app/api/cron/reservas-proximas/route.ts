@@ -1,10 +1,21 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '../../../../lib/supabase/server'
+import { createClient } from '@supabase/supabase-js'
 import { Resend } from 'resend'
 import ReservaProximaSemana from '@/emails/reserva-proxima-semana'
 import AnfitrionProximaSemana from '@/emails/anfitrion-proxima-semana'
 
-const resend = new Resend(process.env.RESEND_API_KEY || "no-key")
+export const runtime = 'nodejs'
+
+const resend = new Resend(process.env.RESEND_API_KEY || 'no-key')
+
+// Service role: la tabla exchange_requests tiene RLS; el cron no actúa como un usuario.
+function serviceClient() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    { auth: { persistSession: false } }
+  )
+}
 
 export async function GET(req: Request) {
   const authHeader = req.headers.get('authorization')
@@ -12,29 +23,21 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
   }
 
-  const supabase = await createClient()
+  const supabase = serviceClient()
 
-  const hoy = new Date()
-  const en7Dias = new Date(hoy)
+  const en7Dias = new Date()
   en7Dias.setDate(en7Dias.getDate() + 7)
   const fechaObjetivo = en7Dias.toISOString().split('T')[0]
 
+  // Intercambios aceptados que comienzan exactamente en 7 días
   const { data: reservas, error } = await supabase
-    .from('exchanges')
-    .select(`
-      id,
-      fecha_inicio,
-      fecha_fin,
-      destino,
-      personas,
-      guest:profiles!guest_id (id, nombre, email),
-      host:profiles!host_id (nombre, email)
-    `)
+    .from('exchange_requests')
+    .select('id, from_user_id, to_user_id, to_home_id, start_date, end_date, guests')
     .eq('status', 'accepted')
-    .eq('fecha_inicio', fechaObjetivo)
+    .eq('start_date', fechaObjetivo)
 
   if (error) {
-    console.error('Error consultando reservas:', error)
+    console.error('[reservas-proximas] error consultando exchange_requests:', error.message)
     return NextResponse.json({ error: 'Error consultando base de datos' }, { status: 500 })
   }
 
@@ -42,44 +45,59 @@ export async function GET(req: Request) {
     return NextResponse.json({ success: true, enviados: 0, mensaje: 'No hay reservas en 7 días' })
   }
 
+  // Batch fetch de perfiles (viajero + anfitrión) y hogares destino
+  const userIds = [...new Set(reservas.flatMap(r => [r.from_user_id, r.to_user_id]).filter(Boolean))]
+  const homeIds = [...new Set(reservas.map(r => r.to_home_id).filter(Boolean))]
+
+  const [{ data: profiles }, { data: homes }] = await Promise.all([
+    supabase.from('profiles').select('id, name, email').in('id', userIds),
+    supabase.from('homes').select('id, city').in('id', homeIds),
+  ])
+
+  const profileById = new Map((profiles || []).map(p => [p.id, p]))
+  const homeById = new Map((homes || []).map(h => [h.id, h]))
+
+  const fmt = (d: string | null) =>
+    d ? new Date(d).toLocaleDateString('es-CL', { day: 'numeric', month: 'short' }) : ''
+
   const resultados = await Promise.allSettled(
-    reservas.map(async (reserva: any) => {
-      const guest = reserva.guest
-      const host = reserva.host
+    reservas.map(async (reserva) => {
+      const guest = profileById.get(reserva.from_user_id)
+      const host = profileById.get(reserva.to_user_id)
+      const destino = homeById.get(reserva.to_home_id)?.city || 'tu destino'
 
-      const fechaInicio = new Date(reserva.fecha_inicio).toLocaleDateString('es-CL', { day: 'numeric', month: 'short' })
-      const fechaFin = new Date(reserva.fecha_fin).toLocaleDateString('es-CL', { day: 'numeric', month: 'short' })
-
+      const fechaInicio = fmt(reserva.start_date)
+      const fechaFin = fmt(reserva.end_date)
       const enviados: string[] = []
 
-      if (guest?.email && guest?.nombre) {
+      if (guest?.email && guest?.name) {
         const { data, error: errGuest } = await resend.emails.send({
           from: 'Rukka <hola@rukka.cl>',
           to: guest.email,
-          subject: `Tu intercambio en ${reserva.destino} comienza en 7 días 🗓️`,
+          subject: `Tu intercambio en ${destino} comienza en 7 días 🗓️`,
           react: ReservaProximaSemana({
-            nombre: guest.nombre,
-            destino: reserva.destino,
+            nombre: guest.name,
+            destino,
             fechaInicio,
             fechaFin,
-            nombreAnfitrion: host?.nombre || 'tu anfitrión',
+            nombreAnfitrion: host?.name || 'tu anfitrión',
           }),
         })
         if (errGuest) throw new Error(`Error enviando a viajero ${guest.email}: ${errGuest.message}`)
         if (data?.id) enviados.push(data.id)
       }
 
-      if (host?.email && host?.nombre) {
+      if (host?.email && host?.name) {
         const { data, error: errHost } = await resend.emails.send({
           from: 'Rukka <hola@rukka.cl>',
           to: host.email,
-          subject: `Prepara tu hogar, ${guest?.nombre || 'tu viajero'} llega en 7 días 🗓️`,
+          subject: `Prepara tu hogar, ${guest?.name || 'tu viajero'} llega en 7 días 🗓️`,
           react: AnfitrionProximaSemana({
-            nombre: host.nombre,
-            nombreViajero: guest?.nombre || 'tu viajero',
+            nombre: host.name,
+            nombreViajero: guest?.name || 'tu viajero',
             fechaLlegada: fechaInicio,
             fechaSalida: fechaFin,
-            personas: reserva.personas ?? 1,
+            personas: reserva.guests ?? 1,
           }),
         })
         if (errHost) throw new Error(`Error enviando a anfitrión ${host.email}: ${errHost.message}`)
