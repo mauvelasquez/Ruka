@@ -30,7 +30,7 @@ const nextConfig = {
           { key: 'X-Frame-Options',         value: 'DENY' },
           { key: 'X-Content-Type-Options',   value: 'nosniff' },
           { key: 'Referrer-Policy',          value: 'strict-origin-when-cross-origin' },
-          { key: 'Permissions-Policy',       value: 'camera=(), microphone=(), geolocation=()' },
+          { key: 'Permissions-Policy',       value: 'camera=(self), microphone=(), geolocation=()' },
           // SECURITY FIX #11: Content-Security-Policy — modo Report-Only para detectar violaciones sin bloquear.
           // Cuando las violaciones sean cero, cambiar a Content-Security-Policy para enforcement.
           // Nota: Next.js usa scripts inline para hidratación — se necesita 'unsafe-inline' hasta migrar a nonces.

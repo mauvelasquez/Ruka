@@ -14,6 +14,29 @@ function eyeAspectRatio(eye) {
 const BLINK_THRESHOLD = 0.22
 const MATCH_THRESHOLD = 0.55
 
+function getCamErrorMessage(err) {
+  switch (err?.name) {
+    case 'NotAllowedError':
+    case 'PermissionDeniedError':
+      return 'Acceso a la cámara denegado. Ve a los ajustes de tu navegador y permite el acceso a la cámara para este sitio, luego recarga la página.'
+    case 'NotFoundError':
+    case 'DevicesNotFoundError':
+      return 'No se encontró una cámara en tu dispositivo. Conecta una cámara e intenta nuevamente.'
+    case 'NotReadableError':
+    case 'TrackStartError':
+      return 'La cámara está siendo usada por otra aplicación. Ciérrala e intenta nuevamente.'
+    case 'OverconstrainedError':
+    case 'ConstraintNotSatisfiedError':
+      return 'La cámara de tu dispositivo no cumple los requisitos mínimos. Intenta con otro dispositivo.'
+    case 'SecurityError':
+      return 'El acceso a la cámara requiere conexión segura (HTTPS). Verifica la URL.'
+    case 'AbortError':
+      return 'El acceso a la cámara fue interrumpido. Intenta nuevamente.'
+    default:
+      return 'No se pudo acceder a la cámara. Verifica los permisos en los ajustes de tu navegador.'
+  }
+}
+
 export default function FaceMatchStep({ ocrResult, onSuccess }) {
   const videoRef    = useRef()
   const canvasRef   = useRef()
@@ -33,12 +56,19 @@ export default function FaceMatchStep({ ocrResult, onSuccess }) {
   const goodFramesRef = useRef(0)
   const animRef = useRef()
 
+  // ── Cleanup stream on unmount only ───────────────────────────────────────────
+  useEffect(() => {
+    return () => {
+      cancelAnimationFrame(animRef.current)
+      streamRef.current?.getTracks().forEach(t => t.stop())
+    }
+  }, [])
+
   // ── Load models ──────────────────────────────────────────────────────────────
   useEffect(() => {
     let cancelled = false
     async function loadModels() {
       try {
-        // Dynamic import — keeps face-api out of SSR bundle
         const faceapi = await import('@vladmandic/face-api')
         faceapiRef.current = faceapi
         const MODEL_URL = '/models'
@@ -62,29 +92,60 @@ export default function FaceMatchStep({ ocrResult, onSuccess }) {
   useEffect(() => {
     if (phase !== 'camera') return
     let active = true
+
     async function startCam() {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } },
-          audio: false,
-        })
-        if (!active) { stream.getTracks().forEach(t => t.stop()); return }
-        streamRef.current = stream
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream
-          videoRef.current.play()
-        }
-        setPhase('liveness')
-      } catch (err) {
-        setCamError('No se pudo acceder a la cámara. Verifica los permisos en tu navegador.')
+      // Check API availability (older Safari / HTTP pages)
+      if (!navigator.mediaDevices?.getUserMedia) {
+        if (!active) return
+        setCamError('Tu navegador no soporta acceso a cámara. Usa Chrome, Safari 11+ o Firefox 36+.')
         setPhase('error')
+        return
       }
+
+      const primaryConstraints = {
+        video: { facingMode: { ideal: 'user' }, width: { ideal: 640 }, height: { ideal: 480 } },
+        audio: false,
+      }
+
+      let stream
+      try {
+        stream = await navigator.mediaDevices.getUserMedia(primaryConstraints)
+      } catch (primaryErr) {
+        if (!active) return
+        // Retry without constraints if they caused the failure
+        if (primaryErr.name === 'OverconstrainedError' || primaryErr.name === 'ConstraintNotSatisfiedError') {
+          try {
+            stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+          } catch (fallbackErr) {
+            if (!active) return
+            setCamError(getCamErrorMessage(fallbackErr))
+            setPhase('error')
+            return
+          }
+        } else {
+          setCamError(getCamErrorMessage(primaryErr))
+          setPhase('error')
+          return
+        }
+      }
+
+      if (!active) { stream.getTracks().forEach(t => t.stop()); return }
+
+      streamRef.current = stream
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream
+        // Await play() — can throw on some browsers if autoplay policy blocks it,
+        // but since video is muted + playsInline this should always succeed
+        await videoRef.current.play().catch(() => {})
+      }
+
+      // Only advance phase if still active (component not unmounted)
+      if (active) setPhase('liveness')
     }
+
     startCam()
-    return () => {
-      active = false
-      streamRef.current?.getTracks().forEach(t => t.stop())
-    }
+    // Only cancel active flag on cleanup — stream lifecycle is managed by the unmount effect
+    return () => { active = false }
   }, [phase])
 
   // ── Detection loop ────────────────────────────────────────────────────────────
@@ -123,7 +184,6 @@ export default function FaceMatchStep({ ocrResult, onSuccess }) {
       const centered = cx > vw * 0.2 && cx < vw * 0.8 && cy > vh * 0.15 && cy < vh * 0.85
       const score    = result.detection.score
 
-      // Draw guide box
       const ok = centered && score > 0.85
       ctx.strokeStyle = ok ? '#2A5C45' : '#C4622D'
       ctx.lineWidth   = 3
@@ -134,7 +194,6 @@ export default function FaceMatchStep({ ocrResult, onSuccess }) {
       // Blink detection via Eye Aspect Ratio
       if (phase === 'liveness' && result.landmarks) {
         const lm = result.landmarks.positions
-        // face_landmark_68: left eye 36-41, right eye 42-47
         const leftEye  = lm.slice(36, 42)
         const rightEye = lm.slice(42, 48)
         const ear = (eyeAspectRatio(leftEye) + eyeAspectRatio(rightEye)) / 2
@@ -174,7 +233,6 @@ export default function FaceMatchStep({ ocrResult, onSuccess }) {
     const faceapi = faceapiRef.current
     setPhase('matching')
     try {
-      // Get selfie descriptor
       const selfieResult = await faceapi
         .detectSingleFace(video, new faceapi.SsdMobilenetv1Options({ minConfidence: 0.6 }))
         .withFaceLandmarks()
@@ -183,7 +241,6 @@ export default function FaceMatchStep({ ocrResult, onSuccess }) {
       if (!selfieResult) throw new Error('No se detectó un rostro en la selfie capturada.')
       const selfieDesc = selfieResult.descriptor
 
-      // Load document photo image into an HTMLImageElement for face-api
       const idImg = await loadImageFromBase64(ocrResult.idPhotoBase64)
       if (!idImg) throw new Error('No hay foto del documento disponible para comparar.')
 
@@ -211,7 +268,6 @@ export default function FaceMatchStep({ ocrResult, onSuccess }) {
     }
   }, [ocrResult, onSuccess])
 
-  // Manual capture button
   const handleManualCapture = () => {
     if (!videoRef.current) return
     cancelAnimationFrame(animRef.current)
@@ -220,12 +276,16 @@ export default function FaceMatchStep({ ocrResult, onSuccess }) {
   }
 
   const retry = () => {
+    cancelAnimationFrame(animRef.current)
+    streamRef.current?.getTracks().forEach(t => t.stop())
+    streamRef.current = null
     blinkRef.current = { wasOpen: true, count: 0 }
     goodFramesRef.current = 0
     setBlinkCount(0)
     setLivenessOk(false)
     setMatchResult(null)
     setError(null)
+    setCamError(null)
     setPhase('camera')
   }
 
@@ -272,7 +332,6 @@ export default function FaceMatchStep({ ocrResult, onSuccess }) {
             )}
           </div>
 
-          {/* Status indicators */}
           <div className="space-y-2">
             <LivenessIndicator
               label="Parpadea 2 veces"
@@ -320,12 +379,10 @@ export default function FaceMatchStep({ ocrResult, onSuccess }) {
             <AlertCircle className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
             <p className="text-sm text-red-700">{error || camError}</p>
           </div>
-          {!camError && (
-            <button onClick={retry} className="w-full flex items-center justify-center gap-2 border border-gray-200 py-3 rounded-xl font-medium text-sm text-gray-700 hover:bg-gray-50 transition-colors">
-              <RotateCcw className="w-4 h-4" />
-              Reintentar
-            </button>
-          )}
+          <button onClick={retry} className="w-full flex items-center justify-center gap-2 border border-gray-200 py-3 rounded-xl font-medium text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+            <RotateCcw className="w-4 h-4" />
+            Reintentar
+          </button>
         </div>
       )}
     </div>
