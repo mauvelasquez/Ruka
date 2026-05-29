@@ -13,9 +13,17 @@ import { supabase } from '../lib/supabase'
 import { COUNTRIES } from '../lib/geo/latam'
 import { getDestinations, DESTINATIONS } from '../lib/geo/destinations'
 import { useCountry } from '../hooks/useCountry'
-import { ArrowRight, Zap, Heart, Gift } from 'lucide-react'
+import { ArrowRight, Zap, Gift } from 'lucide-react'
 import CountrySelector from '../components/CountrySelector'
 import { curateHomesForUser } from '../lib/editorial'
+
+const COUNTRY_CONFIG = {
+  CL: { region: 'Chile',       peers: 'Colombia, Argentina y México' },
+  CO: { region: 'Colombia',    peers: 'Chile, Argentina y México' },
+  AR: { region: 'Argentina',   peers: 'Chile, Colombia y México' },
+  MX: { region: 'México',      peers: 'Chile, Colombia y Argentina' },
+  default: { region: 'Latinoamérica', peers: 'Chile, Colombia, Argentina y México' },
+}
 
 const LATAM_COUNTRIES = [
   { code: 'CL', flag: '🇨🇱', name: 'Chile',     img: 'https://images.unsplash.com/photo-1591378603223-e15b45a81640?w=800', alt: 'Santiago de Chile' },
@@ -71,19 +79,21 @@ export default function HomePage() {
   const { homes, users, user } = useApp()
   const [exploringFrom, setExploringFrom] = useState(null)
 
-  const [heroBanner,      setHeroBanner]      = useState(null)
-  const [countryCounts,   setCountryCounts]   = useState({ CL: 0, MX: 0, CO: 0, AR: 0 })
-  const [localHomeCount,  setLocalHomeCount]  = useState(-1)
+  const [heroBanner,    setHeroBanner]    = useState(null)
+  const [countryCounts, setCountryCounts] = useState({ CL: 0, MX: 0, CO: 0, AR: 0 })
 
   const userCountry    = useCountry()
+  const geoConfig      = COUNTRY_CONFIG[userCountry] ?? COUNTRY_CONFIG.default
   const displayCountry = exploringFrom ?? user?.country_code ?? userCountry ?? 'CL'
   const destData       = getDestinations(displayCountry)
   const userCity       = user?.city ?? ''
 
-  const featured = useMemo(
-    () => curateHomesForUser(homes.filter(h => h.featured), displayCountry, userCity).slice(0, 3),
-    [homes, displayCountry, userCity]
-  )
+  const featured = useMemo(() => {
+    const chileHomes = homes.filter(
+      h => h.featured && (h.country === 'Chile' || h.country_code === 'CL')
+    ).sort((a, b) => (a.is_example ? 1 : 0) - (b.is_example ? 1 : 0))
+    return curateHomesForUser(chileHomes, 'CL', userCity).slice(0, 3)
+  }, [homes, userCity])
 
   // Redirect OAuth errors that Supabase sends to the site root
   useEffect(() => {
@@ -111,18 +121,6 @@ export default function HomePage() {
     ).then(results => setCountryCounts(Object.fromEntries(results)))
   }, [])
 
-  // Count homes for user's specific country (for tertiary banner)
-  useEffect(() => {
-    if (!supabase || !userCountry) return
-    supabase
-      .from('homes')
-      .select('id', { count: 'exact', head: true })
-      .eq('country_code', userCountry)
-      .then(({ count }) => setLocalHomeCount(count || 0))
-  }, [userCountry])
-
-  const bannerCities = destData.cities.slice(0, 5).map(c => c.city).join(' · ')
-
   return (
     <div className="min-h-screen" style={{ background: '#F8F4EE' }}>
       <Navbar />
@@ -145,23 +143,45 @@ export default function HomePage() {
               </div>
             )}
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white leading-[1.05] mb-2">
-              El hogar de Latinoamérica<br />
+              El hogar de {geoConfig.region}<br />
               <span className="text-sand">está lleno de puertas abiertas.</span>
             </h1>
             <p className="text-base text-sand/90 font-medium leading-relaxed max-w-lg mx-auto">
-              Intercambia tu casa con viajeros de Chile, Colombia, Argentina y México.<br className="hidden sm:block" /> Cuenta gratuita, matching automático, identidad verificada.
+              Intercambia tu casa con viajeros de {geoConfig.peers}.<br className="hidden sm:block" /> Cuenta gratuita, matching automático, identidad verificada.
             </p>
           </div>
 
           <FresiaSearchModule />
 
           <div className="flex flex-wrap gap-3 justify-center text-white/80 text-sm">
-            {['✓ Chile · Colombia · Argentina · México', '✓ Cuenta gratuita', '✓ Identidad verificada'].map(t => (
+            {[`✓ ${geoConfig.peers}`, '✓ Cuenta gratuita', '✓ Identidad verificada'].map(t => (
               <span key={t} className="bg-white/10 backdrop-blur-sm px-3 py-1.5 rounded-full">{t}</span>
             ))}
           </div>
         </div>
       </section>
+
+      {/* ── DESTACADOS — solo Chile ───────────────────────────────────────────── */}
+      {featured.length > 0 && (
+        <section className="py-16 bg-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-widest text-terra mb-1">✦ Destacados</p>
+                <h2 className="text-3xl font-extrabold text-gray-900">Hogares que te van a encantar</h2>
+              </div>
+              <Link href="/homes" className="hidden sm:flex items-center gap-2 text-forest font-semibold text-sm hover:text-forest-dark">
+                Ver todos <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {featured.map(h => (
+                <HomeCard key={h.id} home={h} user={users.find(u => u.id === h.userId)} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* ── BANNER 1 ─────────────────────────────────────────────────────────── */}
       <section className="py-8 bg-white border-y border-stone-200/60">
@@ -181,6 +201,7 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
 
       {/* ── 4 PAÍSES LATAM ───────────────────────────────────────────────────── */}
       <section className="py-16" style={{ background: '#F8F4EE' }}>
@@ -239,58 +260,6 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-
-      {/* ── BANNER 2 ─────────────────────────────────────────────────────────── */}
-      <section className="py-6" style={{ background: '#F8F4EE' }}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <AdBanner variant="secondary" heroBanner={heroBanner} />
-        </div>
-      </section>
-
-      {/* ── FEATURED HOMES ───────────────────────────────────────────────────── */}
-      {featured.length > 0 && (
-        <section className="py-16 bg-white">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between mb-8">
-              <div>
-                <p className="text-xs font-bold uppercase tracking-widest text-terra mb-1">✦ Destacados</p>
-                <h2 className="text-3xl font-extrabold text-gray-900">Hogares que te van a encantar</h2>
-              </div>
-              <Link href="/homes" className="hidden sm:flex items-center gap-2 text-forest font-semibold text-sm hover:text-forest-dark">
-                Ver todos <ArrowRight className="w-4 h-4" />
-              </Link>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {featured.map(h => (
-                <HomeCard key={h.id} home={h} user={users.find(u => u.id === h.userId)} />
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* ── BANNER 3: ciudades por país — solo si hay hogares ───────────────── */}
-      {localHomeCount > 0 && userCountry && (
-        <section className="py-8" style={{ background: '#F8F4EE' }}>
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="bg-gradient-to-r from-andean to-blue-700 rounded-2xl p-6 text-white flex flex-col sm:flex-row items-center gap-4 shadow-lg">
-              <div className="flex-1">
-                <span className="inline-block bg-white/20 text-white text-xs font-black px-3 py-1 rounded-full mb-3">
-                  {destData.flag} {destData.countryName.toUpperCase()}
-                </span>
-                <h3 className="font-black text-lg sm:text-xl mb-1 leading-tight">{bannerCities}</h3>
-                <p className="text-white/80 text-sm">
-                  {localHomeCount} {localHomeCount === 1 ? 'hogar disponible' : 'hogares disponibles'} en {destData.countryName}. Regístrate y empieza a intercambiar.
-                </p>
-              </div>
-              <Link href={`/homes?country=${userCountry}`}
-                className="flex-shrink-0 bg-white text-forest-dark font-black px-5 py-3 rounded-xl text-sm hover:bg-sand transition-colors flex items-center gap-2 whitespace-nowrap">
-                <Heart className="w-4 h-4" /> Ver hogares disponibles
-              </Link>
-            </div>
-          </div>
-        </section>
-      )}
 
       <Footer />
     </div>
