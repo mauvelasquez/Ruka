@@ -8,6 +8,7 @@ import Image from 'next/image'
 import { FresiaAvatar } from './fresia/ChatInterface'
 import { analytics } from '../lib/analytics'
 import YankiBalance from './yankis/YankiBalance'
+import CountryPill from './CountryPill'
 
 export default function Navbar() {
   const router = useRouter()
@@ -31,6 +32,9 @@ export default function Navbar() {
           <Link href="/" className="flex items-center gap-2 group hover:opacity-90 transition-opacity">
             <Image src="/rukka-logo-nuevo.png" alt="Rukka" width={48} height={48} className="object-contain" priority />
           </Link>
+
+          {/* Country selector */}
+          <CountryPill className="hidden md:block" />
 
           {/* Desktop links */}
           <div className="hidden md:flex items-center gap-6">
@@ -118,6 +122,9 @@ export default function Navbar() {
 
       {menuOpen && (
         <div className="md:hidden bg-white border-t border-gray-100 py-4 px-4 space-y-2">
+          <div className="px-1 pb-2">
+            <CountryPill onCountryChange={() => setMenuOpen(false)} />
+          </div>
           <Link href="/homes" onClick={() => setMenuOpen(false)} className="flex items-center gap-2 p-3 rounded-xl text-gray-700 hover:bg-forest-50 hover:text-forest">
             <Globe className="w-4 h-4 text-forest" /> Explorar hogares
           </Link>
