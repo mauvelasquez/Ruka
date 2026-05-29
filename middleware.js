@@ -4,10 +4,30 @@ import { NextResponse } from 'next/server'
 const AUTH_REQUIRED = ['/dashboard', '/matches', '/onboarding']
 const AUTH_ONLY = ['/auth/login', '/auth/register']
 
+const SUPPORTED_COUNTRIES = ['CL', 'CO', 'AR', 'MX']
+const COUNTRY_COOKIE = 'rukka_country'
+
+export function getCountryFromRequest(req) {
+  const fromCookie = req.cookies.get(COUNTRY_COOKIE)?.value
+  if (fromCookie && SUPPORTED_COUNTRIES.includes(fromCookie)) return fromCookie
+  const fromHeader = req.headers.get('x-vercel-ip-country')
+  if (fromHeader && SUPPORTED_COUNTRIES.includes(fromHeader)) return fromHeader
+  return 'CL'
+}
+
 export async function middleware(req) {
   let response = NextResponse.next({ request: req })
 
+  // geo: track if we need to stamp the country cookie on the final response
+  const needsCountryCookie = !req.cookies.get(COUNTRY_COOKIE)
+  const detectedCountry = needsCountryCookie ? getCountryFromRequest(req) : null
+
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    if (needsCountryCookie) {
+      response.cookies.set(COUNTRY_COOKIE, detectedCountry, {
+        path: '/', maxAge: 31536000, sameSite: 'lax', httpOnly: false,
+      })
+    }
     return response
   }
 
@@ -72,9 +92,28 @@ export async function middleware(req) {
     return NextResponse.redirect(new URL('/', req.url))
   }
 
+  // geo: stamp country cookie on the final response (after Supabase may have replaced it)
+  if (needsCountryCookie) {
+    response.cookies.set(COUNTRY_COOKIE, detectedCountry, {
+      path: '/', maxAge: 31536000, sameSite: 'lax', httpOnly: false,
+    })
+  }
+
   return response
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*', '/matches/:path*', '/onboarding/:path*', '/auth/login', '/auth/register'],
+  matcher: [
+    '/dashboard/:path*',
+    '/matches/:path*',
+    '/onboarding/:path*',
+    '/auth/login',
+    '/auth/register',
+    '/',
+    '/homes/:path*',
+    '/como-funciona',
+    '/blog/:path*',
+    '/about',
+    '/FresIA',
+  ],
 }

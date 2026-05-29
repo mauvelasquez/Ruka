@@ -7,7 +7,7 @@ import { useCountry } from '../hooks/useCountry'
 import RukkaLogo from './RukkaLogo'
 
 export default function Footer() {
-  const userCountry = useCountry()
+  const { country: userCountry } = useCountry()
   const [destinations, setDestinations] = useState([])
 
   useEffect(() => {
