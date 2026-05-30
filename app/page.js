@@ -14,7 +14,6 @@ import { getDestinations, DESTINATIONS } from '../lib/geo/destinations'
 import { useCountry } from '../hooks/useCountry'
 import { getRandomCountryBanner } from '../lib/country-banners'
 import { ArrowRight, Zap, Gift } from 'lucide-react'
-import CountrySelector from '../components/CountrySelector'
 import { curateHomesForUser } from '../lib/editorial'
 
 const COUNTRY_CONFIG = {
@@ -70,7 +69,6 @@ export default function HomePage() {
   const [exploringFrom, setExploringFrom] = useState(null)
 
   const [heroBanner,    setHeroBanner]    = useState(null)
-  const [countryCounts, setCountryCounts] = useState({ CL: 0, MX: 0, CO: 0, AR: 0 })
 
   const { country: userCountry } = useCountry()
   const geoConfig      = COUNTRY_CONFIG[userCountry] ?? COUNTRY_CONFIG.default
@@ -104,16 +102,6 @@ export default function HomePage() {
     setHeroBanner(getRandomCountryBanner(displayCountry))
   }, [displayCountry])
 
-  // Country-level home counts for the 4-country grid
-  useEffect(() => {
-    if (!supabase) return
-    Promise.all(
-      ['CL', 'MX', 'CO', 'AR'].map(code =>
-        supabase.from('homes').select('id', { count: 'exact', head: true }).eq('country_code', code)
-          .then(({ count }) => [code, count || 0])
-      )
-    ).then(results => setCountryCounts(Object.fromEntries(results)))
-  }, [])
 
   return (
     <div className="min-h-screen" style={{ background: '#F8F4EE' }}>
@@ -227,29 +215,7 @@ export default function HomePage() {
               Ver todos <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
-          <div className="mb-8">
-            <CountrySelector value={displayCountry} onChange={setExploringFrom} label="Explorando desde" />
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-10">
-            {LATAM_COUNTRIES.map(c => (
-              <Link key={c.code} href={`/homes?country=${c.code}`}
-                className="group relative rounded-2xl overflow-hidden h-44 block shadow-sm hover:shadow-lg transition-shadow" style={{ background: 'linear-gradient(135deg, #2A5C45 0%, #3d7a5e 100%)' }}>
-                <img src={c.img} alt={`Fotografía de ${c.alt}`} loading="lazy"
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  onError={(e) => { e.currentTarget.style.display = 'none' }} />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
-                <div className="absolute bottom-0 left-0 right-0 p-4">
-                  <p className="text-2xl mb-0.5">{c.flag}</p>
-                  <p className="text-white font-black text-sm leading-tight">{c.name}</p>
-                  <p className="text-white/60 text-[11px] leading-tight">
-                    {countryCounts[c.code] > 0 ? `${countryCounts[c.code]} hogares` : 'Próximamente'}
-                  </p>
-                </div>
-              </Link>
-            ))}
-          </div>
-
-          {/* Destinos dinámicos por país */}
+          {/* Destinos por región */}
           <div className="mb-4">
             <p className="text-xs font-bold uppercase tracking-widest text-terra mb-1">{destData.badgeLabel}</p>
             <h3 className="text-lg font-extrabold text-gray-900 mb-4">{destData.sectionTitle}</h3>
