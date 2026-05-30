@@ -1,7 +1,8 @@
 'use client'
 import Link from 'next/link'
-import { Star, MapPin, Bed, Users, Calendar, ArrowLeftRight, CheckCircle } from 'lucide-react'
+import { MapPin, Bed, Users, CheckCircle } from 'lucide-react'
 import { analytics } from '../lib/analytics'
+import { getAmenityById, FEATURED_AMENITY_PRIORITY } from '../lib/amenities'
 
 export default function HomeCard({ home, user, compact = false }) {
   if (!home) return null
@@ -71,6 +72,38 @@ export default function HomeCard({ home, user, compact = false }) {
               Disponible desde {new Date(nextAvail.start).toLocaleDateString('es-CL', { day: 'numeric', month: 'short' })}
             </div>
           )}
+
+          {/* Amenity chips — top 5 by priority */}
+          {home.amenities?.length > 0 && (() => {
+            const chips = []
+            for (const pid of FEATURED_AMENITY_PRIORITY) {
+              if (chips.length >= 5) break
+              if (home.amenities.includes(pid)) {
+                const a = getAmenityById(pid)
+                if (a) chips.push(a)
+              }
+            }
+            // Fill remaining slots from the home's own list (not already added)
+            if (chips.length < 5) {
+              for (const id of home.amenities) {
+                if (chips.length >= 5) break
+                if (!chips.some(c => c.id === id)) {
+                  const a = getAmenityById(id)
+                  if (a) chips.push(a)
+                }
+              }
+            }
+            if (!chips.length) return null
+            return (
+              <div className="flex flex-wrap gap-1.5 mb-3">
+                {chips.map(a => (
+                  <span key={a.id} className="inline-flex items-center gap-1 text-xs border border-gray-200 text-gray-500 rounded-full px-2 py-0.5 bg-white">
+                    <span>{a.emoji}</span>{a.label}
+                  </span>
+                ))}
+              </div>
+            )
+          })()}
 
           {/* Footer */}
           <div className="flex items-center justify-between pt-3 border-t border-gray-50">

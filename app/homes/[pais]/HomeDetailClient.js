@@ -2,21 +2,13 @@
 import { useState, useEffect } from 'react'
 import dynamic from 'next/dynamic'
 import 'yet-another-react-lightbox/styles.css'
+import { groupHomeAmenities } from '../../../lib/amenities'
 
 const Lightbox = dynamic(() => import('yet-another-react-lightbox'), { ssr: false })
-
-const AMENITY_LABEL = {
-  wifi:    'WiFi',
-  parking: 'Estacionamiento',
-  ac:      'Aire acondicionado',
-  heating: 'Calefacción',
-  tv:      'Televisor',
-  coffee:  'Cafetera',
-  kitchen: 'Cocina equipada',
-  washer:  'Lavadora',
-  pets:    'Mascotas permitidas',
-  baby:    'Apto para bebés',
-}
+const HomeMap  = dynamic(() => import('../../../components/HomeMap'), {
+  ssr: false,
+  loading: () => <div className="rounded-2xl bg-gray-100 animate-pulse" style={{ height: 400 }} />,
+})
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Navbar from '../../../components/Navbar'
@@ -201,6 +193,21 @@ export default function HomeDetailClient({ id }) {
               {home.size && <p className="text-xs text-gray-400 mt-3">📐 {home.size}m² {home.floor ? `· Piso ${home.floor}` : ''}</p>}
             </div>
 
+            {/* Map */}
+            {(home.latitude || home.comuna || home.region) && (
+              <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
+                <h2 className="text-lg font-bold text-gray-900 mb-4">Dónde se encuentra</h2>
+                <div className="rounded-2xl overflow-hidden" style={{ height: 400 }}>
+                  <HomeMap home={home} />
+                </div>
+                {!home.latitude && (
+                  <p className="text-xs text-gray-400 mt-3 text-center">
+                    La ubicación exacta se comparte al confirmar el intercambio.
+                  </p>
+                )}
+              </div>
+            )}
+
             {/* Availability */}
             {home.availabilityPeriods?.length > 0 && (
               <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
@@ -221,18 +228,29 @@ export default function HomeDetailClient({ id }) {
             )}
 
             {/* Amenities */}
-            {home.amenities?.length > 0 && (
-              <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
-                <h2 className="text-lg font-bold text-gray-900 mb-4">Lo que incluye</h2>
-                <div className="grid grid-cols-2 gap-3">
-                  {home.amenities.map((a, i) => (
-                    <div key={i} className="flex items-center gap-2 text-sm text-gray-600">
-                      <CheckCircle className="w-4 h-4 text-forest flex-shrink-0" /> {AMENITY_LABEL[a] || a}
-                    </div>
-                  ))}
+            {home.amenities?.length > 0 && (() => {
+              const groups = groupHomeAmenities(home.amenities)
+              if (!groups.length) return null
+              return (
+                <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
+                  <h2 className="text-lg font-bold text-gray-900 mb-5">Lo que incluye</h2>
+                  <div className="space-y-5">
+                    {groups.map(cat => (
+                      <div key={cat.id}>
+                        <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">{cat.label}</p>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                          {cat.present.map(a => (
+                            <div key={a.id} className="flex items-center gap-2 text-sm text-gray-600">
+                              <span className="text-base flex-shrink-0">{a.emoji}</span> {a.label}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            )}
+              )
+            })()}
 
             {/* Nearby */}
             {home.nearbyAttractions?.length > 0 && (

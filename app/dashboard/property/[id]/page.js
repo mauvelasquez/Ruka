@@ -24,9 +24,9 @@ const ImportFromAirbnb = dynamic(
 )
 import {
   ArrowLeft, Save, Camera, X, ChevronDown, MapPin,
-  AlertCircle, CheckCircle, Wifi, Car, Snowflake, Flame,
-  Tv, Coffee, Utensils, Shirt, Dog, Baby, Bath
+  AlertCircle, CheckCircle, Bath, Search,
 } from 'lucide-react'
+import { AMENITY_CATEGORIES, AIRBNB_IMPORT_LEGACY_MAP } from '../../../../lib/amenities'
 
 // ── Constantes ────────────────────────────────────────────────────────────────
 const CATEGORY_OPTIONS = [
@@ -41,18 +41,6 @@ const SUBTYPES = {
 
 const BED_TYPES = ['Cama doble', 'Cama queen', 'Cama king', 'Camas individuales', 'Sofá cama', 'Futón']
 
-const AMENITIES = [
-  { id: 'wifi',    label: 'WiFi',               icon: Wifi },
-  { id: 'parking', label: 'Estacionamiento',    icon: Car },
-  { id: 'ac',      label: 'Aire acondicionado', icon: Snowflake },
-  { id: 'heating', label: 'Calefacción',        icon: Flame },
-  { id: 'tv',      label: 'Televisor',          icon: Tv },
-  { id: 'coffee',  label: 'Cafetera',           icon: Coffee },
-  { id: 'kitchen', label: 'Cocina equipada',    icon: Utensils },
-  { id: 'washer',  label: 'Lavadora',           icon: Shirt },
-  { id: 'pets',    label: 'Mascotas permitidas',icon: Dog },
-  { id: 'baby',    label: 'Apto para bebés',    icon: Baby },
-]
 
 // ── Photo uploader ─────────────────────────────────────────────────────────────
 function PhotoUploader({ photos, onChange, max = 12 }) {
@@ -105,6 +93,7 @@ export default function PropertyPage() {
   const [leafletError,    setLeafletError]    = useState(false)
   const [notFound,        setNotFound]        = useState(false)
   const [showAirbnbModal, setShowAirbnbModal] = useState(false)
+  const [searchAmenity,   setSearchAmenity]   = useState('')
 
   // Form state
   const [category,  setCategory]  = useState('full_home')
@@ -275,9 +264,11 @@ export default function PropertyPage() {
 
   const handleAirbnbImport = (data) => {
     try {
-      // Claude Vision devuelve amenities ya como IDs conocidos (wifi, parking, ac...)
-      const knownIds = AMENITIES.map(a => a.id)
-      const mapped = (data?.amenities || []).filter(a => knownIds.includes(a))
+      const allIds = AMENITY_CATEGORIES.flatMap(cat => cat.amenities.map(a => a.id))
+      // Translate legacy Airbnb import IDs → current IDs, then filter valid ones
+      const mapped = (data?.amenities || [])
+        .map(a => AIRBNB_IMPORT_LEGACY_MAP[a] || a)
+        .filter(a => allIds.includes(a))
 
       // Mapear tipo (campo 'type' de Claude Vision) a categoría y subtipo de Rukka
       const tipo = (data?.type || '').toLowerCase()
@@ -553,20 +544,64 @@ export default function PropertyPage() {
 
         {/* ── Comodidades ── */}
         <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
-          <h2 className="font-black text-gray-900 text-lg mb-4">Comodidades</h2>
-          <div className="grid grid-cols-2 gap-2">
-            {AMENITIES.map(({ id: aid, label, icon: Icon }) => {
-              const active = hf.amenities.includes(aid)
-              return (
-                <button key={aid} type="button" onClick={() => toggleAmenity(aid)}
-                  className={`flex items-center gap-2 p-3 rounded-xl border transition text-left text-sm font-medium ${
-                    active ? 'border-forest bg-forest/5 text-forest' : 'border-gray-200 text-gray-500 hover:border-gray-300'
-                  }`}>
-                  <Icon className="w-4 h-4 flex-shrink-0" /> {label}
-                </button>
-              )
-            })}
+          <h2 className="font-black text-gray-900 text-lg mb-3">Comodidades</h2>
+          {/* Search */}
+          <div className="relative mb-4">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+            <input
+              type="text"
+              value={searchAmenity}
+              onChange={e => setSearchAmenity(e.target.value)}
+              placeholder="Buscar comodidad..."
+              className="w-full border border-gray-200 rounded-xl pl-9 pr-9 py-2.5 text-sm focus:ring-2 focus:ring-forest focus:outline-none"
+            />
+            {searchAmenity && (
+              <button type="button" onClick={() => setSearchAmenity('')}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                <X className="w-4 h-4" />
+              </button>
+            )}
           </div>
+          {/* Results: flat when searching, grouped otherwise */}
+          {searchAmenity.trim() ? (
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              {AMENITY_CATEGORIES.flatMap(cat => cat.amenities)
+                .filter(a => a.label.toLowerCase().includes(searchAmenity.toLowerCase()))
+                .map(({ id: aid, emoji, label }) => {
+                  const active = hf.amenities.includes(aid)
+                  return (
+                    <button key={aid} type="button" onClick={() => toggleAmenity(aid)}
+                      className={`flex items-center gap-2 p-3 rounded-xl border transition text-left text-sm font-medium ${
+                        active ? 'border-forest bg-forest/5 text-forest' : 'border-gray-200 text-gray-500 hover:border-gray-300'
+                      }`}>
+                      <span className="text-base flex-shrink-0">{emoji}</span> {label}
+                    </button>
+                  )
+                })
+              }
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {AMENITY_CATEGORIES.map(cat => (
+                <div key={cat.id}>
+                  <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">{cat.label}</p>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                    {cat.amenities.map(({ id: aid, emoji, label }) => {
+                      const active = hf.amenities.includes(aid)
+                      return (
+                        <button key={aid} type="button" onClick={() => toggleAmenity(aid)}
+                          className={`flex items-center gap-2 p-3 rounded-xl border transition text-left text-sm font-medium ${
+                            active ? 'border-forest bg-forest/5 text-forest' : 'border-gray-200 text-gray-500 hover:border-gray-300'
+                          }`}>
+                          <span className="text-base flex-shrink-0">{emoji}</span> {label}
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* ── Fotos ── */}

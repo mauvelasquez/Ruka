@@ -35,7 +35,7 @@ const FRESIA_TOOLS = [
         bedrooms:    { type: 'number',  description: 'Número de dormitorios' },
         bathrooms:   { type: 'number',  description: 'Número de baños' },
         max_guests:  { type: 'number',  description: 'Máximo de huéspedes' },
-        amenities:   { type: 'array',   items: { type: 'string' }, description: 'Comodidades (wifi, parking, ac, heating, tv, kitchen, washer, pets)' },
+        amenities:   { type: 'array',   items: { type: 'string' }, description: 'Comodidades — usar IDs: wifi, estacionamiento, cocina_equipada, calefaccion, aire_acondicionado, lavadora, tv_inteligente, cafetera, mascotas, piscina_privada, piscina_compartida, hot_tub_privado, jacuzzi, quincho, sauna, escritorio, calienta_camas, apto_ninos' },
       },
       required: ['title', 'tipo', 'pais', 'region', 'comuna', 'bedrooms', 'max_guests'],
     },
@@ -117,6 +117,20 @@ Rukka tiene un blog en /blog con artículos sobre home exchange en LATAM. Cuando
 - Emojis con moderación
 - Sin lenguaje corporativo frío ni listas de bullets innecesarias
 - Si el usuario sube una imagen, siempre confirma haberla recibido antes de describirla
+
+## AMENIDADES
+
+Las amenidades de los hogares están organizadas en estas categorías:
+esenciales, baño, dormitorio, cocina, exteriores, bienestar, trabajo,
+seguridad y servicios. Los IDs clave para búsquedas frecuentes son:
+wifi, estacionamiento, cocina_equipada, piscina_privada, piscina_compartida,
+hot_tub_privado, hot_tub_compartido, jacuzzi, mascotas, sauna, quincho,
+escritorio, calefaccion, aire_acondicionado, calienta_camas.
+Cuando el usuario pida hogares por amenidad, usa buscar_hogares filtrando
+por el id correspondiente. Ejemplos:
+- "hogares con tinaja caliente en Pucón" → buscar_hogares({ ciudad: "Pucón", amenidad: "hot_tub_privado" })
+- "casas con piscina que acepten mascotas" → buscar_hogares({ amenidades: ["piscina_privada", "mascotas"] })
+- "departamentos con escritorio para trabajar" → buscar_hogares({ tipo: "Departamento", amenidad: "escritorio" })
 
 ## RESTRICCIONES
 - No inventes datos de hogares que no estén en el contexto

@@ -18,11 +18,11 @@ import CountrySelector from '../components/CountrySelector'
 import { curateHomesForUser } from '../lib/editorial'
 
 const COUNTRY_CONFIG = {
-  CL: { region: 'Chile',       peers: 'Colombia, Argentina y México' },
-  CO: { region: 'Colombia',    peers: 'Chile, Argentina y México' },
-  AR: { region: 'Argentina',   peers: 'Chile, Colombia y México' },
-  MX: { region: 'México',      peers: 'Chile, Colombia y Argentina' },
-  default: { region: 'Latinoamérica', peers: 'Chile, Colombia, Argentina y México' },
+  CL: { region: 'Chile',       peers: 'Colombia, Argentina y México', badge: 'Viaja por todo Chile' },
+  CO: { region: 'Colombia',    peers: 'Chile, Argentina y México',    badge: 'Viaja por toda Colombia' },
+  AR: { region: 'Argentina',   peers: 'Chile, Colombia y México',     badge: 'Viaja por toda Argentina' },
+  MX: { region: 'México',      peers: 'Chile, Colombia y Argentina',  badge: 'Viaja por todo México' },
+  default: { region: 'Latinoamérica', peers: 'Chile, Colombia, Argentina y México', badge: 'Viaja por toda LATAM' },
 }
 
 const LATAM_COUNTRIES = [
@@ -158,7 +158,7 @@ export default function HomePage() {
           <FresiaSearchModule />
 
           <div className="flex flex-wrap gap-3 justify-center text-white/80 text-sm">
-            {[`✓ ${geoConfig.peers}`, '✓ Cuenta gratuita', '✓ Identidad verificada'].map(t => (
+            {[`✓ ${geoConfig.badge}`, '✓ Cuenta gratuita', '✓ Identidad verificada'].map(t => (
               <span key={t} className="bg-white/10 backdrop-blur-sm px-3 py-1.5 rounded-full">{t}</span>
             ))}
           </div>
