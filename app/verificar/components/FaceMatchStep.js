@@ -48,6 +48,7 @@ export default function FaceMatchStep({ ocrResult, onSuccess }) {
   const [matchResult, setMatchResult] = useState(null)
   const [errorCode, setErrorCode]   = useState(null)
   const [error, setError]           = useState(null)
+  const [stream, setStream]         = useState(null)
   const blinkRef = useRef({ wasOpen: true, count: 0 })
   const goodFramesRef = useRef(0)
   const animRef = useRef()
@@ -94,6 +95,15 @@ export default function FaceMatchStep({ ocrResult, onSuccess }) {
     let active = true
 
     async function startCam() {
+      // Gate camera access behind a secure context (HTTPS / localhost).
+      // Browsers hide navigator.mediaDevices entirely on insecure origins.
+      if (typeof window !== 'undefined' && window.isSecureContext === false) {
+        if (!active) return
+        setCamErrorCode('CAMERA_NOT_FOUND')
+        setCamError('La cámara solo funciona en sitios seguros (HTTPS). Abre Rukka con https:// e intenta de nuevo.')
+        setPhase('error')
+        return
+      }
       // Check API availability (older Safari / HTTP pages)
       if (!navigator.mediaDevices?.getUserMedia) {
         if (!active) return
@@ -108,15 +118,15 @@ export default function FaceMatchStep({ ocrResult, onSuccess }) {
         audio: false,
       }
 
-      let stream
+      let camStream
       try {
-        stream = await navigator.mediaDevices.getUserMedia(primaryConstraints)
+        camStream = await navigator.mediaDevices.getUserMedia(primaryConstraints)
       } catch (primaryErr) {
         if (!active) return
         // Retry without constraints if they caused the failure
         if (primaryErr.name === 'OverconstrainedError' || primaryErr.name === 'ConstraintNotSatisfiedError') {
           try {
-            stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+            camStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false })
           } catch (fallbackErr) {
             if (!active) return
             const code = getCamErrorCode(fallbackErr)
@@ -134,24 +144,31 @@ export default function FaceMatchStep({ ocrResult, onSuccess }) {
         }
       }
 
-      if (!active) { stream.getTracks().forEach(t => t.stop()); return }
+      if (!active) { camStream.getTracks().forEach(t => t.stop()); return }
 
-      streamRef.current = stream
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream
-        // Await play() — can throw on some browsers if autoplay policy blocks it,
-        // but since video is muted + playsInline this should always succeed
-        await videoRef.current.play().catch(() => {})
-      }
-
-      // Only advance phase if still active (component not unmounted)
-      if (active) setPhase('liveness')
+      // Hand the stream to state + ref. The <video> element is NOT mounted during
+      // the 'camera' phase, so assigning srcObject here would no-op. A dedicated
+      // effect attaches the stream once the element mounts in the 'liveness' phase.
+      streamRef.current = camStream
+      setStream(camStream)
+      setPhase('liveness')
     }
 
     startCam()
     // Only cancel active flag on cleanup — stream lifecycle is managed by the unmount effect
     return () => { active = false }
   }, [phase])
+
+  // ── Attach stream to <video> once both exist ──────────────────────────────────
+  // Decoupled from getUserMedia so the assignment never races the element mount.
+  useEffect(() => {
+    const video = videoRef.current
+    if (video && stream && video.srcObject !== stream) {
+      video.srcObject = stream
+      // muted + playsInline guarantee autoplay succeeds across browsers (iOS Safari).
+      video.play().catch(() => {})
+    }
+  }, [stream, phase])
 
   // ── Detection loop ────────────────────────────────────────────────────────────
   useEffect(() => {
@@ -294,6 +311,8 @@ export default function FaceMatchStep({ ocrResult, onSuccess }) {
     cancelAnimationFrame(animRef.current)
     streamRef.current?.getTracks().forEach(t => t.stop())
     streamRef.current = null
+    setStream(null)
+    if (videoRef.current) videoRef.current.srcObject = null
     blinkRef.current = { wasOpen: true, count: 0 }
     goodFramesRef.current = 0
     setBlinkCount(0)
