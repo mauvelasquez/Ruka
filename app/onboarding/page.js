@@ -79,6 +79,17 @@ export default function OnboardingPage() {
     avatar:   '',
     location: { region: '', comuna: '' },
   })
+  const [hasCamera, setHasCamera] = useState(null) // null=checking, true/false
+
+  useEffect(() => {
+    if (typeof navigator === 'undefined' || !navigator.mediaDevices?.enumerateDevices) {
+      setHasCamera(false)
+      return
+    }
+    navigator.mediaDevices.enumerateDevices()
+      .then(devices => setHasCamera(devices.some(d => d.kind === 'videoinput')))
+      .catch(() => setHasCamera(false))
+  }, [])
 
   // ── Identity step state ──────────────────────────────────────────────────────
   const [selectedCountry, setSelectedCountry] = useState('CL')
@@ -262,18 +273,24 @@ export default function OnboardingPage() {
                   <label className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wide">
                     Foto de perfil (máx. 1MB)
                   </label>
-                  <label className="cursor-pointer flex items-center gap-2 text-sm text-forest font-semibold hover:text-forest-dark transition">
-                    <Camera className="w-4 h-4" />
-                    {profile.avatar ? 'Cambiar foto' : 'Subir foto'}
-                    <input type="file" accept="image/*" className="hidden" onChange={e => {
-                      const file = e.target.files[0]
-                      if (!file) return
-                      if (file.size > 1024 * 1024) { alert('La foto debe pesar menos de 1MB'); return }
-                      const reader = new FileReader()
-                      reader.onload = ev => setProfile(p => ({ ...p, avatar: ev.target.result }))
-                      reader.readAsDataURL(file)
-                    }} />
-                  </label>
+                  {hasCamera === false ? (
+                    <p className="text-xs text-amber-600 mt-1">
+                      Necesitas una cámara para completar este paso. Intenta desde tu celular.
+                    </p>
+                  ) : (
+                    <label className="cursor-pointer flex items-center gap-2 text-sm text-forest font-semibold hover:text-forest-dark transition">
+                      <Camera className="w-4 h-4" />
+                      Haz clic para abrir la cámara
+                      <input type="file" accept="image/*" capture="user" className="hidden" onChange={e => {
+                        const file = e.target.files[0]
+                        if (!file) return
+                        if (file.size > 1024 * 1024) { alert('La foto debe pesar menos de 1MB'); return }
+                        const reader = new FileReader()
+                        reader.onload = ev => setProfile(p => ({ ...p, avatar: ev.target.result }))
+                        reader.readAsDataURL(file)
+                      }} />
+                    </label>
+                  )}
                 </div>
               </div>
 
