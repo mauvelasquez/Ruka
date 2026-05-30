@@ -197,9 +197,7 @@ export default function HomeDetailClient({ id }) {
             {(home.latitude || home.comuna || home.region) && (
               <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
                 <h2 className="text-lg font-bold text-gray-900 mb-4">Dónde se encuentra</h2>
-                <div className="rounded-2xl overflow-hidden" style={{ height: 400 }}>
-                  <HomeMap home={home} />
-                </div>
+                <HomeMap home={home} />
                 {!home.latitude && (
                   <p className="text-xs text-gray-400 mt-3 text-center">
                     La ubicación exacta se comparte al confirmar el intercambio.

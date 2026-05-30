@@ -4,6 +4,8 @@ import { MapContainer, TileLayer, Marker, Circle } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 
+const MAP_HEIGHT = 400
+
 const markerIcon = new L.Icon({
   iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
   iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
@@ -16,27 +18,26 @@ const markerIcon = new L.Icon({
 
 export default function HomeMap({ home }) {
   const [position, setPosition] = useState(null)
-  const [isExact, setIsExact] = useState(false)
-  const [loading, setLoading] = useState(true)
+  const [isExact, setIsExact]   = useState(false)
+  const [loading, setLoading]   = useState(true)
 
   useEffect(() => {
-    if (home.latitude && home.longitude && home.latitude !== 0 && home.longitude !== 0) {
-      setPosition([home.latitude, home.longitude])
+    // Priority 1: exact coordinates stored in the database
+    if (home.latitude && home.longitude) {
+      setPosition([parseFloat(home.latitude), parseFloat(home.longitude)])
       setIsExact(true)
       setLoading(false)
       return
     }
 
-    const query = [home.comuna, home.region, 'Chile'].filter(Boolean).join(', ')
-    if (!query.trim()) { setLoading(false); return }
+    // Priority 2: geocode via server-side proxy (avoids CSP + forbidden User-Agent)
+    const q = [home.comuna, home.region, 'Chile'].filter(Boolean).join(', ')
+    if (!q.trim()) { setLoading(false); return }
 
-    fetch(
-      `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1`,
-      { headers: { 'User-Agent': 'rukka.cl', 'Accept-Language': 'es' } }
-    )
+    fetch(`/api/geocode?q=${encodeURIComponent(q)}`)
       .then(r => r.json())
       .then(data => {
-        if (data?.length > 0) {
+        if (Array.isArray(data) && data.length > 0) {
           setPosition([parseFloat(data[0].lat), parseFloat(data[0].lon)])
           setIsExact(false)
         }
@@ -46,15 +47,23 @@ export default function HomeMap({ home }) {
   }, [home.latitude, home.longitude, home.comuna, home.region])
 
   if (loading) {
-    return <div className="rounded-2xl bg-gray-100 animate-pulse" style={{ height: '400px' }} />
+    return (
+      <div
+        className="rounded-2xl bg-gray-100 animate-pulse"
+        style={{ height: MAP_HEIGHT }}
+      />
+    )
   }
+
   if (!position) return null
 
   return (
     <MapContainer
       center={position}
       zoom={isExact ? 15 : 12}
-      style={{ height: '100%', width: '100%', borderRadius: '1rem' }}
+      // Explicit pixel height avoids the height:100% collapse caused by
+      // the intermediate wrapper that next/dynamic injects.
+      style={{ height: MAP_HEIGHT, width: '100%', borderRadius: '1rem' }}
       scrollWheelZoom={false}
     >
       <TileLayer
