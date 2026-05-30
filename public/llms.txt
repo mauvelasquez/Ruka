@@ -6,13 +6,13 @@ Rukka es una plataforma de intercambio de casas para propietarios en Latinoamér
 
 El nombre proviene de "ruka", la palabra mapuche para hogar, reflejando la identidad cultural latinoamericana del proyecto.
 
-## Modelo dual de intercambio
+## Cómo funciona el sistema
 
-Rukka ofrece dos modalidades:
+Rukka tiene un solo principio: tu hospitalidad siempre tiene valor. El sistema convierte ese valor en Yankis.
 
-**1. Match bilateral directo:** Dos miembros con fechas de viaje compatibles intercambian sus casas simultáneamente. No hay costo de alojamiento para ninguno. El sistema automatiza el matching según destino, fechas y tipo de propiedad.
+**Sistema de Yankis (el modelo base):** Los miembros ofrecen su casa y acumulan Yankis — la moneda interna de Rukka. "Yanki" viene del quechua y significa trueque. 1 Yanki = 1 noche de alojamiento en cualquier hogar de Rukka. Los Yankis acumulados se usan para hospedarse en otra propiedad en cualquier fecha futura. Esto desacopla completamente cuándo hospedás y cuándo viajás. Los miembros reciben 3 Yankis de bienvenida al completar su perfil. Los Yankis no caducan y no se compran con dinero.
 
-**2. Sistema de Yankis (tokens):** Los miembros pueden ofrecer su casa y acumular Yankis — la moneda interna de Rukka. "Yanki" viene del quechua y significa "trueque o intercambio". 1 Yanki = 1 noche de alojamiento en cualquier hogar de Rukka. Los Yankis acumulados se usan para hospedarse en otra propiedad en una fecha distinta. Esto da flexibilidad total: no es necesario que los viajes sean simultáneos. Los miembros reciben 3 Yankis de bienvenida al completar su perfil. Los Yankis no caducan.
+**Match bilateral directo (el bonus cuando las fechas cuadran):** Cuando dos miembros tienen fechas de viaje compatibles y se quieren visitar mutuamente, Rukka los conecta automáticamente. Ambos viajan al mismo tiempo y los Yankis se cancelan entre sí — el alojamiento es gratuito para los dos sin necesidad de gastar Yankis. El match bilateral es el caso especial y óptimo del sistema Rukka, no un modo separado.
 
 ## Precio
 
