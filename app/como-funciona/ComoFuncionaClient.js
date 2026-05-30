@@ -21,7 +21,7 @@ const FAQS = [
   },
   {
     q: '¿Qué pasa si me cancelan el intercambio?',
-    a: 'Si el intercambio no se concreta, tus Yankis se devuelven íntegros de forma automática. No hay penalidades para vos.',
+    a: 'Si el intercambio no se concreta, tus Yankis se devuelven íntegros de forma automática. No hay penalidades para ti.',
   },
   {
     q: '¿Cuánto cuesta usar Rukka?',
@@ -95,26 +95,12 @@ export default function ComoFuncionaClient() {
           </div>
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white leading-tight mb-5">
             Intercambia tu hogar.<br />
-            <span className="text-sand">Viaja gratis por LATAM.</span>
+            <span className="text-sand">Viaja gratis por Chile.</span>
           </h1>
           <p className="text-lg text-white/80 max-w-2xl mx-auto leading-relaxed mb-8">
             Rukka conecta propietarios de Latinoamérica.<br className="hidden sm:block" />
             Cada vez que hospedas a alguien, ganas el derecho de alojarte en otra casa — en las fechas que quieras.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/auth/register"
-              className="bg-white text-forest-dark font-black px-8 py-4 rounded-2xl text-base hover:bg-sand transition-colors flex items-center justify-center gap-2 shadow-lg"
-            >
-              Publicar mi hogar <ArrowRight className="w-5 h-5" />
-            </Link>
-            <Link
-              href="/homes"
-              className="border-2 border-white/40 text-white font-bold px-8 py-4 rounded-2xl text-base hover:bg-white/10 transition-colors flex items-center justify-center"
-            >
-              Explorar hogares
-            </Link>
-          </div>
         </div>
       </section>
 
@@ -134,7 +120,7 @@ export default function ComoFuncionaClient() {
             <div className="bg-forest-50 border-2 border-forest/20 rounded-3xl p-7 text-center flex-1 max-w-xs">
               <div className="text-5xl mb-3">🏠</div>
               <p className="font-black text-forest">Tu hogar</p>
-              <p className="text-gray-500 text-sm mt-1">Santiago, Bogotá, CDMX, BA…</p>
+              <p className="text-gray-500 text-sm mt-1">Santiago, Viña, Valparaíso…</p>
             </div>
 
             <div className="flex flex-col items-center gap-2">
@@ -149,7 +135,7 @@ export default function ComoFuncionaClient() {
             <div className="bg-terra-50 border-2 border-terra/20 rounded-3xl p-7 text-center flex-1 max-w-xs">
               <div className="text-5xl mb-3">🏖️</div>
               <p className="font-black text-terra">El hogar de alguien</p>
-              <p className="text-gray-500 text-sm mt-1">Pichilemu, Cancún, Cartagena…</p>
+              <p className="text-gray-500 text-sm mt-1">Pichilemu, San Pedro, Puerto Varas…</p>
             </div>
           </div>
 
@@ -194,7 +180,7 @@ export default function ComoFuncionaClient() {
                 <p className="text-2xl font-black text-terra mb-4">1 Yanki = 1 noche de alojamiento</p>
                 <ul className="space-y-2 text-sm text-gray-600">
                   <li className="flex items-start gap-2"><span className="text-terra font-bold mt-0.5">✓</span> 3 Yankis de bienvenida al completar tu perfil</li>
-                  <li className="flex items-start gap-2"><span className="text-terra font-bold mt-0.5">✓</span> Acumulás 1 Yanki por cada noche que hospedás</li>
+                  <li className="flex items-start gap-2"><span className="text-terra font-bold mt-0.5">✓</span> Acumulas 1 Yanki por cada noche que hospedas</li>
                   <li className="flex items-start gap-2"><span className="text-terra font-bold mt-0.5">✓</span> Los Yankis no caducan — usalos cuando quieras</li>
                   <li className="flex items-start gap-2"><span className="text-terra font-bold mt-0.5">✓</span> Si cancela el intercambio, se te devuelven íntegros</li>
                 </ul>
@@ -205,11 +191,11 @@ export default function ComoFuncionaClient() {
                 <ol className="space-y-3 text-sm text-gray-700">
                   <li className="flex items-start gap-3">
                     <span className="bg-terra text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-black flex-shrink-0 mt-0.5">1</span>
-                    <span><strong>Valentina</strong> (Buenos Aires) hospeda a Matías por 5 noches → gana <strong>5 Yankis</strong></span>
+                    <span><strong>Valentina</strong> (Santiago) hospeda a Matías por 5 noches → gana <strong>5 Yankis</strong></span>
                   </li>
                   <li className="flex items-start gap-3">
                     <span className="bg-terra text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-black flex-shrink-0 mt-0.5">2</span>
-                    <span>En septiembre, busca hogares disponibles en Ciudad de México</span>
+                    <span>En septiembre, busca hogares disponibles en Pichilemu</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <span className="bg-terra text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-black flex-shrink-0 mt-0.5">3</span>
@@ -267,7 +253,7 @@ export default function ComoFuncionaClient() {
             <p className="text-white/70 max-w-xl mx-auto">
               Si las fechas cuadran, viajas de inmediato con un match directo.
               Si no, los Yankis guardan ese valor para que lo uses cuando tengas ganas de viajar.
-              El sistema resuelve el problema por vos.
+              El sistema resuelve el problema por ti.
             </p>
           </div>
         </div>
@@ -292,7 +278,7 @@ export default function ComoFuncionaClient() {
                 n: '01',
                 icon: '🏔️',
                 title: 'Publica tu hogar',
-                desc: 'Crea tu perfil y registra tu propiedad en 2 minutos. ¿Ya estás en Airbnb? Pegá el link y Fresia, nuestra IA, importa fotos y descripción automáticamente.',
+                desc: 'Crea tu perfil y registra tu propiedad en 2 minutos. ¿Ya estás en Airbnb? Sube los pantallazos y Fresia, nuestra IA, importa fotos y descripción automáticamente.',
                 tag: 'Recibes 3 Yankis de bienvenida al completar tu perfil.',
               },
               {
@@ -337,7 +323,7 @@ export default function ComoFuncionaClient() {
           <div className="text-center mb-14">
             <p className="text-xs font-bold uppercase tracking-widest text-terra mb-3">Tu hogar, tus reglas</p>
             <h2 id="confianza-heading" className="text-3xl sm:text-4xl font-black text-gray-900 mb-4">
-              Intercambiá con tranquilidad
+              Intercambia con tranquilidad
             </h2>
             <p className="text-gray-500 max-w-xl mx-auto leading-relaxed">
               La diferencia con Airbnb: en Rukka <strong>ambas partes</strong> ponen su hogar en la mesa.
@@ -417,7 +403,7 @@ export default function ComoFuncionaClient() {
               ¿Lista tu hogar para<br />el intercambio?
             </h2>
             <p className="text-white/70 text-lg mb-8">
-              Publicá tu casa en 2 minutos. Recibís 3 Yankis de bienvenida.<br className="hidden sm:block" />
+              Publica tu casa en 2 minutos. Recibes 3 Yankis de bienvenida.<br className="hidden sm:block" />
               Empieza a conectar con viajeros de LATAM.
             </p>
             <Link

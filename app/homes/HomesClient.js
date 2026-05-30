@@ -158,29 +158,6 @@ function HomesContent() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        {/* Chips país — local-first: muestra país activo primero */}
-        <div className="flex gap-2 mb-3 flex-wrap items-center">
-          {country && selectedCountry && (
-            <span className="text-xs text-gray-500 font-medium mr-1">
-              Mostrando en {selectedCountry.flag} {selectedCountry.name}
-            </span>
-          )}
-          {COUNTRIES.map(c => (
-            <button key={c.code} onClick={() => { setCountry(c.code); setRegion('Todas'); setCity('Todas') }}
-              className={`px-3 py-1.5 rounded-full text-xs font-bold border transition-all ${
-                country === c.code ? 'bg-forest text-white border-forest' : 'bg-white text-gray-600 border-gray-200 hover:border-forest/50'
-              }`}>
-              {c.flag} {c.name}
-            </button>
-          ))}
-          <button onClick={() => { setCountry(''); setRegion('Todas'); setCity('Todas') }}
-            className={`px-3 py-1.5 rounded-full text-xs font-bold border transition-all ${
-              !country ? 'bg-forest text-white border-forest' : 'bg-white text-gray-600 border-gray-200 hover:border-forest/50'
-            }`}>
-            🌎 Ver todos
-          </button>
-        </div>
-
         {/* Chips tipo */}
         <div className="flex items-center gap-3 mb-5 flex-wrap">
           <div className="flex gap-2 flex-wrap">

@@ -6,3 +6,17 @@ node_modules/
 .env*.local
 .env.seed
 .gstack/
+
+# macOS
+.DS_Store
+**/.DS_Store
+
+# Build artifacts
+tsconfig.tsbuildinfo
+next-env.d.ts
+
+# Supabase CLI temp
+supabase/.temp/
+
+# Vercel env snapshots
+.env.vercel*
