@@ -1,4 +1,16 @@
 'use client'
+/*
+ * Prerequisitos resueltos:
+ *   ✓ Bucket "home-images" en Supabase Storage (público, RLS por userId)
+ *   ✓ Bucket "avatars" en Supabase Storage
+ *
+ * Arquitectura:
+ *   - isNew=true  → un único submit al final crea el hogar vía /api/homes
+ *   - isNew=false → cada sección tiene su propio botón "Guardar cambios" (updateHome directo)
+ *   - Fotos se auto-guardan en DB tras cada upload/eliminación exitosa (isNew=false)
+ *   - Imágenes comprimidas a ≤600KB con Canvas API (lib/imageUtils.js)
+ */
+
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import dynamic from 'next/dynamic'
@@ -6,10 +18,15 @@ import { useApp } from '../../../../lib/store'
 import ChileLocationSelect from '../../../../components/ChileLocationSelect'
 import CountryRegionSelector from '../../../../components/geo/CountryRegionSelector'
 import DescriptionHints from '../../../../components/DescriptionHints'
+import PhotoUploader from '../../../../components/dashboard/edit/PhotoUploader'
+import AvailabilityEditor from '../../../../components/dashboard/edit/AvailabilityEditor'
 import Link from 'next/link'
+import {
+  ArrowLeft, Save, Camera, X, ChevronDown, MapPin,
+  AlertCircle, CheckCircle, Bath, Search,
+} from 'lucide-react'
+import { AMENITY_CATEGORIES, AIRBNB_IMPORT_LEGACY_MAP } from '../../../../lib/amenities'
 
-// Importación lazy/dinámica — aísla errores del importador Airbnb
-// de la carga principal del formulario de propiedad
 const ImportFromAirbnb = dynamic(
   () => import('../../../../components/ImportFromAirbnb'),
   {
@@ -22,11 +39,6 @@ const ImportFromAirbnb = dynamic(
     ),
   }
 )
-import {
-  ArrowLeft, Save, Camera, X, ChevronDown, MapPin,
-  AlertCircle, CheckCircle, Bath, Search,
-} from 'lucide-react'
-import { AMENITY_CATEGORIES, AIRBNB_IMPORT_LEGACY_MAP } from '../../../../lib/amenities'
 
 // ── Constantes ────────────────────────────────────────────────────────────────
 const CATEGORY_OPTIONS = [
@@ -41,37 +53,26 @@ const SUBTYPES = {
 
 const BED_TYPES = ['Cama doble', 'Cama queen', 'Cama king', 'Camas individuales', 'Sofá cama', 'Futón']
 
-
-// ── Photo uploader ─────────────────────────────────────────────────────────────
-function PhotoUploader({ photos, onChange, max = 12 }) {
-  const handleFile = (e) => {
-    Array.from(e.target.files).forEach(file => {
-      if (file.size > 1024 * 1024) { alert('Cada foto debe pesar menos de 1MB'); return }
-      const reader = new FileReader()
-      reader.onload = ev => onChange([...photos, ev.target.result])
-      reader.readAsDataURL(file)
-    })
-  }
+// ── Botón de guardado por sección ─────────────────────────────────────────────
+function SectionSaveBtn({ saving, saved, onClick, label = 'Guardar cambios' }) {
   return (
-    <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
-      {photos.map((src, i) => (
-        <div key={i} className="relative aspect-video rounded-xl overflow-hidden group">
-          <img src={src} alt="" className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
-            <button type="button" onClick={() => onChange(photos.filter((_, j) => j !== i))}
-              aria-label="Eliminar foto"
-              className="bg-white text-red-500 rounded-full p-1"><X className="w-4 h-4" /></button>
-          </div>
-          {i === 0 && <span className="absolute bottom-1 left-1 text-[10px] bg-black/60 text-white rounded px-1.5 py-0.5">Portada</span>}
-        </div>
-      ))}
-      {photos.length < max && (
-        <label className="aspect-video rounded-xl border-2 border-dashed border-gray-300 hover:border-forest cursor-pointer flex flex-col items-center justify-center gap-1 transition group">
-          <Camera className="w-5 h-5 text-gray-400 group-hover:text-forest" />
-          <span className="text-xs text-gray-400 group-hover:text-forest">Agregar</span>
-          <input type="file" accept="image/*" multiple className="hidden" onChange={handleFile} />
-        </label>
+    <div className="flex items-center justify-end gap-3 mt-4 pt-4 border-t border-gray-100">
+      {saved && (
+        <span className="text-xs text-green-600 font-semibold flex items-center gap-1">
+          <CheckCircle className="w-3.5 h-3.5" /> Guardado
+        </span>
       )}
+      <button
+        type="button"
+        onClick={onClick}
+        disabled={saving}
+        className="flex items-center gap-1.5 bg-forest text-white px-4 py-2 rounded-xl text-sm font-bold disabled:opacity-60 transition-colors hover:bg-forest-dark"
+      >
+        {saving
+          ? <><div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" /> Guardando…</>
+          : <><Save className="w-3.5 h-3.5" /> {label}</>
+        }
+      </button>
     </div>
   )
 }
@@ -80,11 +81,12 @@ function PhotoUploader({ photos, onChange, max = 12 }) {
 export default function PropertyPage() {
   const router = useRouter()
   const params = useParams()
-  const id = params.id
-  const isNew = id === 'new'
+  const id     = params.id
+  const isNew  = id === 'new'
 
   const { currentUser, homes, createHome, updateHome, ready } = useApp()
 
+  // Estado de la página
   const [saving,          setSaving]          = useState(false)
   const [error,           setError]           = useState('')
   const [success,         setSuccess]         = useState(false)
@@ -94,19 +96,27 @@ export default function PropertyPage() {
   const [notFound,        setNotFound]        = useState(false)
   const [showAirbnbModal, setShowAirbnbModal] = useState(false)
   const [searchAmenity,   setSearchAmenity]   = useState('')
+  const [photosUploading, setPhotosUploading] = useState(false)
+
+  // Estado por sección (solo edición)
+  const [sectionSaving, setSectionSaving] = useState(null)
+  const [sectionSaved,  setSectionSaved]  = useState(null)
 
   // Form state
-  const [category,  setCategory]  = useState('full_home')
-  const [subtype,   setSubtype]   = useState('')
-  const [homeForm,  setHomeForm]  = useState({
+  const [category,            setCategory]            = useState('full_home')
+  const [subtype,             setSubtype]             = useState('')
+  const [homeForm,            setHomeForm]            = useState({
     title: '', description: '',
     bedrooms: 1, bathrooms: 1, maxGuests: 2,
     private_bathroom: false, bed_type: '', shared_with: 1,
     amenities: [],
   })
-  const [location, setLocation] = useState({ country_code: 'CL', region: '', region_code: '', comuna: '', city: '', direccion: '' })
-  const [photos,   setPhotos]   = useState([])
-  const [coords,   setCoords]   = useState(null)
+  const [location,            setLocation]            = useState({
+    country_code: 'CL', region: '', region_code: '', comuna: '', city: '', direccion: '',
+  })
+  const [photos,              setPhotos]              = useState([])
+  const [coords,              setCoords]              = useState(null)
+  const [availabilityPeriods, setAvailabilityPeriods] = useState([])
 
   // Map refs
   const mapRef         = useRef(null)
@@ -118,7 +128,7 @@ export default function PropertyPage() {
     if (ready && !currentUser) router.push('/auth/login')
   }, [ready, currentUser, router])
 
-  // Load existing home for editing
+  // Cargar home existente
   useEffect(() => {
     if (isNew || !ready) return
     const home = homes.find(h => h.id === id)
@@ -137,88 +147,83 @@ export default function PropertyPage() {
       shared_with:      home.shared_with || 1,
       amenities:        home.amenities || [],
     })
-    setLocation({ country_code: home.country_code || 'CL', region: home.region || '', region_code: home.region_code || '', comuna: home.comuna || '', city: home.city || home.comuna || '', direccion: home.direccion || '' })
+    setLocation({
+      country_code: home.country_code || 'CL',
+      region:       home.region       || '',
+      region_code:  home.region_code  || '',
+      comuna:       home.comuna       || '',
+      city:         home.city         || home.comuna || '',
+      direccion:    home.direccion    || '',
+    })
     setPhotos(home.images || [])
+    setAvailabilityPeriods(home.availabilityPeriods || [])
     if (home.coords) setCoords(home.coords)
   }, [isNew, ready, homes, id])
 
-  // Init Leaflet map
+  // ── Leaflet ────────────────────────────────────────────────────────────────
   const initMap = useCallback(() => {
     if (!mapRef.current || mapInstanceRef.current || !window.L) return
-    const L = window.L
-
-    const map = L.map(mapRef.current).setView([-33.45, -70.67], 9)
+    const L    = window.L
+    const map  = L.map(mapRef.current).setView([-33.45, -70.67], 9)
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+      attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
     }).addTo(map)
-
-    const icon = L.divIcon({
+    const icon   = L.divIcon({
       html: '<div style="width:18px;height:18px;background:#2A5C45;border:3px solid white;border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,0.35)"></div>',
-      iconSize: [18, 18], iconAnchor: [9, 9], className: ''
+      iconSize: [18, 18], iconAnchor: [9, 9], className: '',
     })
-
     const marker = L.marker([-33.45, -70.67], { icon, draggable: true }).addTo(map)
     marker.on('dragend', e => {
       const { lat, lng } = e.target.getLatLng()
       setCoords({ lat, lng })
     })
-
     mapInstanceRef.current = map
-    markerRef.current = marker
+    markerRef.current      = marker
   }, [])
 
   useEffect(() => {
     if (typeof window === 'undefined') return
-
     let leafletTimeout = null
-
-    const loadLeaflet = () => {
+    const loadLeaflet  = () => {
       if (!document.getElementById('leaflet-css')) {
         const link = document.createElement('link')
-        link.id = 'leaflet-css'
-        link.rel = 'stylesheet'
+        link.id = 'leaflet-css'; link.rel = 'stylesheet'
         link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'
         document.head.appendChild(link)
       }
-      if (window.L) {
-        initMap()
-      } else if (!document.getElementById('leaflet-js')) {
-        const script = document.createElement('script')
-        script.id = 'leaflet-js'
-        script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'
-        script.onload = () => { clearTimeout(leafletTimeout); initMap() }
-        script.onerror = () => { clearTimeout(leafletTimeout); setLeafletError(true) }
+      if (window.L) { initMap() }
+      else if (!document.getElementById('leaflet-js')) {
+        const script    = document.createElement('script')
+        script.id       = 'leaflet-js'
+        script.src      = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'
+        script.onload   = () => { clearTimeout(leafletTimeout); initMap() }
+        script.onerror  = () => { clearTimeout(leafletTimeout); setLeafletError(true) }
         document.body.appendChild(script)
-        // Show fallback if Leaflet doesn't load within 5 seconds
-        leafletTimeout = setTimeout(() => { if (!window.L) setLeafletError(true) }, 5000)
+        leafletTimeout  = setTimeout(() => { if (!window.L) setLeafletError(true) }, 5000)
       }
     }
-
-    // Small delay so the div is rendered
     const t = setTimeout(loadLeaflet, 100)
     return () => {
-      clearTimeout(t)
-      clearTimeout(leafletTimeout)
+      clearTimeout(t); clearTimeout(leafletTimeout)
       if (mapInstanceRef.current) {
         mapInstanceRef.current.remove()
         mapInstanceRef.current = null
-        markerRef.current = null
+        markerRef.current      = null
       }
     }
   }, [initMap])
 
-  // Move marker when coords change
   useEffect(() => {
     if (!coords || !mapInstanceRef.current || !markerRef.current) return
     markerRef.current.setLatLng([coords.lat, coords.lng])
     mapInstanceRef.current.setView([coords.lat, coords.lng], 14)
   }, [coords])
 
+  // ── Geocoding ──────────────────────────────────────────────────────────────
   const geocode = async () => {
     const q = [location.direccion, location.comuna, location.region, 'Chile'].filter(Boolean).join(', ')
     if (!q.trim()) return
-    setGeocoding(true)
-    setGeocodeError('')
+    setGeocoding(true); setGeocodeError('')
     try {
       const controller = new AbortController()
       const timeoutId  = setTimeout(() => controller.abort(), 7000)
@@ -228,63 +233,47 @@ export default function PropertyPage() {
           `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&limit=1`,
           { headers: { 'Accept-Language': 'es' }, signal: controller.signal }
         )
-      } finally {
-        clearTimeout(timeoutId)
-      }
-      if (res.status === 429) {
-        setGeocodeError('Demasiadas solicitudes al servicio de mapas. Espera un momento e intenta de nuevo.')
-      } else if (res.status === 403) {
-        setGeocodeError('El servicio de mapas bloqueó la solicitud. Intenta de nuevo más tarde.')
-      } else if (!res.ok) {
-        setGeocodeError(`No se pudo obtener la ubicación (error ${res.status}). Intenta de nuevo.`)
-      } else {
+      } finally { clearTimeout(timeoutId) }
+      if      (res.status === 429) setGeocodeError('Demasiadas solicitudes. Espera un momento e intenta de nuevo.')
+      else if (res.status === 403) setGeocodeError('El servicio de mapas bloqueó la solicitud. Intenta más tarde.')
+      else if (!res.ok)            setGeocodeError(`No se pudo obtener la ubicación (error ${res.status}).`)
+      else {
         const data = await res.json()
-        if (data.length > 0) {
-          setCoords({ lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) })
-        } else {
-          setGeocodeError('No se encontró la dirección. Prueba con menos detalles o solo la comuna.')
-        }
+        if (data.length > 0) setCoords({ lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) })
+        else setGeocodeError('No se encontró la dirección. Prueba con menos detalles o solo la comuna.')
       }
     } catch (err) {
-      if (err.name === 'AbortError') {
-        setGeocodeError('La búsqueda tardó demasiado. Intenta de nuevo.')
-      } else {
-        setGeocodeError('No se pudo conectar con el servicio de mapas. Verifica tu conexión.')
-      }
+      if (err.name === 'AbortError') setGeocodeError('La búsqueda tardó demasiado. Intenta de nuevo.')
+      else                           setGeocodeError('No se pudo conectar con el servicio de mapas.')
     }
     setGeocoding(false)
   }
 
+  // ── Amenities ──────────────────────────────────────────────────────────────
   const toggleAmenity = (aid) => setHomeForm(f => ({
     ...f,
     amenities: f.amenities.includes(aid)
       ? f.amenities.filter(a => a !== aid)
-      : [...f.amenities, aid]
+      : [...f.amenities, aid],
   }))
 
+  // ── Airbnb import ──────────────────────────────────────────────────────────
   const handleAirbnbImport = (data) => {
     try {
       const allIds = AMENITY_CATEGORIES.flatMap(cat => cat.amenities.map(a => a.id))
-      // Translate legacy Airbnb import IDs → current IDs, then filter valid ones
       const mapped = (data?.amenities || [])
         .map(a => AIRBNB_IMPORT_LEGACY_MAP[a] || a)
         .filter(a => allIds.includes(a))
-
-      // Mapear tipo (campo 'type' de Claude Vision) a categoría y subtipo de Rukka
       const tipo = (data?.type || '').toLowerCase()
       let cat = 'full_home', sub = 'Casa'
-      if (tipo.includes('departamento')) sub = 'Departamento'
-      else if (tipo.includes('cabaña')) sub = 'Cabaña'
-      else if (tipo.includes('villa')) sub = 'Villa'
-      else if (tipo.includes('estudio')) sub = 'Estudio'
-      else if (tipo.includes('loft')) sub = 'Loft'
-      else if (tipo.includes('bungalow')) sub = 'Bungalow'
-      if (tipo.includes('habitación') || tipo.includes('habitacion')) {
-        cat = 'room'; sub = 'Habitación estándar'
-      }
-
-      setCategory(cat)
-      setSubtype(sub)
+      if      (tipo.includes('departamento'))                              sub = 'Departamento'
+      else if (tipo.includes('cabaña'))                                    sub = 'Cabaña'
+      else if (tipo.includes('villa'))                                     sub = 'Villa'
+      else if (tipo.includes('estudio'))                                   sub = 'Estudio'
+      else if (tipo.includes('loft'))                                      sub = 'Loft'
+      else if (tipo.includes('bungalow'))                                  sub = 'Bungalow'
+      if (tipo.includes('habitación') || tipo.includes('habitacion')) { cat = 'room'; sub = 'Habitación estándar' }
+      setCategory(cat); setSubtype(sub)
       setHomeForm(f => ({
         ...f,
         title:       data?.title       || f.title,
@@ -300,15 +289,48 @@ export default function PropertyPage() {
     }
   }
 
+  // ── Guardado por sección ───────────────────────────────────────────────────
+  const saveSection = async (section, data) => {
+    setError('')
+    setSectionSaving(section)
+    try {
+      await updateHome(id, data)
+      setSectionSaved(section)
+      setTimeout(() => setSectionSaved(s => s === section ? null : s), 2500)
+    } catch {
+      setError('Error al guardar. Intenta de nuevo.')
+    } finally {
+      setSectionSaving(s => s === section ? null : s)
+    }
+  }
+
+  // Fotos: auto-save en DB al cambiar el array (solo edición)
+  const handlePhotosChange = useCallback(async (newPhotos) => {
+    setPhotos(newPhotos)
+    if (!isNew) {
+      setSectionSaving('photos')
+      try {
+        await updateHome(id, { images: newPhotos })
+        setSectionSaved('photos')
+        setTimeout(() => setSectionSaved(s => s === 'photos' ? null : s), 2000)
+      } catch {
+        setError('Error al guardar fotos. Intenta de nuevo.')
+      } finally {
+        setSectionSaving(s => s === 'photos' ? null : s)
+      }
+    }
+  }, [isNew, id, updateHome])
+
+  // ── Submit (solo creación nueva) ───────────────────────────────────────────
   const handleSubmit = async (e) => {
     e?.preventDefault()
     setError('')
-    if (!homeForm.title.trim()) { setError('Ingresa el título del hogar'); return }
-    if (location.country_code === 'CL' && !location.region) { setError('Selecciona la región'); return }
-    if (location.country_code === 'CL' && !location.comuna) { setError('Selecciona la ciudad'); return }
-    if (location.country_code !== 'CL' && !location.region_code) { setError('Selecciona la región'); return }
-    if (location.country_code !== 'CL' && !location.city) { setError('Selecciona la ciudad'); return }
-    if (!subtype)               { setError('Selecciona el tipo de hogar'); return }
+    if (!homeForm.title.trim())                                       { setError('Ingresa el título del hogar'); return }
+    if (location.country_code === 'CL' && !location.region)          { setError('Selecciona la región'); return }
+    if (location.country_code === 'CL' && !location.comuna)          { setError('Selecciona la ciudad'); return }
+    if (location.country_code !== 'CL' && !location.region_code)     { setError('Selecciona la región'); return }
+    if (location.country_code !== 'CL' && !location.city)            { setError('Selecciona la ciudad'); return }
+    if (!subtype)                                                     { setError('Selecciona el tipo de hogar'); return }
 
     setSaving(true)
     const data = {
@@ -329,35 +351,31 @@ export default function PropertyPage() {
       maxGuests:        homeForm.maxGuests,
       amenities:        homeForm.amenities,
       images:           photos,
+      availabilityPeriods: availabilityPeriods,
       private_bathroom: homeForm.private_bathroom,
       bed_type:         homeForm.bed_type,
       shared_with:      homeForm.shared_with,
     }
-
     try {
-      if (isNew) {
-        const result = await createHome(data)
-        if (!result) throw new Error('createHome devolvió null')
-      } else {
-        await updateHome(id, data)
-      }
+      const result = await createHome(data)
+      if (!result) throw new Error('createHome devolvió null')
       setSuccess(true)
       setTimeout(() => router.push('/dashboard?tab=homes'), 1200)
     } catch (err) {
-      console.error('Error guardando propiedad:', err)
+      console.error('Error creando propiedad:', err)
       setError('Error al guardar. Intenta de nuevo.')
     } finally {
       setSaving(false)
     }
   }
 
+  // ── Render guards ──────────────────────────────────────────────────────────
   if (!ready) return (
     <div className="min-h-screen flex items-center justify-center" style={{ background: '#F8F4EE' }}>
       <div className="w-8 h-8 border-4 border-forest border-t-transparent rounded-full animate-spin" />
     </div>
   )
   if (!currentUser) return null
-
   if (notFound) return (
     <div className="min-h-screen flex items-center justify-center" style={{ background: '#F8F4EE' }}>
       <div className="text-center">
@@ -373,6 +391,7 @@ export default function PropertyPage() {
 
   return (
     <div className="min-h-screen" style={{ background: '#F8F4EE' }}>
+
       {/* Header sticky */}
       <div className="bg-white border-b border-gray-100 sticky top-0 z-30 shadow-sm">
         <div className="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between">
@@ -381,17 +400,23 @@ export default function PropertyPage() {
             <ArrowLeft className="w-4 h-4" /> Volver
           </Link>
           <h1 className="font-black text-gray-900">{isNew ? 'Publicar hogar' : 'Editar hogar'}</h1>
-          <button type="button" onClick={handleSubmit} disabled={saving}
-            className="flex items-center gap-1.5 bg-forest text-white px-4 py-2 rounded-xl font-bold text-sm hover:bg-forest-dark disabled:opacity-60 transition-colors">
-            {saving
-              ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-              : <><Save className="w-4 h-4" /> Guardar</>
-            }
-          </button>
+          {isNew ? (
+            <button type="button" onClick={handleSubmit} disabled={saving || photosUploading}
+              className="flex items-center gap-1.5 bg-forest text-white px-4 py-2 rounded-xl font-bold text-sm hover:bg-forest-dark disabled:opacity-60 transition-colors">
+              {saving
+                ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                : <><Save className="w-4 h-4" /> Guardar</>
+              }
+            </button>
+          ) : (
+            <div className="w-20" />
+          )}
         </div>
       </div>
 
       <form onSubmit={handleSubmit} className="max-w-3xl mx-auto px-4 py-8 space-y-6">
+
+        {/* Alerts */}
         {success && (
           <div className="flex items-center gap-2 bg-green-50 border border-green-200 text-green-700 text-sm px-4 py-3 rounded-xl">
             <CheckCircle className="w-4 h-4" /> ¡Guardado! Redirigiendo...
@@ -403,7 +428,7 @@ export default function PropertyPage() {
           </div>
         )}
 
-        {/* ── Airbnb import (solo en creación) ── */}
+        {/* ── Importar desde Airbnb (solo creación) ── */}
         {isNew && (
           <>
             <div className="bg-gradient-to-br from-[#FF5A5F]/8 to-[#FF5A5F]/4 border border-[#FF5A5F]/20 rounded-2xl p-5">
@@ -411,14 +436,11 @@ export default function PropertyPage() {
                 <span className="text-xl">📸</span>
                 <div>
                   <p className="font-black text-gray-900 text-base">¿Tu propiedad está en Airbnb?</p>
-                  <p className="text-gray-500 text-sm">Sube pantallazos del anuncio y la IA extrae título, descripción, capacidad y comodidades automáticamente.</p>
+                  <p className="text-gray-500 text-sm">Sube pantallazos y la IA extrae título, descripción, capacidad y comodidades automáticamente.</p>
                 </div>
               </div>
-              <button
-                type="button"
-                onClick={() => setShowAirbnbModal(true)}
-                className="flex items-center gap-2 bg-[#FF5A5F] text-white px-4 py-2.5 rounded-xl font-bold text-sm hover:bg-[#e04e53] transition-colors"
-              >
+              <button type="button" onClick={() => setShowAirbnbModal(true)}
+                className="flex items-center gap-2 bg-[#FF5A5F] text-white px-4 py-2.5 rounded-xl font-bold text-sm hover:bg-[#e04e53] transition-colors">
                 <Camera className="w-4 h-4" /> Importar con pantallazos
               </button>
               <p className="text-xs text-gray-400 mt-2">Máx. 2 MB por imagen · hasta 5 imágenes</p>
@@ -426,11 +448,41 @@ export default function PropertyPage() {
             {showAirbnbModal && (
               <ImportFromAirbnb
                 onClose={() => setShowAirbnbModal(false)}
-                onImport={(data) => { handleAirbnbImport(data); setShowAirbnbModal(false); }}
+                onImport={(data) => { handleAirbnbImport(data); setShowAirbnbModal(false) }}
               />
             )}
           </>
         )}
+
+        {/* ── A. Fotos ── */}
+        <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
+          <div className="flex items-start justify-between mb-1">
+            <h2 className="font-black text-gray-900 text-lg">Fotos</h2>
+            <div className="flex items-center gap-1.5">
+              {!isNew && sectionSaving === 'photos' && (
+                <span className="text-xs text-gray-400 flex items-center gap-1">
+                  <div className="w-3 h-3 border-2 border-gray-300 border-t-forest rounded-full animate-spin" />
+                  Guardando…
+                </span>
+              )}
+              {!isNew && sectionSaved === 'photos' && (
+                <span className="text-xs text-green-600 font-semibold flex items-center gap-1">
+                  <CheckCircle className="w-3.5 h-3.5" /> Guardado
+                </span>
+              )}
+            </div>
+          </div>
+          <p className="text-xs text-gray-400 mb-4">
+            Máx. 12 fotos · optimizadas automáticamente a ≤600 KB · la primera es la portada
+          </p>
+          <PhotoUploader
+            photos={photos}
+            onChange={handlePhotosChange}
+            userId={currentUser.id}
+            onSaving={setPhotosUploading}
+            max={12}
+          />
+        </div>
 
         {/* ── Tipo ── */}
         <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
@@ -448,7 +500,6 @@ export default function PropertyPage() {
               </button>
             ))}
           </div>
-
           <div className="relative mb-4">
             <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">Tipo específico *</label>
             <div className="relative">
@@ -460,7 +511,6 @@ export default function PropertyPage() {
               <ChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             </div>
           </div>
-
           {category === 'room' && (
             <div className="space-y-4 p-4 bg-gray-50 rounded-xl">
               <div className="flex items-center justify-between">
@@ -497,18 +547,28 @@ export default function PropertyPage() {
               </div>
             </div>
           )}
+          {!isNew && (
+            <SectionSaveBtn
+              saving={sectionSaving === 'type'}
+              saved={sectionSaved === 'type'}
+              onClick={() => saveSection('type', {
+                category, subtype, type: subtype,
+                private_bathroom: hf.private_bathroom, bed_type: hf.bed_type, shared_with: hf.shared_with,
+              })}
+            />
+          )}
         </div>
 
-        {/* ── Descripción ── */}
+        {/* ── B. Descripción ── */}
         <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
           <h2 className="font-black text-gray-900 text-lg mb-4">Descripción</h2>
           <div className="mb-4">
             <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">Título *</label>
-            <input type="text" value={hf.title} maxLength={60}
+            <input type="text" value={hf.title} maxLength={80}
               onChange={e => setHomeForm(f => ({ ...f, title: e.target.value }))}
               placeholder="ej. Departamento luminoso en Providencia"
               className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-forest focus:outline-none" />
-            <p className="text-xs text-gray-400 text-right mt-0.5">{hf.title.length}/60</p>
+            <p className="text-xs text-gray-400 text-right mt-0.5">{hf.title.length}/80</p>
           </div>
           <div>
             <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">Descripción</label>
@@ -521,9 +581,16 @@ export default function PropertyPage() {
               <p className="text-xs text-gray-400 flex-shrink-0 ml-2">{hf.description.length}/600</p>
             </div>
           </div>
+          {!isNew && (
+            <SectionSaveBtn
+              saving={sectionSaving === 'info'}
+              saved={sectionSaved === 'info'}
+              onClick={() => saveSection('info', { title: hf.title, description: hf.description })}
+            />
+          )}
         </div>
 
-        {/* ── Capacidad ── */}
+        {/* ── B. Capacidad ── */}
         <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
           <h2 className="font-black text-gray-900 text-lg mb-4">Capacidad</h2>
           <div className="grid grid-cols-3 gap-4">
@@ -540,21 +607,27 @@ export default function PropertyPage() {
               </div>
             ))}
           </div>
+          {!isNew && (
+            <SectionSaveBtn
+              saving={sectionSaving === 'capacity'}
+              saved={sectionSaved === 'capacity'}
+              onClick={() => saveSection('capacity', {
+                bedrooms:   hf.bedrooms,
+                bathrooms:  hf.bathrooms,
+                max_guests: hf.maxGuests,
+              })}
+            />
+          )}
         </div>
 
-        {/* ── Comodidades ── */}
+        {/* ── C. Comodidades ── */}
         <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
           <h2 className="font-black text-gray-900 text-lg mb-3">Comodidades</h2>
-          {/* Search */}
           <div className="relative mb-4">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
-            <input
-              type="text"
-              value={searchAmenity}
-              onChange={e => setSearchAmenity(e.target.value)}
+            <input type="text" value={searchAmenity} onChange={e => setSearchAmenity(e.target.value)}
               placeholder="Buscar comodidad..."
-              className="w-full border border-gray-200 rounded-xl pl-9 pr-9 py-2.5 text-sm focus:ring-2 focus:ring-forest focus:outline-none"
-            />
+              className="w-full border border-gray-200 rounded-xl pl-9 pr-9 py-2.5 text-sm focus:ring-2 focus:ring-forest focus:outline-none" />
             {searchAmenity && (
               <button type="button" onClick={() => setSearchAmenity('')}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
@@ -562,7 +635,6 @@ export default function PropertyPage() {
               </button>
             )}
           </div>
-          {/* Results: flat when searching, grouped otherwise */}
           {searchAmenity.trim() ? (
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
               {AMENITY_CATEGORIES.flatMap(cat => cat.amenities)
@@ -577,8 +649,7 @@ export default function PropertyPage() {
                       <span className="text-base flex-shrink-0">{emoji}</span> {label}
                     </button>
                   )
-                })
-              }
+                })}
             </div>
           ) : (
             <div className="space-y-6">
@@ -602,20 +673,38 @@ export default function PropertyPage() {
               ))}
             </div>
           )}
+          {!isNew && (
+            <SectionSaveBtn
+              saving={sectionSaving === 'amenities'}
+              saved={sectionSaved === 'amenities'}
+              onClick={() => saveSection('amenities', { amenities: hf.amenities })}
+            />
+          )}
         </div>
 
-        {/* ── Fotos ── */}
+        {/* ── D. Disponibilidad ── */}
         <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
-          <h2 className="font-black text-gray-900 text-lg mb-1">Fotos</h2>
-          <p className="text-xs text-gray-400 mb-4">Máx. 12 fotos · 1MB por foto · La primera es la portada</p>
-          <PhotoUploader photos={photos} onChange={setPhotos} max={12} />
+          <h2 className="font-black text-gray-900 text-lg mb-1">Disponibilidad</h2>
+          <p className="text-xs text-gray-400 mb-4">
+            Configura los períodos en que tu hogar está disponible para intercambio.
+            Sin períodos, aparece disponible todo el año.
+          </p>
+          <AvailabilityEditor
+            periods={availabilityPeriods}
+            onChange={setAvailabilityPeriods}
+          />
+          {!isNew && (
+            <SectionSaveBtn
+              saving={sectionSaving === 'availability'}
+              saved={sectionSaved === 'availability'}
+              onClick={() => saveSection('availability', { availability_periods: availabilityPeriods })}
+            />
+          )}
         </div>
 
         {/* ── Ubicación + Mapa ── */}
         <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
           <h2 className="font-black text-gray-900 text-lg mb-4">Ubicación</h2>
-
-          {/* Selector de país */}
           <div className="mb-4">
             <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">País *</label>
             <CountryRegionSelector
@@ -630,12 +719,9 @@ export default function PropertyPage() {
               }))}
             />
           </div>
-
-          {/* Para Chile: mantener el selector detallado con direccion */}
           {location.country_code === 'CL' && (
             <ChileLocationSelect value={location} onChange={v => setLocation(prev => ({ ...prev, ...v }))} showDireccion required />
           )}
-
           <button type="button" onClick={geocode} disabled={geocoding}
             className="mt-4 flex items-center gap-2 text-sm font-semibold text-forest hover:text-forest-dark transition-colors disabled:opacity-60">
             <MapPin className="w-4 h-4" />
@@ -646,7 +732,6 @@ export default function PropertyPage() {
               <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" /> {geocodeError}
             </p>
           )}
-
           {leafletError ? (
             <div className="mt-4 rounded-2xl border border-gray-200 bg-gray-50 flex flex-col items-center justify-center gap-2 text-gray-400 text-sm" style={{ height: 280 }}>
               <MapPin className="w-6 h-6" />
@@ -656,23 +741,43 @@ export default function PropertyPage() {
           ) : (
             <div ref={mapRef} className="mt-4 rounded-2xl overflow-hidden border border-gray-200" style={{ height: 280 }} />
           )}
-
           {coords && (
             <p className="text-xs text-gray-400 mt-2 flex items-center gap-1">
               <MapPin className="w-3 h-3 flex-shrink-0" />
               {coords.lat.toFixed(5)}, {coords.lng.toFixed(5)} — arrastra el marcador verde para ajustar
             </p>
           )}
+          {!isNew && (
+            <SectionSaveBtn
+              saving={sectionSaving === 'location'}
+              saved={sectionSaved === 'location'}
+              onClick={() => saveSection('location', {
+                country_code: location.country_code,
+                region:       location.region,
+                region_code:  location.region_code,
+                comuna:       location.comuna,
+                city:         location.city || location.comuna,
+                direccion:    location.direccion,
+                coords,
+              })}
+            />
+          )}
         </div>
 
-        {/* ── Botón guardar ── */}
-        <button type="submit" disabled={saving}
-          className="w-full bg-forest text-white py-4 rounded-2xl font-extrabold text-sm hover:bg-forest-dark disabled:opacity-60 transition flex items-center justify-center gap-2">
-          {saving
-            ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-            : <><Save className="w-5 h-5" /> {isNew ? 'Publicar hogar' : 'Guardar cambios'}</>
-          }
-        </button>
+        {/* ── Submit global (solo creación) ── */}
+        {isNew && (
+          <button type="submit" disabled={saving || photosUploading}
+            className="w-full bg-forest text-white py-4 rounded-2xl font-extrabold text-sm hover:bg-forest-dark disabled:opacity-60 transition flex items-center justify-center gap-2">
+            {saving ? (
+              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            ) : photosUploading ? (
+              <><div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" /> Subiendo imágenes…</>
+            ) : (
+              <><Save className="w-5 h-5" /> Publicar hogar</>
+            )}
+          </button>
+        )}
+
       </form>
     </div>
   )
