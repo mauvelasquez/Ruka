@@ -31,7 +31,7 @@ export async function generateMetadata({ params }) {
   if (!city || !country) return { title: 'Rukka' }
 
   const title = `Intercambio de hogares en ${city.name}, ${country.name} | Rukka`
-  const description = `Conoce ${city.name} intercambiando tu hogar. Rukka es gratuito, con verificación de identidad, disponible en Chile, Colombia, Argentina y México.`
+  const description = `Conoce ${city.name} intercambiando tu hogar. Rukka es gratuito, con verificación de identidad.`
   const url = `https://rukka.cl/homes/${pais}/${ciudad}`
 
   return {

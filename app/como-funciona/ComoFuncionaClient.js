@@ -29,11 +29,11 @@ const FAQS = [
   },
   {
     q: '¿En qué países opera Rukka?',
-    a: 'Chile, México, Colombia y Argentina. Puedes intercambiar entre cualquiera de estos cuatro países.',
+    a: 'Chile. Puedes intercambiar tu hogar con viajeros de distintas regiones del país.',
   },
   {
     q: '¿Tengo que saber de antemano quién va a ser mi match?',
-    a: 'No. El sistema de Yankis desacopla completamente el "¿quién me hospeda?" del "¿a quién hospedo yo?". Puedes hospedar a alguien de Colombia en marzo y luego usar esos Yankis para alojarte en México en septiembre — sin ninguna relación entre esas dos personas.',
+    a: 'No. El sistema de Yankis desacopla completamente el "¿quién me hospeda?" del "¿a quién hospedo yo?". Puedes hospedar a alguien en Santiago en marzo y luego usar esos Yankis para alojarte en Pichilemu en septiembre — sin ninguna relación entre esas dos personas.',
   },
 ]
 
@@ -285,7 +285,7 @@ export default function ComoFuncionaClient() {
                 n: '02',
                 icon: '🗺️',
                 title: 'Explora destinos',
-                desc: 'Busca hogares disponibles en Chile, México, Colombia o Argentina. Filtra por fechas, tipo de propiedad y ciudad.',
+                desc: 'Busca hogares disponibles en Chile. Filtra por fechas, tipo de propiedad y ciudad.',
                 tag: null,
               },
               {

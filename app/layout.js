@@ -7,23 +7,20 @@ import WelcomePopup from '../components/WelcomePopup'
 export const metadata = {
   metadataBase: new URL('https://rukka.cl'),
   title: {
-    default: 'Rukka — Intercambio de Casas en Chile, México, Colombia y Argentina',
+    default: 'Rukka — Intercambio de Casas en Chile',
     template: '%s | Rukka',
   },
-  description: 'Rukka es la plataforma de intercambio de casas en Latinoamérica. Match bilateral directo y sistema de Yankis (tokens). Opera en Chile, México, Colombia y Argentina. El alojamiento por intercambio es gratuito.',
+  description: 'Rukka es la plataforma de intercambio de casas en Chile. Match bilateral directo y sistema de Yankis (tokens). Viaja por Chile intercambiando tu hogar. El alojamiento por intercambio es gratuito.',
   keywords: [
     'intercambio de casas Chile',
-    'intercambio de casas México',
-    'intercambio de casas Colombia',
-    'intercambio de casas Argentina',
-    'home exchange LATAM',
-    'house swap latinoamerica',
-    'plataforma intercambio hogares',
+    'home exchange Chile',
+    'house swap Chile',
+    'plataforma intercambio hogares Chile',
     'Yankis tokens intercambio casas',
     'match bilateral casas',
-    'alternativa Airbnb gratuita',
-    'alternativa Kindred latinoamerica',
-    'HomeExchange gratis',
+    'alternativa Airbnb gratuita Chile',
+    'alternativa Kindred Chile',
+    'HomeExchange gratis Chile',
     'Rukka',
   ],
   robots: {
@@ -39,7 +36,7 @@ export const metadata = {
   },
   openGraph: {
     title: 'Rukka — Plataforma de Intercambio de Casas en Latinoamérica',
-    description: 'Match bilateral y sistema de Yankis para intercambiar casas en Chile, México, Colombia y Argentina. Alojamiento gratuito entre propietarios.',
+    description: 'Match bilateral y sistema de Yankis para intercambiar casas en Chile. Alojamiento gratuito entre propietarios.',
     url: 'https://rukka.cl',
     siteName: 'Rukka',
     locale: 'es_419',
@@ -49,7 +46,7 @@ export const metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Rukka — Intercambio de Casas en Latinoamérica',
-    description: 'Match bilateral y Yankis (tokens) para intercambiar casas en Chile, México, Colombia y Argentina. 100% gratuito.',
+    description: 'Match bilateral y Yankis (tokens) para intercambiar casas en Chile. 100% gratuito.',
     site: '@rukka_cl',
     images: ['https://rukka.cl/rukka-logo.png'],
   },
@@ -83,7 +80,7 @@ export default function RootLayout({ children }) {
                     'width': 1080,
                     'height': 1080,
                   },
-                  'description': 'Rukka es una plataforma de intercambio de casas en Latinoamérica con modelo dual: match bilateral directo (intercambio simultáneo gratuito) y sistema de Yankis (tokens que permiten viajar de forma asíncrona). Opera en Chile, México, Colombia y Argentina.',
+                  'description': 'Rukka es una plataforma de intercambio de casas en Chile con modelo dual: match bilateral directo (intercambio simultáneo gratuito) y sistema de Yankis (tokens que permiten viajar de forma asíncrona). Viaja por Chile intercambiando tu hogar.',
                   'knowsAbout': [
                     'home exchange',
                     'house swap',
@@ -96,9 +93,6 @@ export default function RootLayout({ children }) {
                   ],
                   'areaServed': [
                     { '@type': 'Country', 'name': 'Chile', 'sameAs': 'https://www.wikidata.org/wiki/Q298' },
-                    { '@type': 'Country', 'name': 'Mexico', 'sameAs': 'https://www.wikidata.org/wiki/Q96' },
-                    { '@type': 'Country', 'name': 'Colombia', 'sameAs': 'https://www.wikidata.org/wiki/Q739' },
-                    { '@type': 'Country', 'name': 'Argentina', 'sameAs': 'https://www.wikidata.org/wiki/Q414' },
                   ],
                   'foundingLocation': {
                     '@type': 'Place',
@@ -122,7 +116,7 @@ export default function RootLayout({ children }) {
                   '@id': 'https://rukka.cl/#website',
                   'url': 'https://rukka.cl',
                   'name': 'Rukka — Intercambio de casas en Latinoamérica',
-                  'description': 'La plataforma latinoamericana de home exchange. Viaja intercambiando tu hogar en Chile, México, Colombia y Argentina.',
+                  'description': 'La plataforma chilena de home exchange. Viaja por Chile intercambiando tu hogar.',
                   'publisher': { '@id': 'https://rukka.cl/#organization' },
                   'inLanguage': 'es',
                   'potentialAction': {

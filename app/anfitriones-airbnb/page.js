@@ -2,7 +2,7 @@ import AnfitrioneClient from './AnfitrioneClient'
 
 export const metadata = {
   title: 'Anfitriones Airbnb en Rukka — Intercambia sin dejar de rentar',
-  description: 'Si ya eres anfitrión en Airbnb, Rukka te permite también intercambiar tu propiedad y viajar gratis. Importa tu listing de Airbnb en segundos. Sin comisiones, sin suscripción. Chile, México, Colombia y Argentina.',
+  description: 'Si ya eres anfitrión en Airbnb, Rukka te permite también intercambiar tu propiedad y viajar gratis por Chile. Importa tu listing de Airbnb en segundos. Sin comisiones, sin suscripción.',
   keywords: [
     'anfitriones Airbnb intercambio casas',
     'importar Airbnb Rukka',

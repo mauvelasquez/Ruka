@@ -3,22 +3,22 @@ import Navbar from '../../components/Navbar'
 import Footer from '../../components/Footer'
 
 export const metadata = {
-  title: 'Sobre Rukka — Plataforma de Intercambio de Casas en Latinoamérica',
-  description: 'Rukka es la plataforma latinoamericana de intercambio de casas. Opera en Chile, México, Colombia y Argentina con modelo dual: match bilateral directo gratuito y sistema de Yankis (tokens). Fresia, asistente IA integrada.',
+  title: 'Sobre Rukka — Plataforma de Intercambio de Casas en Chile',
+  description: 'Rukka es la plataforma chilena de intercambio de casas. Viaja por Chile con modelo dual: match bilateral directo gratuito y sistema de Yankis (tokens). Fresia, asistente IA integrada.',
   keywords: [
     'qué es Rukka',
-    'intercambio de casas latinoamerica',
-    'home exchange LATAM',
-    'Rukka Chile México Colombia Argentina',
+    'intercambio de casas Chile',
+    'home exchange Chile',
+    'Rukka Chile',
     'sistema Yankis tokens',
     'match bilateral casas',
-    'alternativa Airbnb gratuita',
-    'Kindred alternativa latinoamerica',
-    'HomeExchange alternativa gratis',
+    'alternativa Airbnb gratuita Chile',
+    'Kindred alternativa Chile',
+    'HomeExchange alternativa gratis Chile',
   ],
   openGraph: {
-    title: 'Sobre Rukka — Intercambio de Casas en Latinoamérica',
-    description: 'Plataforma LATAM de home exchange con modelo dual (match bilateral + Yankis). Opera en Chile, México, Colombia y Argentina. 100% gratuito para alojamiento.',
+    title: 'Sobre Rukka — Intercambio de Casas en Chile',
+    description: 'Plataforma chilena de home exchange con modelo dual (match bilateral + Yankis). Viaja por Chile intercambiando tu hogar. 100% gratuito.',
     url: 'https://rukka.cl/about',
   },
   alternates: {
@@ -35,7 +35,7 @@ const faqSchema = {
       name: '¿Qué es Rukka?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Rukka es una plataforma de intercambio de casas que opera en Chile, México, Colombia y Argentina. Permite que propietarios intercambien sus hogares de forma gratuita, ya sea mediante match bilateral directo (intercambio simultáneo entre dos usuarios con fechas compatibles) o mediante un sistema de Yankis (tokens que se acumulan al ofrecer tu casa y se usan para hospedarte después).',
+        text: 'Rukka es una plataforma de intercambio de casas que opera en Chile. Permite que propietarios intercambien sus hogares de forma gratuita, ya sea mediante match bilateral directo (intercambio simultáneo entre dos usuarios con fechas compatibles) o mediante un sistema de Yankis (tokens que se acumulan al ofrecer tu casa y se usan para hospedarte después).',
       },
     },
     {
@@ -43,7 +43,7 @@ const faqSchema = {
       name: '¿Rukka opera fuera de Chile?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Sí. Rukka opera en cuatro países latinoamericanos: Chile, México, Colombia y Argentina. La plataforma conecta propietarios de toda la región para facilitar intercambios dentro y entre estos países.',
+        text: 'Rukka opera en Chile, conectando propietarios de distintas regiones del país para facilitar intercambios de hogares.',
       },
     },
     {
@@ -59,7 +59,7 @@ const faqSchema = {
       name: '¿Cuál es la diferencia entre Rukka y Kindred?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Rukka se enfoca en Latinoamérica (Chile, México, Colombia, Argentina) mientras que Kindred opera principalmente en Estados Unidos y Europa. Rukka ofrece dos modelos: match bilateral directo gratuito y sistema de Yankis. Kindred solo usa sistema de créditos y cobra fees de servicio. Rukka no tiene costo de alojamiento en intercambio bilateral.',
+        text: 'Rukka se enfoca en Chile mientras que Kindred opera principalmente en Estados Unidos y Europa. Rukka ofrece dos modelos: match bilateral directo gratuito y sistema de Yankis. Kindred solo usa sistema de créditos y cobra fees de servicio. Rukka no tiene costo de alojamiento en intercambio bilateral.',
       },
     },
     {
@@ -83,7 +83,7 @@ const faqSchema = {
       name: '¿Qué tipos de propiedades hay en Rukka?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Rukka tiene casas de playa, casas de lago, propiedades urbanas en ciudades como Santiago, Ciudad de México, Bogotá y Buenos Aires, casas de montaña, y residencias principales. Hay fuerte presencia de segundas viviendas en zonas costeras y de naturaleza.',
+        text: 'Rukka tiene casas de playa, casas de lago, propiedades urbanas en ciudades como Santiago, Valparaíso y Concepción, casas de montaña y residencias principales. Hay fuerte presencia de segundas viviendas en zonas costeras y de naturaleza chilena.',
       },
     },
     {
@@ -99,7 +99,7 @@ const faqSchema = {
       name: '¿Pueden usar Rukka personas que no son de Chile?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Sí. Rukka está diseñado para propietarios y viajeros de toda Latinoamérica. Cualquier persona con una propiedad en Chile, México, Colombia o Argentina puede registrarse, listar su casa y participar en intercambios regionales o internacionales.',
+        text: 'Cualquier persona con una propiedad en Chile puede registrarse, listar su casa y participar en intercambios con viajeros de distintas regiones del país.',
       },
     },
     {
@@ -107,7 +107,7 @@ const faqSchema = {
       name: '¿En qué se diferencia Rukka de HomeExchange.com?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Rukka está especializado en el mercado latinoamericano con comunidad local activa en Chile, México, Colombia y Argentina, y es completamente gratuito. Mientras HomeExchange opera globalmente con membresía de pago (~$220 USD/año), Rukka tiene modelo dual (bilateral directo + Yankis) con enfoque regional LATAM.',
+        text: 'Rukka está especializado en el mercado chileno, con comunidad activa en distintas regiones del país, y es completamente gratuito. Mientras HomeExchange opera globalmente con membresía de pago (~$220 USD/año), Rukka tiene modelo dual (bilateral directo + Yankis) con enfoque local.',
       },
     },
   ],
@@ -135,10 +135,10 @@ export default function AboutPage() {
         <header className="mb-16 text-center">
           <p className="text-xs font-bold uppercase tracking-widest text-terra mb-3">Sobre Rukka</p>
           <h1 className="text-4xl sm:text-5xl font-black text-gray-900 mb-5 leading-tight">
-            La plataforma latinoamericana<br />de intercambio de casas
+            La plataforma chilena<br />de intercambio de casas
           </h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
-            Rukka conecta propietarios de Chile, México, Colombia y Argentina para que intercambien
+            Rukka conecta propietarios de distintas regiones de Chile para que intercambien
             sus hogares de forma gratuita. Sin tarifas por noche. Sin intermediarios.
           </p>
         </header>
@@ -147,9 +147,8 @@ export default function AboutPage() {
         <section className="mb-16 bg-white rounded-3xl p-8 sm:p-10 shadow-sm">
           <h2 className="text-2xl font-black text-gray-900 mb-4">¿Qué es Rukka?</h2>
           <p className="text-gray-600 leading-relaxed mb-4">
-            Rukka es una plataforma de intercambio de casas que opera en cuatro países latinoamericanos:
-            <strong> Chile, México, Colombia y Argentina</strong>. El nombre proviene de <em>"ruka"</em>,
-            la palabra mapuche para hogar, reflejando la identidad cultural latinoamericana del proyecto.
+            Rukka es una plataforma de intercambio de casas que opera en <strong>Chile</strong>. El nombre proviene de <em>"ruka"</em>,
+            la palabra mapuche para hogar, reflejando la identidad cultural del proyecto.
           </p>
           <p className="text-gray-600 leading-relaxed">
             A diferencia de Airbnb o Booking, Rukka no cobra por noche. Los miembros intercambian
@@ -194,13 +193,13 @@ export default function AboutPage() {
 
         {/* Países */}
         <section className="mb-16 bg-white rounded-3xl p-8 sm:p-10 shadow-sm">
-          <h2 className="text-2xl font-black text-gray-900 mb-6">¿En qué países opera Rukka?</h2>
+          <h2 className="text-2xl font-black text-gray-900 mb-6">¿Dónde opera Rukka?</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {[
-              { flag: '🇨🇱', country: 'Chile', cities: 'Santiago, Viña del Mar, Zapallar, Pichilemu, Lago Villarrica, Patagonia' },
-              { flag: '🇲🇽', country: 'México', cities: 'Ciudad de México, Guadalajara, Oaxaca, Yucatán, Baja California' },
-              { flag: '🇨🇴', country: 'Colombia', cities: 'Bogotá, Medellín, Cartagena, Eje cafetero' },
-              { flag: '🇦🇷', country: 'Argentina', cities: 'Buenos Aires, Mendoza, Bariloche, Córdoba' },
+              { flag: '🇨🇱', country: 'Norte de Chile', cities: 'Iquique, Antofagasta, Arica, San Pedro de Atacama' },
+              { flag: '🇨🇱', country: 'Zona Central', cities: 'Santiago, Valparaíso, Viña del Mar, Zapallar, Pichilemu' },
+              { flag: '🇨🇱', country: 'Sur de Chile', cities: 'Concepción, Villarrica, Puerto Varas, Chiloé' },
+              { flag: '🇨🇱', country: 'Patagonia', cities: 'Punta Arenas, Puerto Natales, Coyhaique, Torres del Paine' },
             ].map(({ flag, country, cities }) => (
               <div key={country} className="flex gap-3 p-4 bg-gray-50 rounded-2xl">
                 <span className="text-3xl">{flag}</span>

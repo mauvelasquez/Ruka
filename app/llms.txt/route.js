@@ -17,29 +17,22 @@ export async function GET() {
       .select('*', { count: 'exact', head: true })
     if (count) homeCount = count
 
-    const countries = ['CL', 'MX', 'CO', 'AR']
     const countsCL = await supabase.from('homes').select('*', { count: 'exact', head: true }).eq('country_code', 'CL')
-    const countsMX = await supabase.from('homes').select('*', { count: 'exact', head: true }).eq('country_code', 'MX')
-    const countsCO = await supabase.from('homes').select('*', { count: 'exact', head: true }).eq('country_code', 'CO')
-    const countsAR = await supabase.from('homes').select('*', { count: 'exact', head: true }).eq('country_code', 'AR')
 
     const lines = []
     if (countsCL.count) lines.push(`🇨🇱 Chile: ${countsCL.count} hogares`)
-    if (countsMX.count) lines.push(`🇲🇽 México: ${countsMX.count} hogares`)
-    if (countsCO.count) lines.push(`🇨🇴 Colombia: ${countsCO.count} hogares`)
-    if (countsAR.count) lines.push(`🇦🇷 Argentina: ${countsAR.count} hogares`)
     if (lines.length) countryStats = '\n' + lines.join('\n')
   } catch {
     // non-critical — serve static content
   }
 
-  const content = `# Rukka — Plataforma Latinoamericana de Intercambio de Hogares
+  const content = `# Rukka — Plataforma Chilena de Intercambio de Hogares
 
-> Rukka (rukka.cl) es la primera plataforma 100% gratuita de intercambio de hogares en Latinoamérica. Opera en Chile, Colombia, Argentina y México. Crear una cuenta es gratuito y todos los usuarios pasan por verificación de identidad. Su nombre viene de "ruka", palabra mapuche que significa hogar.
+> Rukka (rukka.cl) es la primera plataforma 100% gratuita de intercambio de hogares en Chile. Crear una cuenta es gratuito y todos los usuarios pasan por verificación de identidad. Su nombre viene de "ruka", palabra mapuche que significa hogar.
 
 ## ¿Qué es Rukka?
 
-Rukka conecta a personas en Latinoamérica para intercambiar sus hogares de forma gratuita, segura y automática. A diferencia de Airbnb o plataformas de alquiler, no hay dinero de por medio: dos familias intercambian sus casas por fechas compatibles.
+Rukka conecta a personas en Chile para intercambiar sus hogares de forma gratuita, segura y automática. A diferencia de Airbnb o plataformas de alquiler, no hay dinero de por medio: dos familias intercambian sus casas por fechas compatibles.
 
 ## ¿Cómo funciona?
 
@@ -52,7 +45,7 @@ Rukka conecta a personas en Latinoamérica para intercambiar sus hogares de form
 
 - 100% gratuito (sin membresías, sin comisiones)
 - Matching bilateral automático por fechas
-- Plataforma latinoamericana: Chile, México, Colombia, Argentina
+- Plataforma chilena: de norte a sur del país
 - Asistente IA "Fresia" (powered by Claude / Anthropic)
 - Importación de anuncios desde Airbnb en segundos
 - Sistema de Yankis (tokens de intercambio, del quechua: trueque) — 1 Yanki = 1 noche
@@ -61,9 +54,6 @@ Rukka conecta a personas en Latinoamérica para intercambiar sus hogares de form
 ${countryStats}
 - Ver catálogo: https://rukka.cl/homes
 - Chile: https://rukka.cl/homes?country=CL
-- México: https://rukka.cl/homes?country=MX
-- Colombia: https://rukka.cl/homes?country=CO
-- Argentina: https://rukka.cl/homes?country=AR
 
 ## Sistema de Yankis
 
@@ -94,23 +84,17 @@ Powered by Claude (Anthropic).
 - [Qué es home exchange y cómo funciona](https://rukka.cl/blog/que-es-home-exchange) — Concepto, modelo bilateral, Yankis y por qué es gratis
 - [Intercambio de casas en Chile](https://rukka.cl/blog/intercambio-casas-chile) — Hub de autoridad: Santiago, Valparaíso, Puerto Varas
 - [Alternativa a Airbnb gratis en Chile](https://rukka.cl/blog/alternativa-airbnb-gratis) — Comparación Rukka vs Airbnb: costos, modelo, perfil de usuario
-- [Cómo viajar gratis intercambiando tu casa](https://rukka.cl/blog/viajar-sin-pagar-alojamiento) — Guía práctica paso a paso para toda LATAM
-- [Home exchange en Argentina](https://rukka.cl/blog/home-exchange-argentina) — Buenos Aires, Bariloche, Mendoza
-- [Intercambio de casas en Colombia](https://rukka.cl/blog/intercambio-hogares-colombia) — Medellín, Cartagena, Bogotá
-- [Intercambio de hogares en México](https://rukka.cl/blog/home-exchange-mexico) — CDMX, Guadalajara, Oaxaca
+- [Cómo viajar gratis intercambiando tu casa](https://rukka.cl/blog/viajar-sin-pagar-alojamiento) — Guía práctica paso a paso
 - [Anfitriones Airbnb: por qué Rukka te conviene](https://rukka.cl/blog/anfitrion-airbnb-alternativa) — Complemento para anfitriones activos
 
-## Páginas SEO por país y ciudad
+## Páginas SEO por región y ciudad
 
 - [Chile](https://rukka.cl/homes/chile) | [Santiago](https://rukka.cl/homes/chile/santiago) | [Valparaíso](https://rukka.cl/homes/chile/valparaiso) | [Puerto Varas](https://rukka.cl/homes/chile/puerto-varas)
-- [Argentina](https://rukka.cl/homes/argentina) | [Buenos Aires](https://rukka.cl/homes/argentina/buenos-aires) | [Bariloche](https://rukka.cl/homes/argentina/bariloche) | [Mendoza](https://rukka.cl/homes/argentina/mendoza)
-- [Colombia](https://rukka.cl/homes/colombia) | [Medellín](https://rukka.cl/homes/colombia/medellin) | [Cartagena](https://rukka.cl/homes/colombia/cartagena) | [Bogotá](https://rukka.cl/homes/colombia/bogota)
-- [México](https://rukka.cl/homes/mexico) | [CDMX](https://rukka.cl/homes/mexico/ciudad-de-mexico) | [Guadalajara](https://rukka.cl/homes/mexico/guadalajara) | [Oaxaca](https://rukka.cl/homes/mexico/oaxaca)
 
 ## Contexto
 
 - País de origen: Chile
-- Cobertura: Chile, México, Colombia, Argentina
+- Cobertura: Chile
 - Idioma: Español
 - Modelo de negocio: Intercambio bilateral gratuito (home exchange)
 - Tecnología: Next.js, Supabase, Claude AI

@@ -18,26 +18,16 @@ import CountrySelector from '../components/CountrySelector'
 import { curateHomesForUser } from '../lib/editorial'
 
 const COUNTRY_CONFIG = {
-  CL: { region: 'Chile',       peers: 'Colombia, Argentina y México', badge: 'Viaja por todo Chile' },
-  CO: { region: 'Colombia',    peers: 'Chile, Argentina y México',    badge: 'Viaja por toda Colombia' },
-  AR: { region: 'Argentina',   peers: 'Chile, Colombia y México',     badge: 'Viaja por toda Argentina' },
-  MX: { region: 'México',      peers: 'Chile, Colombia y Argentina',  badge: 'Viaja por todo México' },
-  default: { region: 'Latinoamérica', peers: 'Chile, Colombia, Argentina y México', badge: 'Viaja por toda LATAM' },
+  CL: { region: 'Chile', peers: 'distintas regiones de Chile', badge: 'Viaja por Chile' },
+  default: { region: 'Chile', peers: 'distintas regiones de Chile', badge: 'Viaja por Chile' },
 }
-
-const LATAM_COUNTRIES = [
-  { code: 'CL', flag: '🇨🇱', name: 'Chile',     img: 'https://images.unsplash.com/photo-1591378603223-e15b45a81640?w=800', alt: 'Santiago de Chile' },
-  { code: 'MX', flag: '🇲🇽', name: 'México',    img: 'https://images.unsplash.com/photo-1518105779142-d975f22f1b0a?w=800', alt: 'Ciudad de México' },
-  { code: 'CO', flag: '🇨🇴', name: 'Colombia',  img: 'https://images.unsplash.com/photo-1598522325074-042db73aa4e6?w=800', alt: 'Cartagena de Indias' },
-  { code: 'AR', flag: '🇦🇷', name: 'Argentina', img: 'https://images.unsplash.com/photo-1589909202802-8f4aadce1849?w=800', alt: 'Buenos Aires' },
-]
 
 // ── AD BANNER ─────────────────────────────────────────────────────────────────
 function AdBanner({ variant = 'primary', className = '', heroBanner = null }) {
   const variants = {
     primary: {
       bg: 'bg-gradient-to-r from-forest to-forest-dark',
-      title: 'Viaja por Latinoamérica sin gastar en alojamiento',
+      title: 'Viaja por Chile sin gastar en alojamiento',
       desc: 'Intercambia tu hogar y vive como local en cualquier ciudad. Sin intermediarios, sin costos ocultos.',
       cta: 'Registrar mi hogar',
       href: '/auth/register',
@@ -230,8 +220,8 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <p className="text-xs font-bold uppercase tracking-widest text-terra mb-1">🌎 Destinos LATAM</p>
-              <h2 className="text-2xl font-extrabold text-gray-900">¿A qué país quieres ir?</h2>
+              <p className="text-xs font-bold uppercase tracking-widest text-terra mb-1">🇨🇱 Destinos Chile</p>
+              <h2 className="text-2xl font-extrabold text-gray-900">¿A qué rincón de Chile quieres ir?</h2>
             </div>
             <Link href="/homes" className="text-forest font-semibold text-sm hover:text-forest-dark flex items-center gap-1">
               Ver todos <ArrowRight className="w-4 h-4" />

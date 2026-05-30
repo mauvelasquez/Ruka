@@ -1,10 +1,10 @@
 export const metadata = {
-  title: 'Cómo funciona Rukka — Intercambio de casas en Latinoamérica',
-  description: 'Descubre cómo funciona el intercambio de hogares en Rukka: publica tu casa, encuentra tu match automático y viaja por Latinoamérica sin pagar alojamiento.',
-  keywords: ['cómo funciona intercambio casas', 'home exchange latinoamerica', 'intercambio hogar Chile México Colombia Argentina', 'matching automático hogares'],
+  title: 'Cómo funciona Rukka — Intercambio de casas en Chile',
+  description: 'Descubre cómo funciona el intercambio de hogares en Rukka: publica tu casa, encuentra tu match automático y viaja por Chile sin pagar alojamiento.',
+  keywords: ['cómo funciona intercambio casas', 'home exchange Chile', 'intercambio hogar Chile', 'matching automático hogares'],
   openGraph: {
-    title: 'Cómo funciona Rukka — Intercambio de casas en Latinoamérica',
-    description: 'Publica tu hogar, encuentra tu match y viaja. 4 pasos simples para intercambiar casas en Latinoamérica.',
+    title: 'Cómo funciona Rukka — Intercambio de casas en Chile',
+    description: 'Publica tu hogar, encuentra tu match y viaja. 4 pasos simples para intercambiar casas en Chile.',
     url: 'https://rukka.cl/como-funciona',
     siteName: 'Rukka',
     locale: 'es_419',
@@ -36,7 +36,7 @@ const pageSchema = {
           '@type': 'HowToStep',
           'position': 2,
           'name': 'Elige tu destino',
-          'text': 'Busca hogares en Chile, México, Colombia o Argentina. Explora el catálogo de casas, cabañas y departamentos disponibles para intercambio.',
+          'text': 'Busca hogares en Chile. Explora el catálogo de casas, cabañas y departamentos disponibles para intercambio en distintas regiones del país.',
         },
         {
           '@type': 'HowToStep',
@@ -84,7 +84,7 @@ const pageSchema = {
           'name': '¿En qué países funciona Rukka?',
           'acceptedAnswer': {
             '@type': 'Answer',
-            'text': 'Actualmente operamos en Chile, México, Colombia y Argentina. Estamos construyendo una comunidad sólida en toda Latinoamérica y seguimos expandiéndonos.',
+            'text': 'Actualmente operamos en Chile, conectando propietarios de distintas regiones del país para intercambiar sus hogares.',
           },
         },
         {

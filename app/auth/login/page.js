@@ -87,7 +87,7 @@ export default function LoginPage() {
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
-                  {['✓ Sin costo de alojamiento', '✓ Sin comisiones ocultas', '✓ Matches automáticos', '✓ Chile · México · Colombia · Argentina'].map((b, i) => (
+                  {['✓ Sin costo de alojamiento', '✓ Sin comisiones ocultas', '✓ Matches automáticos', '✓ Conoce Chile'].map((b, i) => (
                     <p key={i} className="text-white/70 text-xs">{b}</p>
                   ))}
                 </div>

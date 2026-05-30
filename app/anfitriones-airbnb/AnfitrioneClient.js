@@ -140,7 +140,7 @@ export default function AnfitrionesAirbnbPage() {
                 <span className="text-base">🏠</span> Para anfitriones de Airbnb
               </span>
               <span className="inline-flex items-center gap-1.5 bg-white/15 backdrop-blur-sm border border-white/25 text-white rounded-full px-4 py-1.5 text-sm font-bold">
-                🌎 Chile · Colombia · Argentina · México
+                🇨🇱 Conoce Chile
               </span>
             </div>
 
@@ -150,7 +150,7 @@ export default function AnfitrionesAirbnbPage() {
             </h1>
 
             <p className="text-lg sm:text-xl text-white/80 leading-relaxed mb-8 max-w-xl">
-              Rukka es la comunidad latinoamericana de anfitriones de Chile, Colombia, Argentina y México que intercambian sus propiedades entre sí.
+              Rukka es la comunidad chilena de anfitriones que intercambian sus propiedades entre sí y viajan por Chile.
               Cuenta gratuita, verificación de identidad, sin comisiones.
             </p>
 
@@ -203,7 +203,7 @@ export default function AnfitrionesAirbnbPage() {
                 Tienes una propiedad que le da alojamiento a cientos de personas al año. Sin embargo, cuando tú quieres explorar otro destino, terminas pagando hotel o buscando en el mismo Airbnb que usas para trabajar.
               </p>
               <p className="text-gray-600 leading-relaxed">
-                <strong className="text-gray-900">Hay otra forma.</strong> Otros anfitriones en Chile, Colombia, Argentina y México tienen exactamente el mismo problema, y tienen exactamente lo que tú necesitas: una propiedad en el destino donde quieres ir.
+                <strong className="text-gray-900">Hay otra forma.</strong> Otros anfitriones en Chile tienen exactamente el mismo problema, y tienen exactamente lo que tú necesitas: una propiedad en el destino donde quieres ir.
               </p>
             </div>
 
@@ -397,7 +397,7 @@ export default function AnfitrionesAirbnbPage() {
               {
                 emoji: '🏙️',
                 title: 'Anfitriones urbanos',
-                desc: 'Tienes depto en Santiago, Bogotá, Buenos Aires o Ciudad de México y quieres explorar otros destinos.',
+                desc: 'Tienes depto en Santiago, Valparaíso, Concepción u otra ciudad y quieres explorar otros destinos en Chile.',
                 tag: 'El más común',
                 tagColor: 'bg-forest/10 text-forest',
               },

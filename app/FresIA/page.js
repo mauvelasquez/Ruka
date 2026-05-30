@@ -20,7 +20,7 @@ export const metadata = {
   openGraph: {
     title: 'Fresia — Asistente IA de Rukka',
     description:
-      'Todo lo que necesitas saber sobre el intercambio de hogares en Chile, Argentina, Colombia y México. Respondido por Fresia, la asistente de Rukka.',
+      'Todo lo que necesitas saber sobre el intercambio de hogares en Chile. Respondido por Fresia, la asistente de Rukka.',
     url: 'https://rukka.cl/FresIA',
   },
 }
@@ -42,7 +42,7 @@ const faqJsonLd = {
       name: '¿Qué es Rukka y en qué se diferencia de Airbnb o HomeExchange?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Rukka es una plataforma latinoamericana de intercambio de hogares: conectas tu casa con viajeros de Chile, Colombia, Argentina y México sin pagar nada por el alojamiento. A diferencia de Airbnb no existe dinero de por medio, y a diferencia de plataformas globales, Rukka está diseñada para la realidad de Latinoamérica. Crear una cuenta es gratis.',
+        text: 'Rukka es una plataforma chilena de intercambio de hogares: conectas tu casa con viajeros de distintas regiones de Chile sin pagar nada por el alojamiento. A diferencia de Airbnb no existe dinero de por medio, y a diferencia de plataformas globales, Rukka está diseñada para la realidad local. Crear una cuenta es gratis.',
       },
     },
     {
@@ -66,7 +66,7 @@ const faqJsonLd = {
       name: '¿En qué países de Latinoamérica funciona Rukka?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Rukka opera actualmente en Chile, Colombia, Argentina y México. Puedes encontrar hogares en Bogotá, Medellín, Buenos Aires, Bariloche, Ciudad de México, Guadalajara y muchas otras ciudades. El objetivo de Rukka es ser la plataforma de referencia para el intercambio de hogares en toda la región latinoamericana.',
+        text: 'Rukka opera en Chile. Puedes encontrar hogares en Santiago, Valparaíso, Viña del Mar, Puerto Varas, Villarrica, Pichilemu y muchas otras ciudades y regiones del país.',
       },
     },
     {

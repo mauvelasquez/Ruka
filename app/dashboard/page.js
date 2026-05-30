@@ -287,7 +287,7 @@ function DashboardContent() {
                     <label className="block text-xs font-bold text-gray-600 mb-1.5 uppercase tracking-wide">
                       ¿A qué ciudad quieres ir?
                     </label>
-                    <input list="cities-dash" type="text" placeholder="ej. Pichilemu, Buenos Aires, Ciudad de México..."
+                    <input list="cities-dash" type="text" placeholder="ej. Pichilemu, Villarrica, Valparaíso..."
                       value={wishForm.toCity} onChange={e => setWishForm({...wishForm, toCity: e.target.value})}
                       className="w-full border-2 border-gray-200 focus:border-andean rounded-xl px-4 py-3 text-sm outline-none transition-colors" />
                     <datalist id="cities-dash">

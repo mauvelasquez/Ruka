@@ -4,7 +4,7 @@ import Footer from '../../components/Footer'
 
 export const metadata = {
   title: 'Yankis — Intercambia tu Casa sin Coincidir en Fechas | Rukka',
-  description: 'El sistema de Yankis de Rukka te permite ofrecer tu casa, acumular tokens y hospedarte en otra propiedad cuando quieras. Sin necesidad de match simultáneo. Disponible en Chile, México, Colombia y Argentina.',
+  description: 'El sistema de Yankis de Rukka te permite ofrecer tu casa, acumular tokens y hospedarte en otra propiedad cuando quieras. Sin necesidad de match simultáneo. Viaja por Chile.',
   keywords: [
     'sistema de tokens intercambio casas',
     'Yankis Rukka',
@@ -15,7 +15,7 @@ export const metadata = {
   ],
   openGraph: {
     title: 'Yankis Rukka — Intercambia sin Coincidir en Fechas',
-    description: 'Gana Yankis hospedando visitantes y úsalos para viajar cuando quieras. 1 Yanki = 1 noche en cualquier hogar de Rukka. Chile, México, Colombia, Argentina.',
+    description: 'Gana Yankis hospedando visitantes y úsalos para viajar por Chile cuando quieras. 1 Yanki = 1 noche en cualquier hogar de Rukka.',
     url: 'https://rukka.cl/tokens',
   },
   alternates: {
@@ -45,7 +45,7 @@ const howToSchema = {
       '@type': 'HowToStep',
       position: 3,
       name: 'Elige tu destino',
-      text: 'Busca hogares disponibles en Chile, México, Colombia o Argentina. Filtra por fechas, tipo de propiedad y ciudad.',
+      text: 'Busca hogares disponibles en Chile. Filtra por fechas, tipo de propiedad y ciudad.',
     },
     {
       '@type': 'HowToStep',
@@ -73,7 +73,7 @@ const STEPS = [
     n: '03',
     emoji: '🗺️',
     title: 'Elige dónde ir',
-    desc: 'Busca hogares disponibles en Chile, México, Colombia o Argentina en las fechas que tú quieras.',
+    desc: 'Busca hogares disponibles en Chile en las fechas que tú quieras.',
   },
   {
     n: '04',
@@ -230,14 +230,14 @@ export default function TokensPage() {
         <section className="mb-16 bg-white rounded-3xl p-8 sm:p-10 shadow-sm">
           <h2 className="text-2xl font-black text-gray-900 mb-4">¿Dónde puedo usar mis Yankis?</h2>
           <p className="text-gray-600 mb-6 leading-relaxed">
-            Los Yankis son válidos en todos los hogares activos de la red Rukka, en los cuatro países donde opera la plataforma:
+            Los Yankis son válidos en todos los hogares activos de la red Rukka, a lo largo de todo Chile:
           </p>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {[
-              { flag: '🇨🇱', name: 'Chile' },
-              { flag: '🇲🇽', name: 'México' },
-              { flag: '🇨🇴', name: 'Colombia' },
-              { flag: '🇦🇷', name: 'Argentina' },
+              { flag: '🇨🇱', name: 'Norte' },
+              { flag: '🇨🇱', name: 'Zona Central' },
+              { flag: '🇨🇱', name: 'Sur' },
+              { flag: '🇨🇱', name: 'Patagonia' },
             ].map(({ flag, name }) => (
               <div key={name} className="flex flex-col items-center gap-2 p-4 bg-gray-50 rounded-2xl text-center">
                 <span className="text-3xl">{flag}</span>

@@ -1,21 +1,21 @@
 import ComoFuncionaClient from './ComoFuncionaClient'
 
 export const metadata = {
-  title: 'Cómo funciona Rukka — Intercambia tu hogar y viaja gratis por LATAM',
-  description: 'Publica tu hogar, ganas Yankis cada vez que hospedas, y úsalos para alojarte en Chile, México, Colombia o Argentina cuando quieras. Si las fechas cuadran con alguien, el intercambio es directo y gratis al instante.',
+  title: 'Cómo funciona Rukka — Intercambia tu hogar y viaja gratis por Chile',
+  description: 'Publica tu hogar, ganas Yankis cada vez que hospedas, y úsalos para alojarte en cualquier rincón de Chile cuando quieras. Si las fechas cuadran con alguien, el intercambio es directo y gratis al instante.',
   keywords: [
     'cómo funciona Rukka',
-    'intercambio de casas latinoamerica',
-    'home exchange gratis LATAM',
+    'intercambio de casas Chile',
+    'home exchange gratis Chile',
     'qué son los Yankis Rukka',
-    'intercambio de hogares Chile México Colombia Argentina',
-    'viajar gratis sin hotel LATAM',
+    'intercambio de hogares Chile',
+    'viajar gratis sin hotel Chile',
     'match bilateral casas',
     'sistema Yankis tokens intercambio',
   ],
   openGraph: {
-    title: 'Cómo funciona Rukka — Intercambia tu hogar y viaja gratis por LATAM',
-    description: 'Tu hospitalidad siempre vale. Cada noche que hospedas se convierte en un Yanki (1 Yanki = 1 noche). Cuando las fechas cuadran, match directo gratuito. Opera en Chile, México, Colombia y Argentina.',
+    title: 'Cómo funciona Rukka — Intercambia tu hogar y viaja gratis por Chile',
+    description: 'Tu hospitalidad siempre vale. Cada noche que hospedas se convierte en un Yanki (1 Yanki = 1 noche). Cuando las fechas cuadran, match directo gratuito. Conoce Chile intercambiando tu hogar.',
     url: 'https://rukka.cl/como-funciona',
   },
   alternates: {
@@ -26,8 +26,8 @@ export const metadata = {
 const howToSchema = {
   '@context': 'https://schema.org',
   '@type': 'HowTo',
-  name: 'Cómo funciona Rukka: intercambiar tu hogar y viajar gratis por Latinoamérica',
-  description: 'Rukka convierte tu hospitalidad en créditos de viaje llamados Yankis (1 Yanki = 1 noche). Publica tu hogar, acumula Yankis al hospedar, y úsalos para alojarte en Chile, México, Colombia o Argentina cuando quieras. Si encuentras a alguien con fechas compatibles, el match es directo y gratis — los Yankis se cancelan entre sí.',
+  name: 'Cómo funciona Rukka: intercambiar tu hogar y viajar gratis por Chile',
+  description: 'Rukka convierte tu hospitalidad en créditos de viaje llamados Yankis (1 Yanki = 1 noche). Publica tu hogar, acumula Yankis al hospedar, y úsalos para alojarte en cualquier rincón de Chile cuando quieras. Si encuentras a alguien con fechas compatibles, el match es directo y gratis — los Yankis se cancelan entre sí.',
   step: [
     {
       '@type': 'HowToStep',
@@ -40,7 +40,7 @@ const howToSchema = {
       '@type': 'HowToStep',
       position: 2,
       name: 'Explora destinos y encuentra tu match',
-      text: 'Busca hogares disponibles en Chile, México, Colombia o Argentina. El sistema detecta automáticamente si hay alguien con fechas compatibles (match directo) o te muestra cuántos Yankis necesitas para reservar.',
+      text: 'Busca hogares disponibles en Chile. El sistema detecta automáticamente si hay alguien con fechas compatibles (match directo) o te muestra cuántos Yankis necesitas para reservar.',
       url: 'https://rukka.cl/homes',
     },
     {
@@ -109,7 +109,7 @@ const faqSchema = {
       name: '¿En qué países opera Rukka?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Rukka opera en Chile, México, Colombia y Argentina. Puedes intercambiar entre cualquiera de estos cuatro países latinoamericanos.',
+        text: 'Rukka opera en Chile. Puedes intercambiar tu hogar con viajeros de distintas regiones del país.',
       },
     },
   ],
