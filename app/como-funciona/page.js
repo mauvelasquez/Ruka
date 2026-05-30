@@ -33,7 +33,7 @@ const howToSchema = {
       '@type': 'HowToStep',
       position: 1,
       name: 'Publica tu hogar',
-      text: 'Creá tu perfil y registrá tu propiedad. Si ya tenés listing en Airbnb, importalo automáticamente con un link. Al completar tu perfil recibís 3 Yankis de bienvenida.',
+      text: 'Crea tu perfil y registra tu propiedad. Si ya tienes listing en Airbnb, impórtalo automáticamente con un link. Al completar tu perfil recibes 3 Yankis de bienvenida.',
       url: 'https://rukka.cl/auth/register',
     },
     {

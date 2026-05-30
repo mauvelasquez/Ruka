@@ -91,7 +91,7 @@ export default function ComoFuncionaClient() {
         </div>
         <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
           <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm border border-white/25 text-white rounded-full px-4 py-2 text-sm font-bold mb-6">
-            🌎 Chile · México · Colombia · Argentina
+            🇨🇱 Chile
           </div>
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white leading-tight mb-5">
             Intercambia tu hogar.<br />
@@ -299,7 +299,7 @@ export default function ComoFuncionaClient() {
                 n: '02',
                 icon: '🗺️',
                 title: 'Explora destinos',
-                desc: 'Buscá hogares disponibles en Chile, México, Colombia o Argentina. Filtrá por fechas, tipo de propiedad y ciudad.',
+                desc: 'Busca hogares disponibles en Chile, México, Colombia o Argentina. Filtra por fechas, tipo de propiedad y ciudad.',
                 tag: null,
               },
               {
@@ -392,7 +392,7 @@ export default function ComoFuncionaClient() {
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <p className="text-xs font-bold uppercase tracking-widest text-terra mb-3">Preguntas frecuentes</p>
-            <h2 id="faq-heading" className="text-3xl sm:text-4xl font-black text-gray-900">¿Tenés dudas?</h2>
+            <h2 id="faq-heading" className="text-3xl sm:text-4xl font-black text-gray-900">¿Tienes dudas?</h2>
           </div>
           <div className="space-y-3" role="list">
             {FAQS.map((faq, i) => (
