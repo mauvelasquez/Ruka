@@ -111,16 +111,16 @@ function MatchCard({ result, myHomes, onRequest }) {
             <form onSubmit={handleSend} className="space-y-3">
               {myHomes.length > 1 && (
                 <div>
-                  <label className="block text-xs font-bold text-gray-600 mb-1">Tu hogar a ofrecer</label>
-                  <select value={myHomeId} onChange={e => setMyHomeId(e.target.value)}
+                  <label htmlFor="match-home-select" className="block text-xs font-bold text-gray-600 mb-1">Tu hogar a ofrecer</label>
+                  <select id="match-home-select" value={myHomeId} onChange={e => setMyHomeId(e.target.value)}
                     className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-forest">
                     {myHomes.map(h => <option key={h.id} value={h.id}>{h.title}</option>)}
                   </select>
                 </div>
               )}
               <div>
-                <label className="block text-xs font-bold text-gray-600 mb-1">Mensaje (opcional)</label>
-                <textarea value={msg} onChange={e => setMsg(e.target.value)} rows={2} placeholder="Cuéntales sobre ti..."
+                <label htmlFor="match-message" className="block text-xs font-bold text-gray-600 mb-1">Mensaje (opcional)</label>
+                <textarea id="match-message" value={msg} onChange={e => setMsg(e.target.value)} rows={2} placeholder="Cuéntales sobre ti..."
                   className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-forest resize-none" />
               </div>
               <div className="flex gap-2">
@@ -290,8 +290,9 @@ function MatchesContent() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="lg:col-span-1">
-              <label className="block text-xs font-black text-gray-600 mb-1.5 uppercase tracking-wide">Ciudad destino</label>
+              <label htmlFor="matches-city" className="block text-xs font-black text-gray-600 mb-1.5 uppercase tracking-wide">Ciudad destino</label>
               <input
+                id="matches-city"
                 type="text"
                 list="ciudades-rukka"
                 placeholder="ej. Pichilemu, Puerto Varas, Zapallar..."
@@ -304,8 +305,9 @@ function MatchesContent() {
               )}
             </div>
             <div>
-              <label className="block text-xs font-black text-gray-600 mb-1.5 uppercase tracking-wide">Llegada</label>
+              <label htmlFor="matches-start" className="block text-xs font-black text-gray-600 mb-1.5 uppercase tracking-wide">Llegada</label>
               <input
+                id="matches-start"
                 type="date"
                 value={start}
                 onChange={e => handleStartChange(e.target.value)}
@@ -316,8 +318,9 @@ function MatchesContent() {
               )}
             </div>
             <div>
-              <label className="block text-xs font-black text-gray-600 mb-1.5 uppercase tracking-wide">Salida</label>
+              <label htmlFor="matches-end" className="block text-xs font-black text-gray-600 mb-1.5 uppercase tracking-wide">Salida</label>
               <input
+                id="matches-end"
                 type="date"
                 value={end}
                 min={start || undefined}

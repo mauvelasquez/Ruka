@@ -291,20 +291,20 @@ export default function HomeDetailClient({ id }) {
                   </div>
                   <form onSubmit={handleRequest} className="space-y-4">
                     <div>
-                      <label className="block text-xs font-bold text-gray-600 mb-1.5 uppercase tracking-wide">Fecha llegada</label>
-                      <input type="date" value={form.start} min={new Date().toISOString().split('T')[0]}
+                      <label htmlFor="detail-date-start" className="block text-xs font-bold text-gray-600 mb-1.5 uppercase tracking-wide">Fecha llegada</label>
+                      <input id="detail-date-start" type="date" value={form.start} min={new Date().toISOString().split('T')[0]}
                         onChange={e => setForm({ ...form, start: e.target.value })}
                         className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-forest" />
                     </div>
                     <div>
-                      <label className="block text-xs font-bold text-gray-600 mb-1.5 uppercase tracking-wide">Fecha salida</label>
-                      <input type="date" value={form.end} min={form.start || new Date().toISOString().split('T')[0]}
+                      <label htmlFor="detail-date-end" className="block text-xs font-bold text-gray-600 mb-1.5 uppercase tracking-wide">Fecha salida</label>
+                      <input id="detail-date-end" type="date" value={form.end} min={form.start || new Date().toISOString().split('T')[0]}
                         onChange={e => setForm({ ...form, end: e.target.value })}
                         className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-forest" />
                     </div>
                     <div>
-                      <label className="block text-xs font-bold text-gray-600 mb-1.5 uppercase tracking-wide">Mensaje</label>
-                      <textarea value={form.message} onChange={e => setForm({ ...form, message: e.target.value })}
+                      <label htmlFor="detail-message" className="block text-xs font-bold text-gray-600 mb-1.5 uppercase tracking-wide">Mensaje</label>
+                      <textarea id="detail-message" value={form.message} onChange={e => setForm({ ...form, message: e.target.value })}
                         placeholder="Cuéntale sobre ti y por qué quieres su hogar..." rows={4}
                         className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-forest resize-none" />
                     </div>

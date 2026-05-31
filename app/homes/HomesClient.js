@@ -206,9 +206,9 @@ function HomesContent() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {/* País */}
               <div>
-                <label className="block text-xs font-bold text-gray-700 mb-2 uppercase tracking-wide">País</label>
+                <label htmlFor="homes-filter-country" className="block text-xs font-bold text-gray-700 mb-2 uppercase tracking-wide">País</label>
                 <div className="relative">
-                  <select value={country} onChange={e => { setCountry(e.target.value); setRegion('Todas'); setCity('Todas') }}
+                  <select id="homes-filter-country" value={country} onChange={e => { setCountry(e.target.value); setRegion('Todas'); setCity('Todas') }}
                     className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-forest bg-gray-50 appearance-none">
                     <option value="">Todos los países</option>
                     {COUNTRIES.map(c => <option key={c.code} value={c.code}>{c.flag} {c.name}</option>)}
@@ -221,18 +221,18 @@ function HomesContent() {
 
               {/* Localidad: usa LATAM si hay país seleccionado, sino COMUNAS Chile */}
               <div>
-                <label className="block text-xs font-bold text-gray-700 mb-2 uppercase tracking-wide">
+                <label htmlFor="homes-filter-locality" className="block text-xs font-bold text-gray-700 mb-2 uppercase tracking-wide">
                   {country && country !== 'CL' ? (COUNTRIES.find(c=>c.code===country)?.code === 'MX' ? 'Estado' : country === 'AR' ? 'Provincia' : 'Región') : 'Localidad'}
                 </label>
                 <div className="relative">
                   {country && country !== 'CL' ? (
-                    <select value={region} onChange={e => { setRegion(e.target.value); setCity('Todas') }}
+                    <select id="homes-filter-locality" value={region} onChange={e => { setRegion(e.target.value); setCity('Todas') }}
                       className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-forest bg-gray-50 appearance-none">
                       <option value="Todas">Todas</option>
                       {latamRegions.map(r => <option key={r.code} value={r.code}>{r.name}</option>)}
                     </select>
                   ) : (
-                    <select value={city} onChange={e => { setCity(e.target.value); if (e.target.value !== 'Todas') analytics.homesFilterCity(e.target.value) }}
+                    <select id="homes-filter-locality" value={city} onChange={e => { setCity(e.target.value); if (e.target.value !== 'Todas') analytics.homesFilterCity(e.target.value) }}
                       className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-forest bg-gray-50 appearance-none">
                       <option value="Todas">Todas las localidades</option>
                       {COMUNAS_RUKKA.map(c => <option key={c} value={c}>{c}</option>)}
@@ -246,8 +246,8 @@ function HomesContent() {
 
               {/* Habitaciones */}
               <div>
-                <label className="block text-xs font-bold text-gray-700 mb-2 uppercase tracking-wide">Habitaciones mínimas</label>
-                <div className="flex gap-2">
+                <label id="homes-filter-beds-label" className="block text-xs font-bold text-gray-700 mb-2 uppercase tracking-wide">Habitaciones mínimas</label>
+                <div className="flex gap-2" role="group" aria-labelledby="homes-filter-beds-label">
                   {[0,1,2,3].map(n => (
                     <button key={n} onClick={() => { setMinBeds(n); if (n > 0) analytics.homesFilterBeds(n) }}
                       className={`w-11 h-10 rounded-xl border text-sm font-bold transition-colors ${
