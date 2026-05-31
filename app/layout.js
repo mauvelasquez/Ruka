@@ -135,7 +135,7 @@ export default function RootLayout({ children }) {
         <Providers>
           {children}
           <FresiaWidget />
-          <WelcomePopup />
+          {/* <WelcomePopup /> */}
         </Providers>
       </body>
     </html>
