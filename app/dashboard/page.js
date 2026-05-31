@@ -7,7 +7,7 @@ import Navbar from '../../components/Navbar'
 import MessageThread from '../../components/MessageThread'
 import {
   Home, Heart, ArrowLeftRight, Plus, MapPin, Users, Calendar,
-  CheckCircle, XCircle, Clock, Trash2, Eye, Star, Sparkles, AlertCircle, ScrollText, MessageSquare, User, Lock
+  CheckCircle, XCircle, Clock, Trash2, Eye, Star, Sparkles, AlertCircle, ScrollText, MessageSquare, User, Lock, ChevronRight, TrendingUp
 } from 'lucide-react'
 import { COMUNAS_RUKKA } from '../../lib/comunas'
 import { COUNTRIES as LATAM_COUNTRIES } from '../../lib/geo/latam'
@@ -39,6 +39,8 @@ function StatusBadge({ status }) {
   )
 }
 
+const TX_ICON = { earned: '📈', bonus: '🎁', spent: '✈️', refunded: '↩️' }
+
 const VALID_TABS = new Set(Object.values(TAB))
 
 function DashboardContent() {
@@ -60,10 +62,11 @@ function DashboardContent() {
   const [wishForm, setWishForm] = useState({ toCity: '', startDate: '', endDate: '', guests: 2 })
   const [showWishForm, setShowWishForm] = useState(false)
   const [showNoHomeAlert, setShowNoHomeAlert] = useState(false)
-  const [wishBlockReason, setWishBlockReason] = useState(null) // 'unverified' | 'no_home'
-  const [activeThread, setActiveThread] = useState(null) // { requestId, otherUser }
-  // SECURITY FIX: isAdmin verificado server-side, no expone el email del admin en el bundle JS
+  const [wishBlockReason, setWishBlockReason] = useState(null)
+  const [activeThread, setActiveThread] = useState(null)
   const [isAdmin, setIsAdmin] = useState(false)
+  const [yankiBalance, setYankiBalance] = useState(null)
+  const [yankiTxs, setYankiTxs] = useState([])
 
   useEffect(() => {
     if (!ready || !currentUser) return
@@ -71,9 +74,13 @@ function DashboardContent() {
   }, [ready, currentUser])
 
   useEffect(() => {
+    if (!ready || !currentUser) return
+    fetch('/api/yankis/balance').then(r => r.json()).then(d => setYankiBalance(d)).catch(() => {})
+    fetch('/api/yankis/transactions').then(r => r.json()).then(d => setYankiTxs((d || []).slice(0, 4))).catch(() => {})
+  }, [ready, currentUser])
+
+  useEffect(() => {
     if (ready) return
-    // Si el store no resuelve en 15s (red muy lenta o error real), recargar la página.
-    // Con el nuevo initAuth de getSession(), en condiciones normales esto nunca debería dispararse.
     const timer = setTimeout(() => window.location.reload(), 15000)
     return () => clearTimeout(timer)
   }, [ready])
@@ -89,7 +96,6 @@ function DashboardContent() {
     </div>
   )
 
-  // Mientras el redirect a login ocurre, mostrar spinner en vez de blank page
   if (!currentUser) return (
     <div className="min-h-screen flex items-center justify-center" style={{ background: '#F8F4EE' }}>
       <div className="w-8 h-8 border-4 border-forest border-t-transparent rounded-full animate-spin" />
@@ -136,8 +142,8 @@ function DashboardContent() {
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-3xl font-black text-gray-900">Mi panel</h1>
-            <p className="text-gray-500 mt-1">Bienvenido, {currentUser.name?.split(' ')[0]} 👋</p>
+            <h1 className="text-3xl font-black text-rukka-dark">Mi Rukka</h1>
+            <p className="text-gray-500 mt-0.5">Hola, {currentUser.name?.split(' ')[0]} 👋 ¿A dónde viajas hoy?</p>
           </div>
           <div className="flex items-center gap-2">
             {isAdmin && (
@@ -147,40 +153,144 @@ function DashboardContent() {
               </Link>
             )}
             <Link href="/matches"
-              className="bg-terra text-white px-5 py-2.5 rounded-xl font-bold text-sm hover:bg-terra-dark transition-colors flex items-center gap-2">
+              className="bg-terra text-white px-5 py-2.5 rounded-xl font-bold text-sm hover:bg-terra-dark transition-colors flex items-center gap-2 shadow-sm">
               <Star className="w-4 h-4" /> Buscar match
             </Link>
           </div>
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
           {[
-            { label: 'Deseos de viaje', value: myWishes.length, color: 'bg-andean text-white', icon: Heart,          tabId: TAB.WISHES },
-            { label: 'Hogares',         value: myHomes.length,  color: 'bg-forest text-white', icon: Home,           tabId: TAB.HOMES },
-            { label: 'Recibidas',       value: received.length, color: 'bg-terra text-white',  icon: ArrowLeftRight, tabId: TAB.RECEIVED },
-            { label: 'Enviadas',        value: sent.length,     color: 'bg-gray-700 text-white',icon: ArrowLeftRight, tabId: TAB.SENT },
+            { label: 'Deseos de viaje', value: myWishes.length, bg: 'bg-andean',   icon: Heart,          tabId: TAB.WISHES },
+            { label: 'Mis hogares',     value: myHomes.length,  bg: 'bg-forest',   icon: Home,           tabId: TAB.HOMES },
+            { label: 'Recibidas',       value: received.length, bg: 'bg-terra',    icon: ArrowLeftRight, tabId: TAB.RECEIVED },
+            { label: 'Enviadas',        value: sent.length,     bg: 'bg-gray-700', icon: ArrowLeftRight, tabId: TAB.SENT },
           ].map((s, i) => (
-            <div key={i} className={`${s.color} rounded-2xl p-4 flex items-center gap-3 cursor-pointer hover:opacity-90 transition-opacity`}
-              onClick={() => changeTab(s.tabId)}>
-              <s.icon className="w-6 h-6 opacity-80" />
+            <button key={i}
+              onClick={() => changeTab(s.tabId)}
+              className={`${s.bg} text-white rounded-2xl p-4 flex items-center gap-3 hover:opacity-90 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-sm text-left w-full`}>
+              <s.icon className="w-5 h-5 opacity-75 flex-shrink-0" />
               <div>
-                <p className="text-2xl font-black">{s.value}</p>
-                <p className="text-xs opacity-80">{s.label}</p>
+                <p className="text-2xl font-black leading-none">{s.value}</p>
+                <p className="text-xs opacity-75 mt-0.5 leading-tight">{s.label}</p>
+              </div>
+            </button>
+          ))}
+        </div>
+
+        {/* Módulo Yankis */}
+        <div className="bg-white rounded-3xl border border-terra/15 shadow-sm mb-5 overflow-hidden">
+          {/* Header del módulo */}
+          <div className="bg-gradient-to-r from-terra to-terra-dark px-6 py-5 text-white">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="text-white/60 text-xs font-bold uppercase tracking-widest mb-2">Tus Yankis</p>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-5xl font-black tabular-nums">
+                    {yankiBalance === null ? '—' : yankiBalance.balance ?? 0}
+                  </span>
+                  <span className="text-3xl">🪙</span>
+                </div>
+                <p className="text-white/60 text-xs mt-1.5">disponibles para viajar</p>
+              </div>
+              <Link href="/dashboard/yankis"
+                className="flex-shrink-0 bg-white/20 hover:bg-white/30 text-white text-xs font-bold px-3.5 py-2 rounded-xl transition-colors flex items-center gap-1.5 mt-1">
+                Ver todo <ChevronRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+
+            {/* Mini stats si hay datos */}
+            {yankiBalance !== null && (
+              <div className="flex gap-5 mt-4 pt-4 border-t border-white/20">
+                <div>
+                  <p className="text-white/50 text-xs">Ganados</p>
+                  <p className="text-white font-black text-base">{yankiBalance.total_earned ?? 0} 🪙</p>
+                </div>
+                <div>
+                  <p className="text-white/50 text-xs">Gastados</p>
+                  <p className="text-white font-black text-base">{yankiBalance.total_spent ?? 0} 🪙</p>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Cuerpo del módulo */}
+          <div className="p-5 grid grid-cols-1 sm:grid-cols-2 gap-5">
+            {/* Cómo ganas */}
+            <div>
+              <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Cómo ganar Yankis</p>
+              <div className="space-y-3">
+                <div className="flex items-start gap-3">
+                  <span className="text-xl flex-shrink-0">🏠</span>
+                  <div>
+                    <p className="text-sm font-bold text-gray-800">Hospeda viajeros</p>
+                    <p className="text-xs text-gray-400 leading-relaxed">1 Yanki por noche al aceptar un intercambio</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <span className="text-xl flex-shrink-0">🎁</span>
+                  <div>
+                    <p className="text-sm font-bold text-gray-800">Bono de bienvenida</p>
+                    <p className="text-xs text-gray-400 leading-relaxed">3 Yankis al completar tu perfil verificado</p>
+                  </div>
+                </div>
               </div>
             </div>
-          ))}
+
+            {/* Transacciones recientes o explicación de uso */}
+            <div>
+              {yankiTxs.length > 0 ? (
+                <>
+                  <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Últimos movimientos</p>
+                  <div className="space-y-2.5">
+                    {yankiTxs.map(tx => (
+                      <div key={tx.id} className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <span className="text-base flex-shrink-0">{TX_ICON[tx.type] || '🪙'}</span>
+                          <p className="text-xs text-gray-600 truncate">{tx.description}</p>
+                        </div>
+                        <span className={`text-xs font-black flex-shrink-0 ${tx.type === 'spent' ? 'text-red-500' : 'text-forest'}`}>
+                          {tx.type === 'spent' ? '−' : '+'}{tx.amount} 🪙
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              ) : (
+                <>
+                  <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Para qué sirven</p>
+                  <div className="space-y-3">
+                    <div className="flex items-start gap-3">
+                      <span className="text-xl flex-shrink-0">✈️</span>
+                      <div>
+                        <p className="text-sm font-bold text-gray-800">Viaja sin match bilateral</p>
+                        <p className="text-xs text-gray-400 leading-relaxed">1 Yanki = 1 noche en cualquier hogar Rukka</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <span className="text-xl flex-shrink-0">🤝</span>
+                      <div>
+                        <p className="text-sm font-bold text-gray-800">Match bilateral = gratis</p>
+                        <p className="text-xs text-gray-400 leading-relaxed">Si ambos viajan juntos, los Yankis se cancelan entre sí</p>
+                      </div>
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
         </div>
 
         {/* CTA si no tiene hogar */}
         {myHomes.length === 0 && (
-          <div className="bg-gradient-to-r from-forest to-forest-dark rounded-2xl p-5 text-white flex flex-col sm:flex-row items-center gap-4 mb-6 shadow-md">
+          <div className="bg-gradient-to-r from-forest to-forest-dark rounded-2xl p-5 text-white flex flex-col sm:flex-row items-center gap-4 mb-5 shadow-md">
             <div className="flex-1">
               <p className="font-black text-base mb-1">🏠 Aún no tienes un hogar registrado</p>
-              <p className="text-white/80 text-sm">Publica tu hogar para poder intercambiar y encontrar matches.</p>
+              <p className="text-white/75 text-sm">Publica tu hogar para intercambiar estadías y ganar Yankis.</p>
             </div>
             <button onClick={() => gate('publish', () => router.push('/dashboard/property/new'))}
-              className="flex-shrink-0 bg-white text-forest-dark font-black px-5 py-2.5 rounded-xl text-sm hover:bg-sand transition-colors flex items-center gap-2 whitespace-nowrap">
+              className="flex-shrink-0 bg-white text-forest-dark font-black px-5 py-2.5 rounded-xl text-sm hover:bg-sand transition-colors flex items-center gap-2 whitespace-nowrap shadow-sm">
               <Plus className="w-4 h-4" /> Publicar mi hogar
             </button>
           </div>
@@ -188,7 +298,7 @@ function DashboardContent() {
 
         {/* Quiero viajar hero */}
         {tab === TAB.WISHES && myWishes.length === 0 && !showWishForm && (
-          <div className="bg-gradient-to-br from-andean to-blue-700 rounded-3xl p-8 text-white text-center mb-6 shadow-lg">
+          <div className="bg-gradient-to-br from-andean to-blue-700 rounded-3xl p-8 text-white text-center mb-5 shadow-lg">
             <div className="text-5xl mb-4">🗺️</div>
             <h2 className="text-2xl font-black mb-2">¿Cuándo te gustaría ir de vacaciones?</h2>
             <p className="text-white/80 text-sm mb-6 max-w-md mx-auto">
@@ -552,6 +662,7 @@ function DashboardContent() {
             )}
           </div>
         )}
+
         {/* ── TAB: MI PERFIL ── */}
         {tab === TAB.PROFILE && (
           <div className="max-w-xl">
@@ -638,10 +749,10 @@ function DashboardContent() {
         )}
 
       </div>
-    {modalOpen && (
-      <VerificationRequiredModal action={modalAction} onClose={closeModal} />
-    )}
-  </div>
+      {modalOpen && (
+        <VerificationRequiredModal action={modalAction} onClose={closeModal} />
+      )}
+    </div>
   )
 }
 
