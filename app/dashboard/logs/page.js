@@ -28,7 +28,7 @@ export default function LogsPage() {
   const [offset,  setOffset]  = useState(0)
   const [hasMore, setHasMore] = useState(true)
 
-  const [filters, setFilters] = useState({ level: '', source: '', hours: '24' })
+  const [filters, setFilters] = useState({ level: '', source: '', hours: '168' })
 
   // SECURITY FIX: isAdmin se verifica server-side para no exponer el email del admin en el bundle JS
   const [isAdmin, setIsAdmin] = useState(false)
