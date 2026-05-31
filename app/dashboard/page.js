@@ -7,7 +7,7 @@ import Navbar from '../../components/Navbar'
 import MessageThread from '../../components/MessageThread'
 import {
   Home, Heart, ArrowLeftRight, Plus, MapPin, Users, Calendar,
-  CheckCircle, XCircle, Clock, Trash2, Eye, Star, Sparkles, AlertCircle, ScrollText, MessageSquare, User, Lock, ChevronRight, TrendingUp
+  CheckCircle, XCircle, Clock, Trash2, Eye, Star, Sparkles, AlertCircle, ScrollText, MessageSquare, User, Lock, ChevronRight, TrendingUp, ExternalLink, Share2, Check
 } from 'lucide-react'
 import { COMUNAS_RUKKA } from '../../lib/comunas'
 import { COUNTRIES as LATAM_COUNTRIES } from '../../lib/geo/latam'
@@ -67,6 +67,7 @@ function DashboardContent() {
   const [isAdmin, setIsAdmin] = useState(false)
   const [yankiBalance, setYankiBalance] = useState(null)
   const [yankiTxs, setYankiTxs] = useState([])
+  const [copiedHomeId, setCopiedHomeId] = useState(null)
 
   useEffect(() => {
     if (!ready || !currentUser) return
@@ -126,12 +127,19 @@ function DashboardContent() {
     setShowWishForm(false)
   }
 
+  const shareHome = (homeId) => {
+    const url = `${window.location.origin}/homes/${homeId}`
+    navigator.clipboard.writeText(url).then(() => {
+      setCopiedHomeId(homeId)
+      setTimeout(() => setCopiedHomeId(null), 2000)
+    })
+  }
+
   const tabs = [
     { id: TAB.WISHES,   label: 'Quiero viajar', icon: Heart,          count: myWishes.length },
     { id: TAB.HOMES,    label: 'Mis hogares',   icon: Home,           count: myHomes.length },
     { id: TAB.RECEIVED, label: 'Recibidas',     icon: ArrowLeftRight, count: received.length },
     { id: TAB.SENT,     label: 'Enviadas',      icon: ArrowLeftRight, count: sent.length },
-    { id: TAB.PROFILE,  label: 'Mi perfil',     icon: User,           count: 0 },
   ]
 
   return (
@@ -152,6 +160,14 @@ function DashboardContent() {
                 <ScrollText className="w-4 h-4" /> Logs
               </Link>
             )}
+            <button onClick={() => changeTab(TAB.PROFILE)}
+              className={`px-4 py-2.5 rounded-xl font-bold text-sm transition-colors flex items-center gap-2 ${
+                tab === TAB.PROFILE
+                  ? 'bg-forest text-white'
+                  : 'bg-white text-gray-600 border border-gray-200 hover:border-forest hover:text-forest'
+              }`}>
+              <User className="w-4 h-4" /> Mi perfil
+            </button>
             <Link href="/matches"
               className="bg-terra text-white px-5 py-2.5 rounded-xl font-bold text-sm hover:bg-terra-dark transition-colors flex items-center gap-2 shadow-sm">
               <Star className="w-4 h-4" /> Buscar match
@@ -517,9 +533,23 @@ function DashboardContent() {
                       <div className="flex items-start justify-between gap-2">
                         <h3 className="font-black text-gray-900 text-lg leading-tight">{home.title}</h3>
                         <div className="flex gap-2 flex-shrink-0">
+                          <Link href={`/homes/${home.id}`} target="_blank"
+                            className="p-1.5 text-gray-400 hover:text-andean transition-colors"
+                            aria-label={`Ver página pública de ${home.title}`}>
+                            <ExternalLink className="w-4 h-4" />
+                          </Link>
+                          <button onClick={() => shareHome(home.id)}
+                            className="p-1.5 transition-colors"
+                            aria-label={`Compartir link de ${home.title}`}
+                            title="Copiar link">
+                            {copiedHomeId === home.id
+                              ? <Check className="w-4 h-4 text-forest" />
+                              : <Share2 className="w-4 h-4 text-gray-400 hover:text-terra" />
+                            }
+                          </button>
                           <Link href={`/dashboard/property/${home.id}`}
                             className="p-1.5 text-gray-400 hover:text-forest transition-colors"
-                            aria-label={`Ver y editar ${home.title}`}>
+                            aria-label={`Editar ${home.title}`}>
                             <Eye className="w-4 h-4" />
                           </Link>
                           <button onClick={() => removeHome(home.id)} aria-label={`Eliminar hogar ${home.title}`} className="p-1.5 text-gray-400 hover:text-red-500 transition-colors">

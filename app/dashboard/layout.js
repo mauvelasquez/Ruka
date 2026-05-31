@@ -1,5 +1,5 @@
 export const metadata = {
-  title: 'Panel de control — Rukka',
+  title: 'Mi Rukka — Rukka',
   robots: {
     index: false,
     follow: false,
