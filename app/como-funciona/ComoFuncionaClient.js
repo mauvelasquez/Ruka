@@ -5,6 +5,7 @@ import Navbar from '../../components/Navbar'
 import Footer from '../../components/Footer'
 import { CHILE_BANNERS } from '../../lib/chile-banners'
 import { ArrowRight, ArrowLeftRight, ChevronDown, ChevronUp, Shield, CheckCircle, RotateCcw } from 'lucide-react'
+import { openPublicarModal } from '../../components/PublicarModal'
 
 const FAQS = [
   {
@@ -40,17 +41,19 @@ const FAQS = [
 function FaqItem({ q, a, isOpen, onToggle }) {
   return (
     <div className="border border-gray-200 rounded-2xl overflow-hidden bg-white">
-      <button
-        onClick={onToggle}
-        className="w-full flex items-center justify-between p-5 text-left hover:bg-gray-50 transition-colors"
-        aria-expanded={isOpen}
-      >
-        <span className="font-bold text-gray-900 pr-4 text-sm sm:text-base">{q}</span>
-        {isOpen
-          ? <ChevronUp className="w-5 h-5 text-forest flex-shrink-0" />
-          : <ChevronDown className="w-5 h-5 text-gray-400 flex-shrink-0" />
-        }
-      </button>
+      <h3 className="m-0">
+        <button
+          onClick={onToggle}
+          className="w-full flex items-center justify-between p-5 text-left hover:bg-gray-50 transition-colors font-bold text-gray-900 text-sm sm:text-base"
+          aria-expanded={isOpen}
+        >
+          <span className="pr-4">{q}</span>
+          {isOpen
+            ? <ChevronUp className="w-5 h-5 text-forest flex-shrink-0" />
+            : <ChevronDown className="w-5 h-5 text-gray-400 flex-shrink-0" />
+          }
+        </button>
+      </h3>
       <div
         className={`px-5 text-gray-600 text-sm leading-relaxed border-t border-gray-100 overflow-hidden transition-all duration-200 ${isOpen ? 'pb-5 pt-4 max-h-96' : 'max-h-0 border-t-0'}`}
         aria-hidden={!isOpen}
@@ -119,7 +122,7 @@ export default function ComoFuncionaClient() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8">
             <div className="bg-forest-50 border-2 border-forest/20 rounded-3xl p-7 text-center flex-1 max-w-xs">
               <div className="text-5xl mb-3">🏠</div>
-              <p className="font-black text-forest">Tu hogar</p>
+              <h3 className="font-black text-forest m-0">Tu hogar</h3>
               <p className="text-gray-500 text-sm mt-1">Santiago, Viña, Valparaíso…</p>
             </div>
 
@@ -134,7 +137,7 @@ export default function ComoFuncionaClient() {
 
             <div className="bg-terra-50 border-2 border-terra/20 rounded-3xl p-7 text-center flex-1 max-w-xs">
               <div className="text-5xl mb-3">🏖️</div>
-              <p className="font-black text-terra">El hogar de alguien</p>
+              <h3 className="font-black text-terra m-0">El hogar de alguien</h3>
               <p className="text-gray-500 text-sm mt-1">Pichilemu, San Pedro, Puerto Varas…</p>
             </div>
           </div>
@@ -249,7 +252,7 @@ export default function ComoFuncionaClient() {
           {/* Unifying statement */}
           <div className="mt-6 bg-forest-dark rounded-3xl p-8 text-white text-center">
             <p className="text-forest-light text-sm font-bold uppercase tracking-widest mb-3">En cualquier caso</p>
-            <p className="text-2xl font-black mb-3">Tu hospitalidad siempre tiene valor.</p>
+            <h3 className="text-2xl font-black mb-3 m-0">Tu hospitalidad siempre tiene valor.</h3>
             <p className="text-white/70 max-w-xl mx-auto">
               Si las fechas cuadran, viajas de inmediato con un match directo.
               Si no, los Yankis guardan ese valor para que lo uses cuando tengas ganas de viajar.
@@ -406,12 +409,12 @@ export default function ComoFuncionaClient() {
               Publica tu casa en 2 minutos. Recibes 3 Yankis de bienvenida.<br className="hidden sm:block" />
               Empieza a conectar con viajeros de LATAM.
             </p>
-            <Link
-              href="/auth/register"
+            <button
+              onClick={openPublicarModal}
               className="inline-flex items-center gap-2 bg-white text-forest-dark font-black px-10 py-4 rounded-2xl text-lg hover:bg-sand transition-colors shadow-lg"
             >
               Publicar mi hogar <ArrowRight className="w-5 h-5" />
-            </Link>
+            </button>
             <p className="text-white/40 text-sm mt-5">Sin tarjeta de crédito. Tarda 2 minutos.</p>
           </div>
         </div>

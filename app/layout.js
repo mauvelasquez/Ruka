@@ -1,8 +1,11 @@
 import './globals.css'
+import dynamic from 'next/dynamic'
 import Providers from './providers'
-import FresiaWidget from '../components/fresia/FresiaWidget'
 import GoogleAnalytics from '../components/GoogleAnalytics'
 import WelcomePopup from '../components/WelcomePopup'
+
+const FresiaWidget   = dynamic(() => import('../components/fresia/FresiaWidget'),   { ssr: false })
+const PublicarModal  = dynamic(() => import('../components/PublicarModal'),          { ssr: false })
 
 export const metadata = {
   metadataBase: new URL('https://rukka.cl'),
@@ -135,6 +138,7 @@ export default function RootLayout({ children }) {
         <Providers>
           {children}
           <FresiaWidget />
+          <PublicarModal />
           {/* <WelcomePopup /> */}
         </Providers>
       </body>

@@ -62,8 +62,9 @@ export default function ResetPasswordPage() {
           ) : (
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Email</label>
+                <label htmlFor="reset-email" className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Email</label>
                 <input
+                  id="reset-email"
                   type="email"
                   value={email}
                   onChange={e => setEmail(e.target.value)}

@@ -148,16 +148,16 @@ export default function LoginPage() {
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1.5">Email</label>
-              <input type="email" value={email} onChange={e => setEmail(e.target.value)}
+              <label htmlFor="login-email" className="block text-sm font-bold text-gray-700 mb-1.5">Email</label>
+              <input id="login-email" type="email" value={email} onChange={e => setEmail(e.target.value)}
                 placeholder="tu@email.com" required
                 autoComplete="email" inputMode="email" enterKeyHint="next"
                 className="w-full border border-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-forest bg-white" />
             </div>
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1.5">Contraseña</label>
+              <label htmlFor="login-password" className="block text-sm font-bold text-gray-700 mb-1.5">Contraseña</label>
               <div className="relative">
-                <input type={showPw ? 'text' : 'password'} value={password}
+                <input id="login-password" type={showPw ? 'text' : 'password'} value={password}
                   onChange={e => setPassword(e.target.value)} placeholder="••••••••" required
                   autoComplete="current-password" enterKeyHint="go"
                   className="w-full border border-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-forest bg-white pr-12" />

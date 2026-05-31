@@ -58,23 +58,23 @@ export default function RegisterClient({ subtitle }) {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Nombre completo</label>
-              <input type="text" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })}
+              <label htmlFor="reg-name" className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Nombre completo</label>
+              <input id="reg-name" type="text" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })}
                 placeholder="Tu nombre" required
                 autoComplete="name" enterKeyHint="next"
                 className="w-full border border-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-forest transition-all" />
             </div>
             <div>
-              <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Email</label>
-              <input type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })}
+              <label htmlFor="reg-email" className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Email</label>
+              <input id="reg-email" type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })}
                 placeholder="tu@email.com" required
                 autoComplete="email" inputMode="email" enterKeyHint="next"
                 className="w-full border border-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-forest transition-all" />
             </div>
             <div>
-              <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Contraseña</label>
+              <label htmlFor="reg-password" className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Contraseña</label>
               <div className="relative">
-                <input type={showPwd ? 'text' : 'password'} value={form.password}
+                <input id="reg-password" type={showPwd ? 'text' : 'password'} value={form.password}
                   onChange={e => setForm({ ...form, password: e.target.value })}
                   placeholder="Mínimo 6 caracteres" required
                   autoComplete="new-password" enterKeyHint="go"

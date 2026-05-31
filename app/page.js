@@ -1,11 +1,11 @@
 'use client'
 import { useState, useEffect, useMemo } from 'react'
+import dynamic from 'next/dynamic'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import HomeCard from '../components/HomeCard'
-import FresiaSearchModule from '../components/FresiaSearchModule'
 import FeaturedHomeCard from '../components/FeaturedHomeCard'
 import { useApp } from '../lib/store'
 import { supabase } from '../lib/supabase'
@@ -15,6 +15,12 @@ import { useCountry } from '../hooks/useCountry'
 import { getRandomCountryBanner } from '../lib/country-banners'
 import { ArrowRight, Zap, Gift } from 'lucide-react'
 import { curateHomesForUser } from '../lib/editorial'
+import { openPublicarModal } from '../components/PublicarModal'
+
+const FresiaSearchModule = dynamic(() => import('../components/FresiaSearchModule'), {
+  ssr: false,
+  loading: () => <div className="h-[72px] w-full max-w-2xl mx-auto rounded-2xl bg-white/10 animate-pulse" />,
+})
 
 const COUNTRY_CONFIG = {
   CL: { region: 'Chile', peers: 'distintas regiones de Chile', badge: 'Viaja por Chile' },
@@ -28,8 +34,7 @@ function AdBanner({ variant = 'primary', className = '', heroBanner = null }) {
       bg: 'bg-gradient-to-r from-forest to-forest-dark',
       title: 'Viaja por Chile sin gastar en alojamiento',
       desc: 'Intercambia tu hogar y vive como local en cualquier ciudad. Sin intermediarios, sin costos ocultos.',
-      cta: 'Registrar mi hogar',
-      href: '/auth/register',
+      cta: 'Publicar mi hogar',
       icon: Gift,
     },
     secondary: {
@@ -38,7 +43,6 @@ function AdBanner({ variant = 'primary', className = '', heroBanner = null }) {
       title: `¿Quieres ir a ${heroBanner?.city ?? 'tu próximo destino'}? Hay alguien que quiere venir a tu ciudad`,
       desc: 'El algoritmo Rukka conecta viajeros que se quieren visitar mutuamente en fechas compatibles.',
       cta: 'Buscar mi match',
-      href: '/auth/register',
       icon: Zap,
     },
   }
@@ -54,10 +58,11 @@ function AdBanner({ variant = 'primary', className = '', heroBanner = null }) {
         <h3 className="font-black text-lg sm:text-xl mb-1 leading-tight">{v.title}</h3>
         <p className="text-white/80 text-sm">{v.desc}</p>
       </div>
-      <Link href={v.href}
+      <button
+        onClick={openPublicarModal}
         className="flex-shrink-0 bg-white text-forest-dark font-black px-5 py-3 rounded-xl text-sm hover:bg-sand transition-colors flex items-center gap-2 whitespace-nowrap">
         <Icon className="w-4 h-4" /> {v.cta}
-      </Link>
+      </button>
     </div>
   )
 }
@@ -174,10 +179,11 @@ export default function HomePage() {
               <p className="text-gray-500 mb-6 max-w-md mx-auto text-sm">
                 Estamos creciendo en tu país. Publica tu hogar y conecta con viajeros de {geoConfig.peers}.
               </p>
-              <Link href="/auth/register"
+              <button
+                onClick={openPublicarModal}
                 className="inline-flex items-center gap-2 bg-forest text-white font-bold px-6 py-3 rounded-full hover:bg-forest-dark transition-colors">
                 Publicar mi hogar <ArrowRight className="w-4 h-4" />
-              </Link>
+              </button>
             </div>
           )}
         </div>
@@ -194,10 +200,11 @@ export default function HomePage() {
               <span className="font-black">Regístrate hoy</span> y recibe{' '}
               <span className="font-black">3 Yankis de bienvenida</span> = 3 noches de alojamiento gratis
             </p>
-            <Link href="/auth/register"
+            <button
+              onClick={openPublicarModal}
               className="flex-shrink-0 ml-auto bg-terra text-white text-xs sm:text-sm font-black px-4 py-2 rounded-xl hover:bg-terra-dark transition-colors whitespace-nowrap hidden sm:block">
               Crear cuenta gratis
-            </Link>
+            </button>
           </div>
         </div>
       </section>
