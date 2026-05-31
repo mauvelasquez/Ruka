@@ -2,6 +2,8 @@
 import { useState, useEffect, useRef } from 'react'
 import { X, ArrowRight, CheckCircle } from 'lucide-react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { useApp } from '../lib/store'
 
 export const PUBLICAR_EVENT = 'rukka:publicar'
 
@@ -12,6 +14,8 @@ export function openPublicarModal() {
 }
 
 export default function PublicarModal() {
+  const router = useRouter()
+  const { user } = useApp()
   const [open, setOpen] = useState(false)
   const [email, setEmail] = useState('')
   const [submitted, setSubmitted] = useState(false)
@@ -19,10 +23,16 @@ export default function PublicarModal() {
   const firstFocusRef = useRef(null)
 
   useEffect(() => {
-    const handler = () => setOpen(true)
+    const handler = () => {
+      if (user?.id) {
+        router.push('/dashboard/property/new')
+        return
+      }
+      setOpen(true)
+    }
     window.addEventListener(PUBLICAR_EVENT, handler)
     return () => window.removeEventListener(PUBLICAR_EVENT, handler)
-  }, [])
+  }, [user, router])
 
   useEffect(() => {
     if (!open) return
