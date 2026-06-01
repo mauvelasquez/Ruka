@@ -1,9 +1,8 @@
 import Link from 'next/link'
-import Image from 'next/image'
 import Navbar from '../../components/Navbar'
 import Footer from '../../components/Footer'
 import { getAllPosts } from '../../lib/blog'
-import { getArticleCoverImage } from '../../lib/blogImage'
+import { getArticleCoverImage, getFallbackImage } from '../../lib/blogImage'
 import { Calendar, ArrowRight } from 'lucide-react'
 
 export const revalidate = 3600
@@ -38,17 +37,17 @@ function PostCard({ post }) {
     ? new Date(post.lastUpdated).toLocaleDateString('es-CL', { year: 'numeric', month: 'long' })
     : ''
   const imgSrc = getArticleCoverImage(post.title, post.description, post.image)
+  const fallbackSrc = getFallbackImage(post.slug)
 
   return (
     <Link href={`/blog/${post.slug}`} className="group bg-white rounded-2xl border border-stone-200/60 shadow-sm hover:shadow-md hover:border-forest/40 transition-all overflow-hidden flex flex-col">
       <div className="relative h-44 overflow-hidden bg-stone-100">
-        <Image
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
           src={imgSrc}
           alt={post.title}
-          fill
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-          className="object-cover group-hover:scale-105 transition-transform duration-500"
-          unoptimized={imgSrc.includes('source.unsplash.com')}
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          onError={(e) => { e.currentTarget.src = fallbackSrc; e.currentTarget.onerror = null }}
         />
         <div className={`absolute top-3 left-3 px-2.5 py-1 rounded-full text-xs font-bold border ${cluster.bg} ${cluster.text} ${cluster.border}`}>
           {cluster.label}

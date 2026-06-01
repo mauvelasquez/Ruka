@@ -3,7 +3,7 @@ import Link from 'next/link'
 import Navbar from '../../../components/Navbar'
 import Footer from '../../../components/Footer'
 import { getAllPosts, getPostBySlug, extractFAQs } from '../../../lib/blog'
-import { getArticleCoverImage } from '../../../lib/blogImage'
+import { getArticleCoverImage, getFallbackImage } from '../../../lib/blogImage'
 import { MDXRemote } from 'next-mdx-remote/rsc'
 import { Calendar, ArrowRight, ArrowLeft, Home } from 'lucide-react'
 
@@ -56,13 +56,16 @@ export async function generateMetadata({ params }) {
 function RelatedCard({ post }) {
   const cluster = CLUSTER_COLORS[post.market] || CLUSTER_COLORS.LATAM
   const imgSrc = getArticleCoverImage(post.title, post.description, post.image)
+  const fallbackSrc = getFallbackImage(post.slug)
   return (
     <Link href={`/blog/${post.slug}`} className="group flex gap-3 p-3 rounded-xl hover:bg-forest-50 transition-colors">
       <div className="relative w-16 h-14 flex-shrink-0 overflow-hidden rounded-lg bg-stone-100">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={imgSrc}
           alt={post.title}
           className="w-full h-full object-cover"
+          onError={(e) => { e.currentTarget.src = fallbackSrc; e.currentTarget.onerror = null }}
         />
       </div>
       <div>
@@ -86,6 +89,7 @@ export default async function BlogPostPage({ params }) {
     .slice(0, 3)
 
   const coverImg = getArticleCoverImage(fm.title, fm.description, fm.image)
+  const coverFallback = getFallbackImage(fm.slug)
   const faqs = extractFAQs(content)
   const dateStr = fm.lastUpdated
     ? new Date(fm.lastUpdated).toLocaleDateString('es-CL', { year: 'numeric', month: 'long' })
@@ -151,7 +155,13 @@ export default async function BlogPostPage({ params }) {
               {/* Header */}
               <div className="bg-white rounded-2xl border border-stone-200/60 shadow-sm overflow-hidden mb-6">
                 <div className="relative h-56 sm:h-72 bg-stone-100">
-                  <img src={coverImg} alt={fm.title} className="w-full h-full object-cover" />
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={coverImg}
+                    alt={fm.title}
+                    className="w-full h-full object-cover"
+                    onError={(e) => { e.currentTarget.src = coverFallback; e.currentTarget.onerror = null }}
+                  />
                 </div>
                 <div className="p-6 sm:p-8">
                   <div className="flex items-center gap-3 mb-4">
