@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import Navbar from '../../components/Navbar'
 import Footer from '../../components/Footer'
+import BlogImage from '../../components/BlogImage'
 import { getAllPosts } from '../../lib/blog'
 import { getArticleCoverImage, getFallbackImage } from '../../lib/blogImage'
 import { Calendar, ArrowRight } from 'lucide-react'
@@ -42,12 +43,11 @@ function PostCard({ post }) {
   return (
     <Link href={`/blog/${post.slug}`} className="group bg-white rounded-2xl border border-stone-200/60 shadow-sm hover:shadow-md hover:border-forest/40 transition-all overflow-hidden flex flex-col">
       <div className="relative h-44 overflow-hidden bg-stone-100">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
+        <BlogImage
           src={imgSrc}
+          fallback={fallbackSrc}
           alt={post.title}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-          onError={(e) => { e.currentTarget.src = fallbackSrc; e.currentTarget.onerror = null }}
         />
         <div className={`absolute top-3 left-3 px-2.5 py-1 rounded-full text-xs font-bold border ${cluster.bg} ${cluster.text} ${cluster.border}`}>
           {cluster.label}

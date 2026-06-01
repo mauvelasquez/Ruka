@@ -4,6 +4,7 @@ import Navbar from '../../../components/Navbar'
 import Footer from '../../../components/Footer'
 import { getAllPosts, getPostBySlug, extractFAQs } from '../../../lib/blog'
 import { getArticleCoverImage, getFallbackImage } from '../../../lib/blogImage'
+import BlogImage from '../../../components/BlogImage'
 import { MDXRemote } from 'next-mdx-remote/rsc'
 import { Calendar, ArrowRight, ArrowLeft, Home } from 'lucide-react'
 
@@ -60,12 +61,11 @@ function RelatedCard({ post }) {
   return (
     <Link href={`/blog/${post.slug}`} className="group flex gap-3 p-3 rounded-xl hover:bg-forest-50 transition-colors">
       <div className="relative w-16 h-14 flex-shrink-0 overflow-hidden rounded-lg bg-stone-100">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
+        <BlogImage
           src={imgSrc}
+          fallback={fallbackSrc}
           alt={post.title}
           className="w-full h-full object-cover"
-          onError={(e) => { e.currentTarget.src = fallbackSrc; e.currentTarget.onerror = null }}
         />
       </div>
       <div>
@@ -155,12 +155,11 @@ export default async function BlogPostPage({ params }) {
               {/* Header */}
               <div className="bg-white rounded-2xl border border-stone-200/60 shadow-sm overflow-hidden mb-6">
                 <div className="relative h-56 sm:h-72 bg-stone-100">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
+                  <BlogImage
                     src={coverImg}
+                    fallback={coverFallback}
                     alt={fm.title}
                     className="w-full h-full object-cover"
-                    onError={(e) => { e.currentTarget.src = coverFallback; e.currentTarget.onerror = null }}
                   />
                 </div>
                 <div className="p-6 sm:p-8">
