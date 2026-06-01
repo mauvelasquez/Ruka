@@ -3,6 +3,7 @@ import Link from 'next/link'
 import Navbar from '../../../components/Navbar'
 import Footer from '../../../components/Footer'
 import { getAllPosts, getPostBySlug, extractFAQs } from '../../../lib/blog'
+import { getArticleCoverImage } from '../../../lib/blogImage'
 import { MDXRemote } from 'next-mdx-remote/rsc'
 import { Calendar, ArrowRight, ArrowLeft, Home } from 'lucide-react'
 
@@ -54,11 +55,16 @@ export async function generateMetadata({ params }) {
 
 function RelatedCard({ post }) {
   const cluster = CLUSTER_COLORS[post.market] || CLUSTER_COLORS.LATAM
+  const imgSrc = getArticleCoverImage(post.title, post.description, post.image)
   return (
     <Link href={`/blog/${post.slug}`} className="group flex gap-3 p-3 rounded-xl hover:bg-forest-50 transition-colors">
-      {post.image && (
-        <img src={post.image} alt={post.title} className="w-16 h-14 object-cover rounded-lg flex-shrink-0" />
-      )}
+      <div className="relative w-16 h-14 flex-shrink-0 overflow-hidden rounded-lg bg-stone-100">
+        <img
+          src={imgSrc}
+          alt={post.title}
+          className="w-full h-full object-cover"
+        />
+      </div>
       <div>
         <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${cluster.bg} ${cluster.text}`}>{cluster.label}</span>
         <p className="text-sm font-semibold text-gray-800 group-hover:text-forest mt-1 line-clamp-2 leading-snug">{post.title}</p>
@@ -79,6 +85,7 @@ export default async function BlogPostPage({ params }) {
     .filter(Boolean)
     .slice(0, 3)
 
+  const coverImg = getArticleCoverImage(fm.title, fm.description, fm.image)
   const faqs = extractFAQs(content)
   const dateStr = fm.lastUpdated
     ? new Date(fm.lastUpdated).toLocaleDateString('es-CL', { year: 'numeric', month: 'long' })
@@ -143,11 +150,9 @@ export default async function BlogPostPage({ params }) {
             <article className="flex-1 min-w-0">
               {/* Header */}
               <div className="bg-white rounded-2xl border border-stone-200/60 shadow-sm overflow-hidden mb-6">
-                {fm.image && (
-                  <div className="relative h-56 sm:h-72">
-                    <img src={fm.image} alt={fm.title} className="w-full h-full object-cover" />
-                  </div>
-                )}
+                <div className="relative h-56 sm:h-72 bg-stone-100">
+                  <img src={coverImg} alt={fm.title} className="w-full h-full object-cover" />
+                </div>
                 <div className="p-6 sm:p-8">
                   <div className="flex items-center gap-3 mb-4">
                     <span className={`px-3 py-1 rounded-full text-xs font-bold ${cluster.bg} ${cluster.text}`}>
@@ -197,7 +202,7 @@ export default async function BlogPostPage({ params }) {
               {/* CTA principal */}
               <div className="bg-forest text-white rounded-2xl p-6 shadow-sm">
                 <p className="font-extrabold text-lg leading-tight mb-2">¿Listo para intercambiar tu hogar?</p>
-                <p className="text-white/75 text-sm mb-4 leading-relaxed">Publica tu hogar gratis en Rukka y empieza a recibir solicitudes de intercambio de toda Latinoamérica.</p>
+                <p className="text-white/75 text-sm mb-4 leading-relaxed">Publica tu hogar gratis en Rukka y empieza a recibir solicitudes de intercambio de todo Chile.</p>
                 <Link href="/onboarding" className="flex items-center justify-center gap-2 bg-white text-forest font-bold py-2.5 px-4 rounded-xl hover:bg-forest-50 transition-colors text-sm">
                   Publicar mi hogar <ArrowRight className="w-4 h-4" />
                 </Link>

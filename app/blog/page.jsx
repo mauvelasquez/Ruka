@@ -3,18 +3,19 @@ import Image from 'next/image'
 import Navbar from '../../components/Navbar'
 import Footer from '../../components/Footer'
 import { getAllPosts } from '../../lib/blog'
+import { getArticleCoverImage } from '../../lib/blogImage'
 import { Calendar, ArrowRight } from 'lucide-react'
 
 export const revalidate = 3600
 
 export const metadata = {
   title: 'Blog de Rukka — Viaja sin pagar alojamiento',
-  description: 'Guías sobre home exchange en Latinoamérica. Aprende a viajar gratis intercambiando tu hogar en Chile, Argentina, Colombia y México.',
-  keywords: ['home exchange latinoamerica', 'intercambio de casas', 'viajar gratis', 'blog rukka'],
+  description: 'Guías sobre home exchange en Chile. Aprende a viajar gratis intercambiando tu hogar por todo Chile.',
+  keywords: ['home exchange Chile', 'intercambio de casas', 'viajar gratis', 'blog rukka'],
   alternates: { canonical: 'https://rukka.cl/blog' },
   openGraph: {
     title: 'Blog de Rukka — Viaja sin pagar alojamiento',
-    description: 'Guías sobre home exchange en Latinoamérica.',
+    description: 'Guías sobre home exchange en Chile.',
     url: 'https://rukka.cl/blog',
     siteName: 'Rukka',
     type: 'website',
@@ -36,21 +37,19 @@ function PostCard({ post }) {
   const dateStr = post.lastUpdated
     ? new Date(post.lastUpdated).toLocaleDateString('es-CL', { year: 'numeric', month: 'long' })
     : ''
+  const imgSrc = getArticleCoverImage(post.title, post.description, post.image)
 
   return (
     <Link href={`/blog/${post.slug}`} className="group bg-white rounded-2xl border border-stone-200/60 shadow-sm hover:shadow-md hover:border-forest/40 transition-all overflow-hidden flex flex-col">
       <div className="relative h-44 overflow-hidden bg-stone-100">
-        {post.image ? (
-          <img
-            src={post.image}
-            alt={post.title}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-          />
-        ) : (
-          <div className="w-full h-full bg-gradient-to-br from-forest-50 to-andean-50 flex items-center justify-center">
-            <span className="text-4xl">🏡</span>
-          </div>
-        )}
+        <Image
+          src={imgSrc}
+          alt={post.title}
+          fill
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          className="object-cover group-hover:scale-105 transition-transform duration-500"
+          unoptimized={imgSrc.includes('source.unsplash.com')}
+        />
         <div className={`absolute top-3 left-3 px-2.5 py-1 rounded-full text-xs font-bold border ${cluster.bg} ${cluster.text} ${cluster.border}`}>
           {cluster.label}
         </div>
