@@ -1,6 +1,13 @@
 import { createClient } from '@/lib/supabase/server'
 import { createClient as createAdminClient } from '@supabase/supabase-js'
+import { Resend } from 'resend'
+import YankisRecibidos from '@/emails/yankis-recibidos'
+import YankisUsados from '@/emails/yankis-usados'
 import { NextResponse } from 'next/server'
+
+const resend = new Resend(process.env.RESEND_API_KEY || 'no-key')
+const FROM = 'Rukka <hola@rukka.cl>'
+const fmt = d => d ? new Date(d + 'T12:00:00').toLocaleDateString('es-CL', { day: 'numeric', month: 'short', year: 'numeric' }) : ''
 
 export const runtime = 'nodejs'
 
@@ -32,7 +39,7 @@ export async function POST(req) {
 
   const { data: exchange, error: fetchErr } = await supabase
     .from('exchange_requests')
-    .select('id, from_user_id, to_user_id, status')
+    .select('id, from_user_id, to_user_id, to_home_id, start_date, end_date, status')
     .eq('id', requestId)
     .single()
 
@@ -86,6 +93,46 @@ export async function POST(req) {
       })
       if (debitErr) {
         console.warn('[yankis/exchange] debit failed (low balance):', debitErr.message)
+      }
+
+      // Notificaciones de Yankis por email
+      try {
+        const [
+          { data: travelerProfile },
+          { data: hostProfile },
+          { data: destHome },
+          { data: hostBalanceRow },
+          { data: travelerBalanceRow },
+        ] = await Promise.all([
+          admin.from('profiles').select('name, email').eq('id', exchange.from_user_id).single(),
+          admin.from('profiles').select('name, email').eq('id', exchange.to_user_id).single(),
+          admin.from('homes').select('city').eq('id', exchange.to_home_id).single(),
+          admin.from('yankis_balance').select('balance').eq('user_id', exchange.to_user_id).single(),
+          admin.from('yankis_balance').select('balance').eq('user_id', exchange.from_user_id).single(),
+        ])
+        const destino     = destHome?.city || 'tu destino'
+        const fechaInicio = fmt(exchange.start_date)
+        const fechaFin    = fmt(exchange.end_date)
+        const sends = []
+        if (hostProfile?.email) {
+          sends.push(resend.emails.send({
+            from: FROM,
+            to:   hostProfile.email,
+            subject: 'Recibiste 1 Yanki 🪙',
+            react: YankisRecibidos({ nombre: hostProfile.name || 'Anfitrión', yanquisRecibidos: 1, yanquisTotal: hostBalanceRow?.balance ?? 1, motivo: `Intercambio confirmado en ${destino}`, nombreHuesped: travelerProfile?.name }),
+          }))
+        }
+        if (!debitErr && travelerProfile?.email) {
+          sends.push(resend.emails.send({
+            from: FROM,
+            to:   travelerProfile.email,
+            subject: `Usaste 1 Yanki en ${destino} 🏠`,
+            react: YankisUsados({ nombre: travelerProfile.name || 'Viajero', yanquisUsados: 1, yanquisRestantes: travelerBalanceRow?.balance ?? 0, destino, fechaInicio, fechaFin }),
+          }))
+        }
+        await Promise.all(sends)
+      } catch (emailErr) {
+        console.warn('[yankis/exchange] email notifications failed:', emailErr?.message)
       }
     } else if (action === 'cancel') {
       // Refund SOLO si el viajero fue debitado por este intercambio
