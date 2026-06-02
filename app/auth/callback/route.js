@@ -58,11 +58,11 @@ export async function GET(request) {
 
     user = data.session.user
 
-    // Send welcome email on fresh email confirmation (not OAuth logins).
-    // Heuristic: email provider + email_confirmed_at set within the last 5 minutes.
+    // Send confirmation email on fresh email verification (email provider only, not OAuth).
+    // Window extended to 30 min to cover slow email clients / link expiry re-sends.
     if (user.app_metadata?.provider === 'email' && user.email_confirmed_at) {
       const confirmedAt = new Date(user.email_confirmed_at)
-      if (Date.now() - confirmedAt.getTime() < 5 * 60 * 1000) {
+      if (Date.now() - confirmedAt.getTime() < 30 * 60 * 1000) {
         const userName = user.user_metadata?.name || user.user_metadata?.full_name || 'Usuario'
         sendVerificationSuccessEmail(user.email, userName)
           .catch(e => console.error('[auth/callback] verification email:', e.message))

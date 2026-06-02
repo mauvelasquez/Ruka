@@ -186,6 +186,9 @@ export default function OnboardingPage() {
       verification_completed_at: new Date().toISOString(),
     })
     if (res?.success) {
+      // Bonus idempotente: se activa al verificar identidad
+      fetch('/api/yankis/bonus', { method: 'POST' })
+        .catch(err => console.warn('[yankis] bonus failed:', err))
       setStep(3)
     } else {
       setIdError('Error al guardar. Intenta de nuevo.')
@@ -213,6 +216,13 @@ export default function OnboardingPage() {
     })
     setLoadingChoice(null)
     if (!res.success) { setError(res.error || 'Error al guardar. Intenta de nuevo.'); return }
+    if (typeof window !== 'undefined' && window.gtag) {
+      window.gtag('event', 'conversion', {
+        send_to: 'AW-18204995346/registro_completado',
+        value: 1.0,
+        currency: 'CLP'
+      })
+    }
     router.push(destination ?? (addNow ? '/dashboard/property/new' : '/dashboard'))
   }
 
