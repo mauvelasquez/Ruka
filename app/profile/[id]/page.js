@@ -13,35 +13,35 @@ export async function generateMetadata({ params }) {
   try {
     const { data: profile } = await getSupabase()
       .from('profiles')
-      .select('id, name, bio, location, avatar')
+      .select('id, full_name, city, country, avatar_url, id_verified')
       .eq('id', params.id)
       .single()
 
-    if (!profile) return { title: 'Perfil | Rukka' }
+    if (!profile) return { robots: { index: false } }
 
-    const name = profile.name || 'Anfitrión'
-    const title = `${name} — Anfitrión en Rukka`
-    const description = profile.bio
-      ? profile.bio.slice(0, 155)
-      : `Conoce el perfil de ${name} en Rukka, la plataforma de intercambio de hogares en Latinoamérica.`
+    const name = profile.full_name ?? 'Anfitrión'
+    const location = profile.city ?? 'Chile'
+    const title = `${name} — Anfitrión en ${location} | Rukka`
+    const description = `Conoce el perfil de ${name} en Rukka y contacta para intercambiar hogares.`
     const url = `https://rukka.cl/profile/${params.id}`
 
     return {
       title,
       description,
+      robots: { index: true, follow: true },
       alternates: {
         canonical: url,
         languages: { 'es-419': url },
       },
       openGraph: {
-        title,
+        title: `${name} | Rukka`,
         description,
         url,
         siteName: 'Rukka',
         type: 'profile',
         locale: 'es_419',
-        images: profile.avatar
-          ? [{ url: profile.avatar, width: 400, height: 400, alt: name }]
+        images: profile.avatar_url
+          ? [{ url: profile.avatar_url, width: 400, height: 400, alt: name }]
           : [{ url: 'https://rukka.cl/rukka-logo.png', width: 1080, height: 1080, alt: 'Rukka' }],
       },
       twitter: {
@@ -51,7 +51,7 @@ export async function generateMetadata({ params }) {
       },
     }
   } catch {
-    return { title: 'Perfil | Rukka' }
+    return { robots: { index: false } }
   }
 }
 

@@ -49,7 +49,7 @@ export async function generateMetadata({ params }) {
       .eq('id', pais)
       .single()
 
-    if (!home) return { title: 'Hogar no encontrado | Rukka' }
+    if (!home) return { robots: { index: false } }
 
     const city = home.city || home.location || ''
     const title = `${home.title}${city ? ` en ${city}` : ''} — Rukka`
@@ -59,12 +59,13 @@ export async function generateMetadata({ params }) {
 
     return {
       title, description,
+      robots: { index: true, follow: true },
       alternates: { canonical: url, languages: { 'es-419': url } },
       openGraph: { title, description, url, siteName: 'Rukka', type: 'website', locale: 'es_419', images: [{ url: imageUrl, width: 1200, height: 630, alt: home.title }] },
       twitter: { card: 'summary_large_image', title, description, images: [imageUrl] },
     }
   } catch {
-    return { title: 'Hogar | Rukka' }
+    return { robots: { index: false } }
   }
 }
 

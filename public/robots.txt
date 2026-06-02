@@ -9,7 +9,6 @@ Disallow: /admin/
 Disallow: /matches/
 Disallow: /verificar/
 Disallow: /onboarding/
-Disallow: /profile/
 Allow: /
 
 # ── Motores de búsqueda tradicionales ────────────────────────────────────────
