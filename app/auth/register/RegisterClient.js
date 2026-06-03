@@ -5,11 +5,13 @@ import { useRouter } from 'next/navigation'
 import { useApp } from '../../../lib/store'
 import { Eye, EyeOff, ArrowRight, AlertCircle } from 'lucide-react'
 import RukkaLogo from '../../../components/RukkaLogo'
+import PhoneInputCL from '../../../components/ui/PhoneInputCL'
+import CountryUserSelect from '../../../components/ui/CountryUserSelect'
 
 export default function RegisterClient({ subtitle }) {
   const { register, loginWithGoogle } = useApp()
   const router = useRouter()
-  const [form, setForm] = useState({ name: '', email: '', password: '' })
+  const [form, setForm] = useState({ name: '', email: '', password: '', phone: '', country_user: '' })
   const [showPwd, setShowPwd] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -19,8 +21,16 @@ export default function RegisterClient({ subtitle }) {
     setError('')
     if (!form.name.trim()) { setError('Ingresa tu nombre'); return }
     if (form.password.length < 6) { setError('La contraseña debe tener al menos 6 caracteres'); return }
+    // Teléfono opcional, pero si se ingresa debe ser válido (9 dígitos empezando en 9)
+    if (form.phone) {
+      const local = form.phone.replace(/^\+56/, '')
+      if (local.length !== 9 || !local.startsWith('9')) {
+        setError('El teléfono no es válido. Debe tener 9 dígitos y comenzar con 9.')
+        return
+      }
+    }
     setLoading(true)
-    const res = await register(form)
+    const res = await register({ ...form, phone: form.phone || null, country_user: form.country_user || null })
     setLoading(false)
     if (!res.success) { setError(res.error || 'Error al crear la cuenta'); return }
     // Si Supabase no requiere confirmación de email, la sesión ya existe → ir directo al onboarding
@@ -87,6 +97,22 @@ export default function RegisterClient({ subtitle }) {
               </div>
             </div>
 
+            <CountryUserSelect
+              value={form.country_user}
+              onChange={v => setForm({ ...form, country_user: v })}
+              detectIP={true}
+            />
+
+            <div>
+              <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">
+                Teléfono <span className="text-gray-400 normal-case font-normal">(opcional)</span>
+              </label>
+              <PhoneInputCL
+                value={form.phone}
+                onChange={v => setForm({ ...form, phone: v })}
+              />
+            </div>
+
             {error && (
               <div className="flex items-center gap-2 bg-red-50 border border-red-100 text-red-600 text-xs px-4 py-3 rounded-xl">
                 <AlertCircle className="w-4 h-4 flex-shrink-0" /> {error}
@@ -108,8 +134,9 @@ export default function RegisterClient({ subtitle }) {
 
           <div className="mt-4 pt-4 border-t border-gray-100 text-center">
             <p className="text-xs text-gray-400">
-              Al registrarte aceptas nuestros{' '}
-              <a href="/terminos" className="text-forest hover:underline">Términos</a> y{' '}
+              Al crear tu cuenta aceptas nuestros{' '}
+              <a href="/terminos" className="text-forest hover:underline">Términos y Condiciones</a>, incluyendo
+              el uso de tus datos para personalización publicitaria con Meta y Google.{' '}
               <a href="/terminos#privacidad" className="text-forest hover:underline">Política de privacidad</a>
             </p>
           </div>

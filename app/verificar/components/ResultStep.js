@@ -3,6 +3,8 @@ import { useEffect, useState } from 'react'
 import { CheckCircle, XCircle, Loader, AlertCircle, ArrowRight, MessageCircle, Shield } from 'lucide-react'
 import { useApp } from '../../../lib/store'
 import { VERIFICATION_ERRORS } from '../../../lib/verification-errors'
+import { trackIdentityVerified } from '../../../lib/tracking/metaEvents'
+import { trackGA4IdentityVerified } from '../../../lib/tracking/googleEvents'
 
 const ACTION_LABELS = {
   publish: 'Publicar tu hogar',
@@ -17,7 +19,7 @@ const ACTION_ROUTES = {
 }
 
 export default function ResultStep({ ocrResult, faceResult, action, onRetry, attemptsLeft }) {
-  const { syncSession } = useApp()
+  const { syncSession, user } = useApp()
   const [status, setStatus] = useState('saving') // saving | verified | bypass | failed | pending | error
   const [errorMsg, setErrorMsg]   = useState(null)
   const [errorCode, setErrorCode] = useState(null)
@@ -28,7 +30,11 @@ export default function ResultStep({ ocrResult, faceResult, action, onRetry, att
     if (!faceResult) return
     // OCR-only mode: profile already marked verified by the extract API route
     if (faceResult.ocr_only) {
-      syncSession().catch(() => {}).finally(() => setStatus('verified'))
+      syncSession().catch(() => {}).finally(() => {
+        setStatus('verified')
+        trackIdentityVerified(user)
+        trackGA4IdentityVerified()
+      })
       return
     }
     async function save() {
@@ -53,11 +59,15 @@ export default function ResultStep({ ocrResult, faceResult, action, onRetry, att
         if (data.success && data.bypass) {
           await syncSession().catch(() => {})
           setStatus('bypass')
+          trackIdentityVerified(user)
+          trackGA4IdentityVerified()
           return
         }
         if (data.success) {
           await syncSession().catch(() => {})
           setStatus('verified')
+          trackIdentityVerified(user)
+          trackGA4IdentityVerified()
           return
         }
         if (data.status === 'pending') {

@@ -51,6 +51,11 @@ export default function TerminosPage() {
                 <li><a href="#MX" className="hover:text-forest transition-colors">🇲🇽 México — LFPDPPP</a></li>
               </ol>
             </li>
+            <li className="pt-2">
+              <a href="#publicidad" className="text-forest font-semibold hover:underline flex items-center gap-2">
+                <span className="text-terra font-bold">IV.</span> Uso de datos para personalización y publicidad
+              </a>
+            </li>
           </ol>
         </nav>
 
@@ -348,6 +353,47 @@ export default function TerminosPage() {
           </section>
         </div>
 
+        {/* ══════════════════════════════════════════════════════════════
+            SECCIÓN IV — USO DE DATOS PARA PUBLICIDAD
+        ══════════════════════════════════════════════════════════════ */}
+        <div id="publicidad" className="bg-white rounded-3xl border border-gray-100 shadow-sm p-8 sm:p-12 space-y-6 text-gray-700 mt-8 scroll-mt-24">
+          <div>
+            <div className="inline-flex items-center gap-2 bg-andean/8 text-andean rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-widest mb-4">
+              Sección IV
+            </div>
+            <h2 className="text-2xl font-black text-gray-900 mb-2">Uso de datos para personalización y publicidad</h2>
+          </div>
+
+          <p className="text-sm leading-relaxed">
+            Rukka utiliza herramientas de medición y publicidad de terceros, incluyendo{' '}
+            <strong>Meta Pixel (Facebook/Instagram)</strong> y{' '}
+            <strong>Google Analytics/Google Ads</strong>, para medir el rendimiento de nuestras campañas y mostrarte publicidad relevante.
+          </p>
+
+          <p className="text-sm leading-relaxed">
+            Con tu consentimiento al registrarte, podemos compartir información como tu dirección de correo electrónico, número de teléfono, fecha de nacimiento y país de residencia con estos servicios en{' '}
+            <strong>formato hasheado (cifrado SHA-256)</strong>, lo que impide que terceros accedan a tus datos en texto claro.
+          </p>
+
+          <div>
+            <p className="text-sm font-bold text-gray-800 mb-2">Esta información se utiliza exclusivamente para:</p>
+            <ul className="text-sm space-y-2 leading-relaxed">
+              <li className="flex items-start gap-2"><span className="text-forest font-bold mt-0.5">→</span><span>Medir conversiones y optimizar nuestras campañas publicitarias.</span></li>
+              <li className="flex items-start gap-2"><span className="text-forest font-bold mt-0.5">→</span><span>Crear audiencias similares para encontrar usuarios con intereses parecidos.</span></li>
+              <li className="flex items-start gap-2"><span className="text-forest font-bold mt-0.5">→</span><span>Evitar mostrarte publicidad de Rukka si ya eres usuario activo.</span></li>
+            </ul>
+          </div>
+
+          <p className="text-sm leading-relaxed">
+            Puedes solicitar la eliminación de tus datos en cualquier momento escribiendo a{' '}
+            <a href="mailto:privacidad@rukka.cl" className="text-forest font-semibold hover:underline">privacidad@rukka.cl</a>.
+            Para más información sobre cómo Meta usa estos datos, consulta la{' '}
+            <a href="https://www.facebook.com/privacy/policy/" target="_blank" rel="noopener noreferrer" className="text-forest underline">Política de datos de Meta</a>.
+            Para Google, consulta la{' '}
+            <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" className="text-forest underline">Política de privacidad de Google</a>.
+          </p>
+        </div>
+
         {/* Footer links */}
         <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4 text-sm text-gray-400">
           <Link href="#privacidad" className="hover:text-forest transition-colors">↑ Política de Privacidad</Link>
@@ -355,6 +401,8 @@ export default function TerminosPage() {
           <Link href="#terminos" className="hover:text-forest transition-colors">↑ Términos de Servicio</Link>
           <span className="hidden sm:inline">·</span>
           <Link href="#CL" className="hover:text-forest transition-colors">↑ Verificación por país</Link>
+          <span className="hidden sm:inline">·</span>
+          <Link href="#publicidad" className="hover:text-forest transition-colors">↑ Publicidad</Link>
           <span className="hidden sm:inline">·</span>
           <Link href="/" className="hover:text-forest transition-colors">← Volver al inicio</Link>
         </div>
