@@ -8,11 +8,6 @@ const nextConfig = {
         destination: 'https://rukka.cl/:path*',
         permanent: true,
       },
-      {
-        source: '/fresia',
-        destination: '/FresIA',
-        permanent: true,
-      },
     ]
   },
   images: {
