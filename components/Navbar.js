@@ -28,7 +28,7 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 group hover:opacity-90 transition-opacity">
-            <Image src="/rukka-logo-nuevo.png" alt="Rukka" width={48} height={48} className="object-contain" priority />
+            <Image src="/rukka-logo-blanco.png" alt="Rukka" width={48} height={48} className="object-contain" priority />
           </Link>
 
           {/* Country selector */}
