@@ -10,6 +10,7 @@ export async function POST(req) {
     const { event_name, event_id, email, phone, url, user_agent, ip, value, currency } = body
 
     const payload = {
+      ...(process.env.META_TEST_CODE && { test_event_code: process.env.META_TEST_CODE }),
       data: [{
         event_name,
         event_time: Math.floor(Date.now() / 1000),

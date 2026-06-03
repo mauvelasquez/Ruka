@@ -1,6 +1,5 @@
 'use client'
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useApp } from '../lib/store'
 import { Menu, X, Globe, User, LogOut, LayoutDashboard, ChevronDown, Sparkles } from 'lucide-react'
@@ -12,7 +11,6 @@ import CountryPill from './CountryPill'
 import { openPublicarModal } from './PublicarModal'
 
 export default function Navbar() {
-  const router = useRouter()
   const { user, logout } = useApp()
   const [menuOpen, setMenuOpen] = useState(false)
   const [dropdownOpen, setDropdownOpen] = useState(false)
@@ -21,8 +19,7 @@ export default function Navbar() {
     setDropdownOpen(false)
     setMenuOpen(false)
     await logout()
-    router.push('/')
-    router.refresh()
+    window.location.href = '/'
   }
 
   return (
