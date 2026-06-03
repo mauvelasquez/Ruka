@@ -1,14 +1,13 @@
 import Script from 'next/script'
 import Link from 'next/link'
+import dynamic from 'next/dynamic'
 import { ArrowLeft } from 'lucide-react'
-import FresiaFaqs from '../../components/fresia/FresiaFaqs'
 import { FresiaAvatar } from '../../components/fresia/ChatInterface'
 
-// TODO: re-habilitar chat Fresia
-// import ChatInterface from '../../components/fresia/ChatInterface'
-// import { analytics } from '../../lib/analytics'
-// 'use client'
-// useEffect(() => { analytics.fresiaPageView() }, [])
+const ChatInterface = dynamic(
+  () => import('../../components/fresia/ChatInterface'),
+  { ssr: false, loading: () => null }
+)
 
 export const metadata = {
   title: 'Fresia — Asistente de intercambio de hogares | Rukka',
@@ -132,15 +131,10 @@ export default function FresIAPage() {
         </div>
       </div>
 
-      {/* TODO: re-habilitar chat Fresia */}
-      {/*
+      {/* Chat interface */}
       <div className="flex flex-col h-[calc(100vh-57px)]" id="chat-fresia">
         <ChatInterface showHeader={false} />
       </div>
-      */}
-
-      {/* FAQs estáticas — SSR, indexables por Google y LLMs */}
-      <FresiaFaqs />
     </div>
   )
 }
