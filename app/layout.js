@@ -3,6 +3,7 @@ import dynamic from 'next/dynamic'
 import Providers from './providers'
 import GoogleAnalytics from '../components/GoogleAnalytics'
 import WelcomePopup from '../components/WelcomePopup'
+import MetaPixel from '../components/MetaPixel'
 
 const FresiaWidget   = dynamic(() => import('../components/fresia/FresiaWidget'),   { ssr: false })
 const PublicarModal  = dynamic(() => import('../components/PublicarModal'),          { ssr: false })
@@ -134,6 +135,7 @@ export default function RootLayout({ children }) {
         />
       </head>
       <body suppressHydrationWarning>
+        <MetaPixel />
         <GoogleAnalytics />
         <Providers>
           {children}
