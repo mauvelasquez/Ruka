@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { useApp } from '../../lib/store'
+import { sendMetaEvent } from '../../lib/meta-events'
 import ChileLocationSelect from '../../components/ChileLocationSelect'
 import {
   User, Home, CheckCircle, ArrowRight, AlertCircle, Camera, Plus,
@@ -223,6 +224,7 @@ export default function OnboardingPage() {
         currency: 'CLP'
       })
     }
+    sendMetaEvent({ event_name: 'CompleteRegistration', email: user?.email })
     router.push(destination ?? (addNow ? '/dashboard/property/new' : '/dashboard'))
   }
 

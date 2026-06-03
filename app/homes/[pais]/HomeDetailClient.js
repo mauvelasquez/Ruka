@@ -15,6 +15,7 @@ import Navbar from '../../../components/Navbar'
 import Footer from '../../../components/Footer'
 import { useApp } from '../../../lib/store'
 import { Star, MapPin, Bed, Bath, Users, ChevronLeft, ChevronRight, ArrowLeftRight, Calendar, CheckCircle, Globe, Heart, Share2, Sparkles, Shield, Clock, AlertTriangle, Home as HomeIcon } from 'lucide-react'
+import { sendMetaEvent } from '../../../lib/meta-events'
 
 export default function HomeDetailClient({ id }) {
   const router = useRouter()
@@ -32,7 +33,11 @@ export default function HomeDetailClient({ id }) {
 
   useEffect(() => {
     const h = getHomeById(id)
-    if (h) { setHome(h); setHost(getUserById(h.userId)) }
+    if (h) {
+      setHome(h)
+      setHost(getUserById(h.userId))
+      sendMetaEvent({ event_name: 'ViewContent' })
+    }
   }, [id, homes])
 
   if (!home) return (

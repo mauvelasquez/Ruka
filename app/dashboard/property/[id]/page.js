@@ -26,6 +26,7 @@ import {
   AlertCircle, CheckCircle, Bath, Search,
 } from 'lucide-react'
 import { AMENITY_CATEGORIES, AIRBNB_IMPORT_LEGACY_MAP } from '../../../../lib/amenities'
+import { sendMetaEvent } from '../../../../lib/meta-events'
 
 const ImportFromAirbnb = dynamic(
   () => import('../../../../components/ImportFromAirbnb'),
@@ -367,6 +368,7 @@ export default function PropertyPage() {
           currency: 'CLP'
         })
       }
+      sendMetaEvent({ event_name: 'Lead', email: currentUser?.email })
       setTimeout(() => router.push('/dashboard?tab=homes'), 1200)
     } catch (err) {
       console.error('Error creando propiedad:', err)
