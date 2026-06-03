@@ -215,127 +215,51 @@ function DashboardContent() {
           </div>
         </div>
 
-        {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
-          {[
-            { label: 'Deseos de viaje', value: myWishes.length, bg: 'bg-andean',   icon: Heart,          tabId: TAB.WISHES },
-            { label: 'Mis hogares',     value: myHomes.length,  bg: 'bg-forest',   icon: Home,           tabId: TAB.HOMES },
-            { label: 'Recibidas',       value: received.length, bg: 'bg-terra',    icon: ArrowLeftRight, tabId: TAB.RECEIVED },
-            { label: 'Enviadas',        value: sent.length,     bg: 'bg-gray-700', icon: ArrowLeftRight, tabId: TAB.SENT },
-          ].map((s, i) => (
-            <button key={i}
-              onClick={() => changeTab(s.tabId)}
-              className={`${s.bg} text-white rounded-2xl p-4 flex items-center gap-3 hover:opacity-90 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-sm text-left w-full`}>
-              <s.icon className="w-5 h-5 opacity-75 flex-shrink-0" />
-              <div>
-                <p className="text-2xl font-black leading-none">{s.value}</p>
-                <p className="text-xs opacity-75 mt-0.5 leading-tight">{s.label}</p>
-              </div>
-            </button>
-          ))}
-        </div>
-
-        {/* Módulo Yankis */}
-        <div className="bg-white rounded-3xl border border-terra/15 shadow-sm mb-5 overflow-hidden">
-          {/* Header del módulo */}
-          <div className="bg-gradient-to-r from-terra to-terra-dark px-6 py-5 text-white">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <p className="text-white/60 text-xs font-bold uppercase tracking-widest mb-2">Tus Yankis</p>
-                <div className="flex items-baseline gap-2">
-                  <span className="text-5xl font-black tabular-nums">
+        {/* Módulo Yankis — compacto */}
+        <div className="bg-white rounded-2xl border border-terra/15 shadow-sm mb-5 overflow-hidden">
+          <div className="bg-gradient-to-r from-terra to-terra-dark px-4 py-3 text-white">
+            <div className="flex items-center justify-between gap-3 flex-wrap">
+              <div className="flex items-center gap-4 flex-wrap">
+                {/* Saldo */}
+                <div className="flex items-baseline gap-1.5">
+                  <span className="text-2xl font-black tabular-nums">
                     {yankiBalance === null ? '—' : yankiBalance.balance ?? 0}
                   </span>
-                  <span className="text-3xl">🪙</span>
+                  <span className="text-lg">🪙</span>
+                  <span className="text-white/60 text-xs ml-0.5">disponibles</span>
                 </div>
-                <p className="text-white/60 text-xs mt-1.5">disponibles para viajar</p>
+                {/* Ganados / Gastados */}
+                {yankiBalance !== null && (
+                  <div className="flex gap-4 border-l border-white/20 pl-4">
+                    <div>
+                      <p className="text-white/50 text-[10px] leading-none">Ganados</p>
+                      <p className="text-white font-black text-sm">{yankiBalance.total_earned ?? 0} 🪙</p>
+                    </div>
+                    <div>
+                      <p className="text-white/50 text-[10px] leading-none">Gastados</p>
+                      <p className="text-white font-black text-sm">{yankiBalance.total_spent ?? 0} 🪙</p>
+                    </div>
+                  </div>
+                )}
               </div>
               <Link href="/dashboard/yankis"
-                className="flex-shrink-0 bg-white/20 hover:bg-white/30 text-white text-xs font-bold px-3.5 py-2 rounded-xl transition-colors flex items-center gap-1.5 mt-1">
-                Ver todo <ChevronRight className="w-3.5 h-3.5" />
+                className="flex-shrink-0 bg-white/20 hover:bg-white/30 text-white text-xs font-bold px-3 py-1.5 rounded-xl transition-colors flex items-center gap-1">
+                Ver todo <ChevronRight className="w-3 h-3" />
               </Link>
             </div>
-
-            {/* Mini stats si hay datos */}
-            {yankiBalance !== null && (
-              <div className="flex gap-5 mt-4 pt-4 border-t border-white/20">
-                <div>
-                  <p className="text-white/50 text-xs">Ganados</p>
-                  <p className="text-white font-black text-base">{yankiBalance.total_earned ?? 0} 🪙</p>
-                </div>
-                <div>
-                  <p className="text-white/50 text-xs">Gastados</p>
-                  <p className="text-white font-black text-base">{yankiBalance.total_spent ?? 0} 🪙</p>
-                </div>
-              </div>
-            )}
           </div>
-
-          {/* Cuerpo del módulo */}
-          <div className="p-5 grid grid-cols-1 sm:grid-cols-2 gap-5">
-            {/* Cómo ganas */}
-            <div>
-              <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Cómo ganar Yankis</p>
-              <div className="space-y-3">
-                <div className="flex items-start gap-3">
-                  <span className="text-xl flex-shrink-0">🏠</span>
-                  <div>
-                    <p className="text-sm font-bold text-gray-800">Hospeda viajeros</p>
-                    <p className="text-xs text-gray-400 leading-relaxed">1 Yanki por noche al aceptar un intercambio</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <span className="text-xl flex-shrink-0">🎁</span>
-                  <div>
-                    <p className="text-sm font-bold text-gray-800">Bono de bienvenida</p>
-                    <p className="text-xs text-gray-400 leading-relaxed">3 Yankis al completar tu perfil verificado</p>
-                  </div>
-                </div>
+          {/* Último movimiento */}
+          {yankiTxs.length > 0 && (
+            <div className="px-4 py-2 flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2 min-w-0">
+                <span className="text-sm flex-shrink-0">{TX_ICON[yankiTxs[0].type] || '🪙'}</span>
+                <p className="text-xs text-gray-500 truncate">{yankiTxs[0].description}</p>
               </div>
+              <span className={`text-xs font-black flex-shrink-0 ${yankiTxs[0].type === 'spent' ? 'text-red-500' : 'text-forest'}`}>
+                {yankiTxs[0].type === 'spent' ? '−' : '+'}{yankiTxs[0].amount} 🪙
+              </span>
             </div>
-
-            {/* Transacciones recientes o explicación de uso */}
-            <div>
-              {yankiTxs.length > 0 ? (
-                <>
-                  <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Últimos movimientos</p>
-                  <div className="space-y-2.5">
-                    {yankiTxs.map(tx => (
-                      <div key={tx.id} className="flex items-center justify-between gap-2">
-                        <div className="flex items-center gap-2 min-w-0">
-                          <span className="text-base flex-shrink-0">{TX_ICON[tx.type] || '🪙'}</span>
-                          <p className="text-xs text-gray-600 truncate">{tx.description}</p>
-                        </div>
-                        <span className={`text-xs font-black flex-shrink-0 ${tx.type === 'spent' ? 'text-red-500' : 'text-forest'}`}>
-                          {tx.type === 'spent' ? '−' : '+'}{tx.amount} 🪙
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </>
-              ) : (
-                <>
-                  <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Para qué sirven</p>
-                  <div className="space-y-3">
-                    <div className="flex items-start gap-3">
-                      <span className="text-xl flex-shrink-0">✈️</span>
-                      <div>
-                        <p className="text-sm font-bold text-gray-800">Viaja sin match bilateral</p>
-                        <p className="text-xs text-gray-400 leading-relaxed">1 Yanki = 1 noche en cualquier hogar Rukka</p>
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <span className="text-xl flex-shrink-0">🤝</span>
-                      <div>
-                        <p className="text-sm font-bold text-gray-800">Match bilateral = gratis</p>
-                        <p className="text-xs text-gray-400 leading-relaxed">Si ambos viajan juntos, los Yankis se cancelan entre sí</p>
-                      </div>
-                    </div>
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
+          )}
         </div>
 
         {/* CTA si no tiene hogar */}
@@ -841,15 +765,15 @@ function DashboardContent() {
                 <div>
                   <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1.5">
                     Fecha de nacimiento
-                    {currentUser.verified && <span className="text-gray-400 normal-case font-normal ml-1">(completada por verificación)</span>}
                   </label>
                   <input
                     type="date"
                     value={profileForm.birth_date}
-                    onChange={e => setProfileForm(f => ({ ...f, birth_date: e.target.value }))}
-                    className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-forest transition-all"
+                    disabled
+                    readOnly
+                    className="w-full border border-gray-100 rounded-xl px-4 py-3 text-sm bg-gray-50 text-gray-400 cursor-not-allowed"
                   />
-                  <p className="text-xs text-gray-400 mt-1">Se usa para personalización y publicidad. Ver <a href="/terminos#publicidad" className="text-forest hover:underline">Términos</a>.</p>
+                  <p className="text-xs text-gray-400 mt-1">Completada automáticamente mediante verificación de identidad.</p>
                 </div>
 
                 {profileError && (

@@ -80,7 +80,7 @@ export default function Navbar() {
                       </div>
                       {[
                         { href: '/dashboard', icon: <LayoutDashboard className="w-4 h-4" />, label: 'Mi Panel' },
-                        { href: `/profile/${user.id}`, icon: <User className="w-4 h-4" />, label: 'Mi Perfil' },
+                        { href: '/dashboard?tab=profile', icon: <User className="w-4 h-4" />, label: 'Mi Rukka' },
                         { href: '/matches', icon: <Sparkles className="w-4 h-4" />, label: 'Buscar match' },
                       ].map(item => (
                         <Link key={item.href} href={item.href} onClick={() => setDropdownOpen(false)}
@@ -146,6 +146,9 @@ export default function Navbar() {
               </div>
               <Link href="/dashboard" onClick={() => setMenuOpen(false)} className="flex items-center gap-2 p-3 rounded-xl text-gray-700 hover:bg-forest-50">
                 <LayoutDashboard className="w-4 h-4 text-forest" /> Mi Panel
+              </Link>
+              <Link href="/dashboard?tab=profile" onClick={() => setMenuOpen(false)} className="flex items-center gap-2 p-3 rounded-xl text-gray-700 hover:bg-forest-50">
+                <User className="w-4 h-4 text-forest" /> Mi Rukka
               </Link>
               <button onClick={handleLogout} className="flex items-center gap-2 p-3 rounded-xl text-red-500 w-full hover:bg-red-50">
                 <LogOut className="w-4 h-4" /> Cerrar sesión
