@@ -5,6 +5,7 @@ import { Heart, Mail } from 'lucide-react'
 import { getDestinations } from '../lib/geo/destinations'
 import { useCountry } from '../hooks/useCountry'
 import RukkaLogo from './RukkaLogo'
+import CountryPill from './CountryPill'
 
 export default function Footer() {
   const { country: userCountry } = useCountry()
@@ -83,7 +84,7 @@ export default function Footer() {
 
         <div className="border-t border-gray-700/60 mt-12 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-400">
           <p>© 2026 Rukka. Todos los derechos reservados.</p>
-          <p className="text-gray-300 italic text-sm">"Mi casa es tu casa."</p>
+          <CountryPill />
           <p className="flex items-center gap-1.5">
             Construido con <Heart className="w-3 h-3 text-terra fill-current" /> para la comunidad viajera de Chile
           </p>

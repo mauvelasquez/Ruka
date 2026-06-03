@@ -88,7 +88,11 @@ export default function PerfilPage() {
       if (uploadError) throw uploadError
 
       const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(path)
-      await updateProfile({ avatar: publicUrl })
+      const versionedUrl = `${publicUrl}?v=${Date.now()}`
+      await updateProfile({ avatar: versionedUrl })
+      // Persist avatar in auth metadata so the fast-path cookie shows the photo on next load
+      supabase.auth.updateUser({ data: { picture: versionedUrl } }).catch(() => {})
+      setPreviewUrl(null)
       setAvatarSaved(true)
       setTimeout(() => setAvatarSaved(false), 3000)
     } catch (err) {
