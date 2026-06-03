@@ -114,6 +114,5 @@ export const config = {
     '/como-funciona',
     '/blog/:path*',
     '/about',
-    '/FresIA',
   ],
 }
