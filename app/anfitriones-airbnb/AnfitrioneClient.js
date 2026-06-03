@@ -21,16 +21,16 @@ const FAQS = [
     a: 'Tú controlas las fechas disponibles para intercambio en Rukka. Solo ofreces los períodos que tienes libres. Si tienes reservas en Airbnb para julio, simplemente no ofreces julio en Rukka.',
   },
   {
-    q: '¿El import de Airbnb trae todas mis fotos?',
-    a: 'Sí. El import trae título, descripción, fotos, capacidad, número de habitaciones, baños y amenities directamente desde tu listing. Luego puedes editar lo que quieras antes de publicar.',
+    q: '¿Cómo funciona la carga con pantallazos?',
+    a: 'Tomas capturas de pantalla de tu listing en Airbnb: la galería de fotos, los detalles del hogar y las características. Las subes a Rukka y nuestra IA lee las imágenes para extraer automáticamente el título, descripción, capacidad, habitaciones, baños y amenities. Luego confirmas o editas antes de publicar.',
   },
   {
     q: '¿Tengo que pagar algo?',
     a: 'Rukka no cobra comisión por intercambio, ni suscripción mensual, ni ningún costo oculto. Tu hogar es tu única moneda de cambio.',
   },
   {
-    q: '¿Puedo importar más de una propiedad?',
-    a: 'Sí. Si tienes varios Airbnbs puedes importar cada uno por separado y publicarlos todos en Rukka. Más propiedades = más opciones de intercambio.',
+    q: '¿Puedo cargar más de una propiedad?',
+    a: 'Sí. Si tienes varios Airbnbs puedes cargar cada uno por separado y publicarlos todos en Rukka. Más propiedades = más opciones de intercambio.',
   },
   {
     q: '¿Cómo sé que la persona que viene es confiable?',
@@ -157,7 +157,7 @@ export default function AnfitrionesAirbnbPage() {
             <div className="flex flex-col sm:flex-row gap-3">
               <Link href="/auth/register"
                 className="inline-flex items-center justify-center gap-2 bg-white text-forest-dark font-black px-8 py-4 rounded-2xl text-base hover:bg-sand transition-colors shadow-lg">
-                Importar mi Airbnb <ArrowRight className="w-5 h-5" />
+                Publicar mi hogar <ArrowRight className="w-5 h-5" />
               </Link>
               <Link href="/homes"
                 className="inline-flex items-center justify-center gap-2 border-2 border-white/40 text-white font-bold px-8 py-4 rounded-2xl text-base hover:bg-white/10 transition-colors">
@@ -177,7 +177,7 @@ export default function AnfitrionesAirbnbPage() {
             {[
               { n: '$0',    label: 'Costo por usar Rukka' },
               { n: '4',     label: 'Países de Latinoamérica' },
-              { n: '1 clic', label: 'Para importar tu Airbnb' },
+              { n: '3 pasos', label: 'Para publicar tu hogar' },
               { n: '100%',  label: 'Anfitriones verificados' },
             ].map((s, i) => (
               <div key={i}>
@@ -214,7 +214,7 @@ export default function AnfitrionesAirbnbPage() {
                 { icon: '😤', label: 'No tienes red de anfitriones de confianza', bad: true },
                 { icon: '✅', label: 'Con Rukka: usas tu propiedad como moneda de cambio', bad: false },
                 { icon: '✅', label: 'Intercambias con anfitriones verificados como tú', bad: false },
-                { icon: '✅', label: 'Con Rukka: tu Airbnb ya está listo para importar y usarlo en intercambios', bad: false },
+                { icon: '✅', label: 'Con Rukka: sube pantallazos de tu Airbnb y úsalo en intercambios', bad: false },
               ].map((item, i) => (
                 <div key={i} className={`flex items-center gap-3 p-4 rounded-2xl border ${
                   item.bad
@@ -236,31 +236,37 @@ export default function AnfitrionesAirbnbPage() {
       <section className="py-24" style={{ background: '#F8F4EE' }}>
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-14">
-            <p className="text-xs font-black uppercase tracking-widest text-[#ff5a5f] mb-3">Import 1 clic</p>
+            <p className="text-xs font-black uppercase tracking-widest text-[#ff5a5f] mb-3">Carga con pantallazos</p>
             <h2 className="text-3xl sm:text-4xl font-black text-gray-900 mb-4">
-              Tu propiedad ya está lista.<br />Solo pega el link.
+              Tu propiedad ya está lista.<br />Solo sube los pantallazos.
             </h2>
             <p className="text-gray-500 max-w-xl mx-auto">
-              No tienes que volver a escribir la descripción, subir las fotos ni ingresar las características. Lo hacemos por ti en segundos.
+              Sube capturas de pantalla de tu Airbnb. Nuestra IA extrae automáticamente la descripción, fotos y características. Sin copiar, sin escribir nada.
             </p>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
             {/* Visual del import */}
             <div className="bg-white rounded-3xl border border-gray-100 p-6 shadow-sm">
-              <div className="flex items-center gap-2 mb-5">
-                <div className="w-3 h-3 rounded-full bg-red-400" />
-                <div className="w-3 h-3 rounded-full bg-amber-400" />
-                <div className="w-3 h-3 rounded-full bg-green-400" />
-                <div className="flex-1 bg-gray-100 rounded-full h-5 flex items-center px-3">
-                  <span className="text-xs text-gray-400 truncate">airbnb.cl/rooms/12345</span>
+              {/* Zona de carga de pantallazos */}
+              <div className={`flex items-center gap-3 mb-5 p-3 rounded-xl border-2 border-dashed transition-all ${
+                importStep >= 0 ? 'border-[#ff5a5f]/40 bg-[#ff5a5f]/5' : 'border-gray-200 bg-gray-50'
+              }`}>
+                <Upload className="w-4 h-4 text-[#ff5a5f] flex-shrink-0" />
+                <span className="text-xs text-gray-500 flex-1 truncate">Pantallazos de tu Airbnb</span>
+                <div className="flex gap-1">
+                  {[...Array(3)].map((_, i) => (
+                    <div key={i} className={`w-7 h-7 rounded-lg transition-all duration-500 ${
+                      importStep >= 0 ? 'bg-[#ff5a5f]/20' : 'bg-gray-200'
+                    }`} style={{ transitionDelay: `${i * 100}ms` }} />
+                  ))}
                 </div>
               </div>
 
               {/* Pasos animados */}
               <div className="space-y-2 mb-6">
-                <ImportStep n="1" label="Pegaste el link de tu Airbnb" sublabel="airbnb.cl/rooms/12345..." active={importStep >= 0} />
-                <ImportStep n="2" label="Descargando información" sublabel="Fotos, título, capacidad, amenities..." active={importStep >= 1} />
+                <ImportStep n="1" label="Subiste tus pantallazos" sublabel="Galería, detalles y características de tu Airbnb" active={importStep >= 0} />
+                <ImportStep n="2" label="IA leyendo las imágenes" sublabel="Extrae título, fotos, capacidad, amenities..." active={importStep >= 1} />
                 <ImportStep n="3" label="Confirmas los datos" sublabel="Vista previa antes de publicar" active={importStep >= 2} />
                 <ImportStep n="4" label="¡Listo para intercambiar!" sublabel="Tu hogar ya está en la comunidad Rukka" active={importStep >= 3} />
               </div>
@@ -291,22 +297,22 @@ export default function AnfitrionesAirbnbPage() {
                   icon: Upload,
                   color: 'text-[#ff5a5f]',
                   bg: 'bg-[#ff5a5f]/8',
-                  title: 'Copia y pega el link',
-                  desc: 'Solo necesitas la URL de tu listing de Airbnb (ej: airbnb.cl/rooms/12345). Nada más.',
+                  title: 'Sube pantallazos de tu Airbnb',
+                  desc: 'Captura la galería, los detalles y las características desde la app o web de Airbnb. Nada más que eso.',
                 },
                 {
-                  icon: Zap,
+                  icon: Sparkles,
                   color: 'text-amber-600',
                   bg: 'bg-amber-50',
-                  title: 'Importamos todo automáticamente',
-                  desc: 'Fotos, título, descripción, habitaciones, baños, capacidad y todos tus amenities. En segundos.',
+                  title: 'Nuestra IA lee las imágenes',
+                  desc: 'Extrae título, descripción, habitaciones, baños, capacidad y todos tus amenities directamente de las capturas. En segundos.',
                 },
                 {
                   icon: CheckCircle,
                   color: 'text-forest',
                   bg: 'bg-forest/8',
                   title: 'Tú confirmas antes de publicar',
-                  desc: 'Ves una vista previa completa con todo lo que se importó. Puedes editar lo que quieras antes de publicar.',
+                  desc: 'Ves una vista previa completa con todo lo que se extrajo de tus pantallazos. Puedes editar lo que quieras antes de publicar.',
                 },
                 {
                   icon: Users,
@@ -347,8 +353,8 @@ export default function AnfitrionesAirbnbPage() {
               {
                 n: '01',
                 emoji: '📲',
-                title: 'Importa tu Airbnb',
-                desc: 'Pega el link de tu propiedad en Airbnb. Traemos fotos, descripción y características automáticamente. Confirmas y listo.',
+                title: 'Publica tu hogar',
+                desc: 'Sube pantallazos de tu Airbnb. Nuestra IA extrae fotos, descripción y características automáticamente. Confirmas y listo.',
                 color: 'border-[#ff5a5f]/30 bg-[#ff5a5f]/5',
               },
               {
@@ -418,7 +424,7 @@ export default function AnfitrionesAirbnbPage() {
               {
                 emoji: '🏡',
                 title: 'Varios Airbnbs',
-                desc: 'Tienes más de una propiedad. Puedes importarlas todas y tener más flexibilidad para intercambiar.',
+                desc: 'Tienes más de una propiedad. Puedes cargarlas todas con pantallazos y tener más flexibilidad para intercambiar.',
                 tag: 'Multi-propiedad',
                 tagColor: 'bg-andean/10 text-andean',
               },
@@ -432,7 +438,7 @@ export default function AnfitrionesAirbnbPage() {
               {
                 emoji: '🔑',
                 title: 'Primera vez en Rukka',
-                desc: 'No importa si llevas un mes o cinco años en Airbnb. El onboarding es simple y el import es instantáneo.',
+                desc: 'No importa si llevas un mes o cinco años en Airbnb. El onboarding es simple y cargar tu hogar con pantallazos es muy rápido.',
                 tag: 'Bienvenido',
                 tagColor: 'bg-gray-100 text-gray-600',
               },
@@ -485,7 +491,7 @@ export default function AnfitrionesAirbnbPage() {
               <tbody>
                 {[
                   ['Costo por noche',      '🔄 Intercambio',   '$80k-300k',       '$50k-200k'],
-                  ['Import de propiedad',  '✓ 1 clic',         '—',               '—'],
+                  ['Publicar tu hogar',    '✓ Con pantallazos', '—',               '—'],
                   ['Comunidad verificada', '✓ LATAM',          '—',               'Parcial'],
                   ['Match automático',     '✓ Bilateral',      '—',               '—'],
                   ['Comisión',             '✓ 0%',             'Fija',            '3–15%'],
@@ -518,14 +524,14 @@ export default function AnfitrionesAirbnbPage() {
               name="Valentina R."
               city="Santiago"
               airbnbs="2 propiedades"
-              text="Tengo dos deptos en Providencia. Los importé en menos de 2 minutos y ya cerré mi primer intercambio con alguien de Puerto Varas. Nunca pensé que usar mi propiedad para viajar sería tan fácil."
+              text="Tengo dos deptos en Providencia. Los cargué con pantallazos en minutos y ya cerré mi primer intercambio con alguien de Puerto Varas. Nunca pensé que usar mi propiedad para viajar sería tan fácil."
               avatar="https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=80&h=80&fit=crop&crop=face"
             />
             <Testimonial
               name="Rodrigo M."
               city="Valparaíso"
               airbnbs="1 propiedad"
-              text="Llevo 3 años siendo anfitrión en Airbnb y siempre pago hotel cuando viajo yo. Rukka es exactamente lo que le faltaba al ecosistema. El import funcionó a la primera con todas mis fotos."
+              text="Llevo 3 años siendo anfitrión en Airbnb y siempre pago hotel cuando viajo yo. Rukka es exactamente lo que le faltaba al ecosistema. Subí unos pantallazos y listo, todas mis fotos quedaron cargadas."
               avatar="https://images.unsplash.com/photo-1552058544-f2b08422138a?w=80&h=80&fit=crop&crop=face"
             />
             <Testimonial
@@ -605,7 +611,7 @@ export default function AnfitrionesAirbnbPage() {
               </div>
               <h2 className="text-3xl sm:text-4xl font-black text-white mb-4 leading-tight">
                 Tu Airbnb ya está listo.<br />
-                <span style={{ color: '#E8D5B0' }}>Solo falta importarlo.</span>
+                <span style={{ color: '#E8D5B0' }}>Solo falta subir los pantallazos.</span>
               </h2>
               <p className="text-white/70 text-lg mb-8 max-w-lg mx-auto">
                 Únete a la comunidad de anfitriones que usan sus propiedades para viajar por intercambio.
@@ -613,7 +619,7 @@ export default function AnfitrionesAirbnbPage() {
 
               <Link href="/auth/register"
                 className="inline-flex items-center gap-2 bg-white text-forest-dark font-black px-10 py-4 rounded-2xl text-lg hover:bg-sand transition-colors shadow-lg">
-                Importar mi Airbnb <ArrowRight className="w-5 h-5" />
+                Publicar mi hogar <ArrowRight className="w-5 h-5" />
               </Link>
 
               <div className="flex flex-wrap justify-center gap-6 mt-8">
