@@ -12,6 +12,7 @@ const nextConfig = {
         source: '/fresia',
         destination: '/FresIA',
         permanent: true,
+        caseSensitive: true,
       },
     ]
   },
