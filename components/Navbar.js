@@ -105,11 +105,6 @@ export default function Navbar() {
                   className="text-sm font-semibold text-gray-700 px-4 py-2 rounded-full border border-gray-300 hover:border-gray-400 hover:bg-gray-50 transition-colors">
                   Ingresar
                 </Link>
-                <button
-                  onClick={openPublicarModal}
-                  className="text-sm font-bold bg-forest text-white px-5 py-2 rounded-full hover:bg-forest-dark transition-colors shadow-sm">
-                  Publicar mi hogar
-                </button>
               </div>
             )}
           </div>
@@ -159,7 +154,6 @@ export default function Navbar() {
           ) : (
             <div className="flex flex-col gap-2 pt-2">
               <Link href="/auth/login" onClick={() => setMenuOpen(false)} className="text-center p-3 rounded-xl border border-gray-300 text-gray-700 font-semibold hover:bg-gray-50 transition-colors">Ingresar</Link>
-              <button onClick={() => { setMenuOpen(false); openPublicarModal() }} className="text-center p-3 rounded-xl bg-forest text-white font-bold">Publicar mi hogar</button>
             </div>
           )}
         </div>
