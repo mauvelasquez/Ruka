@@ -368,7 +368,7 @@ export default function PropertyPage() {
           currency: 'CLP'
         })
       }
-      sendMetaEvent({ event_name: 'Lead', email: currentUser?.email })
+      sendMetaEvent({ event_name: 'Lead', email: currentUser?.email, content_name: 'hogar_publicado' })
       setTimeout(() => router.push('/dashboard?tab=homes'), 1200)
     } catch (err) {
       console.error('Error creando propiedad:', err)

@@ -7,7 +7,11 @@ const hash = (val) =>
 export async function POST(req) {
   try {
     const body = await req.json()
-    const { event_name, event_id, email, phone, url, user_agent, ip, value, currency } = body
+    const { event_name, event_id, email, phone, url, user_agent, ip, value, currency, content_name } = body
+
+    const customData = {}
+    if (value) { customData.value = value; customData.currency = currency || 'CLP' }
+    if (content_name) customData.content_name = content_name
 
     const payload = {
       ...(process.env.META_TEST_CODE && { test_event_code: process.env.META_TEST_CODE }),
@@ -23,7 +27,7 @@ export async function POST(req) {
           client_ip_address: ip,
           client_user_agent: user_agent,
         },
-        custom_data: value ? { value, currency: currency || 'CLP' } : undefined,
+        custom_data: Object.keys(customData).length ? customData : undefined,
       }],
     }
 
