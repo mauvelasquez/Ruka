@@ -2,7 +2,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { useApp } from '../../../lib/store'
-import { X, ChevronDown, RefreshCw, AlertCircle } from 'lucide-react'
+import { X, ChevronDown, RefreshCw, AlertCircle, Mail } from 'lucide-react'
 
 const LEVEL_STYLE = {
   error: 'bg-red-100 text-red-700',
@@ -11,10 +11,46 @@ const LEVEL_STYLE = {
   debug: 'bg-gray-100 text-gray-500',
 }
 
-const SOURCES = ['airbnb-import', 'auth', 'store', 'client', 'admin']
+const SOURCES = ['airbnb-import', 'auth', 'store', 'client', 'admin', 'email']
 
 function fmt(ts) {
   return new Date(ts).toLocaleString('es-CL', { dateStyle: 'short', timeStyle: 'medium' })
+}
+
+function EmailRow({ log, onDetail }) {
+  const m = log.metadata ?? {}
+  const sent = m.status === 'sent'
+  return (
+    <tr className={`hover:bg-gray-50 transition-colors ${!sent ? 'bg-red-50/30' : ''}`}>
+      <td className="px-4 py-3 text-xs text-gray-400 whitespace-nowrap">{fmt(log.created_at)}</td>
+      <td className="px-4 py-3 text-xs font-mono text-gray-700 whitespace-nowrap">{m.event ?? '—'}</td>
+      <td className="px-4 py-3 whitespace-nowrap">
+        {sent
+          ? <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold bg-green-100 text-green-700">✅ sent</span>
+          : <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold bg-red-100 text-red-700">❌ failed</span>
+        }
+      </td>
+      <td className="px-4 py-3 text-xs font-mono text-gray-400 whitespace-nowrap">
+        {m.resend_id ? (
+          <span title={m.resend_id}>{m.resend_id.slice(0, 16)}…</span>
+        ) : '—'}
+      </td>
+      <td className="px-4 py-3 text-xs text-gray-500 whitespace-nowrap">
+        {m.to_domain ? `@${m.to_domain}` : '—'}
+      </td>
+      <td className="px-4 py-3 text-xs text-gray-400 whitespace-nowrap">
+        {m.triggered_by ?? '—'}
+      </td>
+      <td className="px-4 py-3">
+        {(!sent || log.metadata) && (
+          <button onClick={() => onDetail(log)}
+            className="text-xs text-forest font-bold hover:text-forest-dark transition-colors whitespace-nowrap">
+            {!sent ? 'Ver error' : 'Detalle'}
+          </button>
+        )}
+      </td>
+    </tr>
+  )
 }
 
 export default function LogsPage() {
@@ -30,7 +66,6 @@ export default function LogsPage() {
 
   const [filters, setFilters] = useState({ level: '', source: '', hours: '168' })
 
-  // SECURITY FIX: isAdmin se verifica server-side para no exponer el email del admin en el bundle JS
   const [isAdmin, setIsAdmin] = useState(false)
 
   useEffect(() => {
@@ -69,13 +104,19 @@ export default function LogsPage() {
     }
   }, [filters, offset])
 
-  // Fetch inicial y al cambiar filtros
   useEffect(() => {
     if (!isAdmin) return
     setOffset(0)
     setHasMore(true)
     fetchLogs(true)
   }, [filters, isAdmin]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const isEmailView = filters.source === 'email'
+
+  const emailStats = isEmailView ? {
+    sent:   logs.filter(l => l.metadata?.status === 'sent').length,
+    failed: logs.filter(l => l.metadata?.status === 'failed').length,
+  } : null
 
   if (!ready || !isAdmin) return (
     <div className="min-h-screen flex items-center justify-center" style={{ background: '#F8F4EE' }}>
@@ -133,6 +174,33 @@ export default function LogsPage() {
           </div>
         </div>
 
+        {/* Stats de email */}
+        {isEmailView && emailStats && logs.length > 0 && (
+          <div className="grid grid-cols-3 gap-3 mb-4">
+            <div className="bg-white rounded-2xl border border-gray-100 p-4 flex items-center gap-3">
+              <Mail className="w-5 h-5 text-gray-400 flex-shrink-0" />
+              <div>
+                <p className="text-2xl font-black text-gray-900">{logs.length}</p>
+                <p className="text-xs text-gray-400">total cargados</p>
+              </div>
+            </div>
+            <div className="bg-white rounded-2xl border border-green-100 p-4 flex items-center gap-3">
+              <span className="text-xl">✅</span>
+              <div>
+                <p className="text-2xl font-black text-green-700">{emailStats.sent}</p>
+                <p className="text-xs text-gray-400">enviados</p>
+              </div>
+            </div>
+            <div className="bg-white rounded-2xl border border-red-100 p-4 flex items-center gap-3">
+              <span className="text-xl">❌</span>
+              <div>
+                <p className="text-2xl font-black text-red-600">{emailStats.failed}</p>
+                <p className="text-xs text-gray-400">fallidos</p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {error && (
           <div className="flex items-center gap-2 bg-red-50 border border-red-100 text-red-600 text-sm px-4 py-3 rounded-xl mb-4">
             <AlertCircle className="w-4 h-4 flex-shrink-0" /> {error}
@@ -145,43 +213,60 @@ export default function LogsPage() {
             <div className="p-10 text-center text-gray-400 text-sm">No hay logs con los filtros actuales.</div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead className="bg-gray-50 border-b border-gray-100">
-                  <tr>
-                    {['Fecha', 'Nivel', 'Fuente', 'Mensaje', 'User ID', 'ms', ''].map(h => (
-                      <th key={h} className="px-4 py-3 text-left text-xs font-bold text-gray-400 uppercase tracking-wide whitespace-nowrap">{h}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-50">
-                  {logs.map(log => (
-                    <tr key={log.id} className={`hover:bg-gray-50 transition-colors ${log.level === 'error' ? 'bg-red-50/30' : ''}`}>
-                      <td className="px-4 py-3 text-xs text-gray-400 whitespace-nowrap">{fmt(log.created_at)}</td>
-                      <td className="px-4 py-3">
-                        <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-bold ${LEVEL_STYLE[log.level] ?? 'bg-gray-100 text-gray-500'}`}>
-                          {log.level}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 text-xs font-mono text-gray-600 whitespace-nowrap">{log.source}</td>
-                      <td className="px-4 py-3 text-gray-700 max-w-xs truncate">{log.message}</td>
-                      <td className="px-4 py-3 text-xs font-mono text-gray-400 whitespace-nowrap">
-                        {log.user_id ? log.user_id.slice(0, 8) + '…' : '—'}
-                      </td>
-                      <td className="px-4 py-3 text-xs text-gray-400 whitespace-nowrap">
-                        {log.duration_ms != null ? `${log.duration_ms}ms` : '—'}
-                      </td>
-                      <td className="px-4 py-3">
-                        {log.metadata && (
-                          <button onClick={() => setDetail(log)}
-                            className="text-xs text-forest font-bold hover:text-forest-dark transition-colors whitespace-nowrap">
-                            Ver detalle
-                          </button>
-                        )}
-                      </td>
+              {isEmailView ? (
+                <table className="w-full text-sm">
+                  <thead className="bg-gray-50 border-b border-gray-100">
+                    <tr>
+                      {['Fecha', 'Evento', 'Estado', 'Resend ID', 'Destinatario', 'Origen', ''].map(h => (
+                        <th key={h} className="px-4 py-3 text-left text-xs font-bold text-gray-400 uppercase tracking-wide whitespace-nowrap">{h}</th>
+                      ))}
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="divide-y divide-gray-50">
+                    {logs.map(log => (
+                      <EmailRow key={log.id} log={log} onDetail={setDetail} />
+                    ))}
+                  </tbody>
+                </table>
+              ) : (
+                <table className="w-full text-sm">
+                  <thead className="bg-gray-50 border-b border-gray-100">
+                    <tr>
+                      {['Fecha', 'Nivel', 'Fuente', 'Mensaje', 'User ID', 'ms', ''].map(h => (
+                        <th key={h} className="px-4 py-3 text-left text-xs font-bold text-gray-400 uppercase tracking-wide whitespace-nowrap">{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-50">
+                    {logs.map(log => (
+                      <tr key={log.id} className={`hover:bg-gray-50 transition-colors ${log.level === 'error' ? 'bg-red-50/30' : ''}`}>
+                        <td className="px-4 py-3 text-xs text-gray-400 whitespace-nowrap">{fmt(log.created_at)}</td>
+                        <td className="px-4 py-3">
+                          <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-bold ${LEVEL_STYLE[log.level] ?? 'bg-gray-100 text-gray-500'}`}>
+                            {log.level}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 text-xs font-mono text-gray-600 whitespace-nowrap">{log.source}</td>
+                        <td className="px-4 py-3 text-gray-700 max-w-xs truncate">{log.message}</td>
+                        <td className="px-4 py-3 text-xs font-mono text-gray-400 whitespace-nowrap">
+                          {log.user_id ? log.user_id.slice(0, 8) + '…' : '—'}
+                        </td>
+                        <td className="px-4 py-3 text-xs text-gray-400 whitespace-nowrap">
+                          {log.duration_ms != null ? `${log.duration_ms}ms` : '—'}
+                        </td>
+                        <td className="px-4 py-3">
+                          {log.metadata && (
+                            <button onClick={() => setDetail(log)}
+                              className="text-xs text-forest font-bold hover:text-forest-dark transition-colors whitespace-nowrap">
+                              Ver detalle
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
             </div>
           )}
 

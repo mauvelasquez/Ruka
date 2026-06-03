@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server'
-import { Resend } from 'resend'
 import YankisUsados from '@/emails/yankis-usados'
-
-const resend = new Resend(process.env.RESEND_API_KEY || "no-key")
+import { sendEmail } from '@/lib/sendEmail'
 
 export async function POST(req: Request) {
   try {
@@ -15,22 +13,19 @@ export async function POST(req: Request) {
 
     const label = yanquisUsados === 1 ? 'Yanki' : 'Yankis'
 
-    const { data, error } = await resend.emails.send({
-      from: 'Rukka <hola@rukka.cl>',
+    const { data, error } = await sendEmail({
       to: email,
       subject: `Usaste ${yanquisUsados} ${label} en ${destino} 🏠`,
       react: YankisUsados({ nombre, yanquisUsados, yanquisRestantes, destino, fechaInicio, fechaFin }),
+      event: 'yankis-usados',
     })
 
     if (error) {
-      console.error('[email/yankis-usados] Resend error:', error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    console.log('[email/yankis-usados] sent, id:', data?.id)
     return NextResponse.json({ success: true, id: data?.id })
   } catch (err) {
-    console.error('[email/yankis-usados]', err)
     return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 })
   }
 }

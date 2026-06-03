@@ -1,12 +1,9 @@
 import { createClient } from '@/lib/supabase/server'
 import { createClient as createAdminClient } from '@supabase/supabase-js'
-import { Resend } from 'resend'
 import YankisRecibidos from '@/emails/yankis-recibidos'
 import YankisUsados from '@/emails/yankis-usados'
+import { sendEmail } from '@/lib/sendEmail'
 import { NextResponse } from 'next/server'
-
-const resend = new Resend(process.env.RESEND_API_KEY || 'no-key')
-const FROM = 'Rukka <hola@rukka.cl>'
 const fmt = d => d ? new Date(d + 'T12:00:00').toLocaleDateString('es-CL', { day: 'numeric', month: 'short', year: 'numeric' }) : ''
 
 export const runtime = 'nodejs'
@@ -115,19 +112,23 @@ export async function POST(req) {
         const fechaFin    = fmt(exchange.end_date)
         const sends = []
         if (hostProfile?.email) {
-          sends.push(resend.emails.send({
-            from: FROM,
-            to:   hostProfile.email,
+          sends.push(sendEmail({
+            to:      hostProfile.email,
             subject: 'Recibiste 1 Yanki 🪙',
             react: YankisRecibidos({ nombre: hostProfile.name || 'Anfitrión', yanquisRecibidos: 1, yanquisTotal: hostBalanceRow?.balance ?? 1, motivo: `Intercambio confirmado en ${destino}`, nombreHuesped: travelerProfile?.name }),
+            event: 'yankis-recibidos',
+            userId: exchange.to_user_id,
+            triggeredBy: 'exchange-confirm',
           }))
         }
         if (!debitErr && travelerProfile?.email) {
-          sends.push(resend.emails.send({
-            from: FROM,
-            to:   travelerProfile.email,
+          sends.push(sendEmail({
+            to:      travelerProfile.email,
             subject: `Usaste 1 Yanki en ${destino} 🏠`,
             react: YankisUsados({ nombre: travelerProfile.name || 'Viajero', yanquisUsados: 1, yanquisRestantes: travelerBalanceRow?.balance ?? 0, destino, fechaInicio, fechaFin }),
+            event: 'yankis-usados',
+            userId: exchange.from_user_id,
+            triggeredBy: 'exchange-confirm',
           }))
         }
         await Promise.all(sends)

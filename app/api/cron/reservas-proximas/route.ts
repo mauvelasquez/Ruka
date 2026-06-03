@@ -1,15 +1,12 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { Resend } from 'resend'
 import ReservaProximaSemana from '@/emails/reserva-proxima-semana'
 import AnfitrionProximaSemana from '@/emails/anfitrion-proxima-semana'
 import RecomiendaAmigo from '@/emails/recomienda-amigo'
+import { sendEmail } from '@/lib/sendEmail'
 
 export const runtime = 'nodejs'
 
-const resend = new Resend(process.env.RESEND_API_KEY || 'no-key')
-
-// Service role: la tabla exchange_requests tiene RLS; el cron no actúa como un usuario.
 function serviceClient() {
   return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -30,7 +27,6 @@ export async function GET(req: Request) {
   en7Dias.setDate(en7Dias.getDate() + 7)
   const fechaObjetivo = en7Dias.toISOString().split('T')[0]
 
-  // Intercambios aceptados que comienzan exactamente en 7 días
   const { data: reservas, error } = await supabase
     .from('exchange_requests')
     .select('id, from_user_id, to_user_id, to_home_id, start_date, end_date, guests')
@@ -45,7 +41,6 @@ export async function GET(req: Request) {
   const fmt = (d: string | null) =>
     d ? new Date(d).toLocaleDateString('es-CL', { day: 'numeric', month: 'short' }) : ''
 
-  // ── Recordatorios: intercambios que comienzan en 7 días ───────────────────
   let proximosEnviados = 0
   let proximosFallidos = 0
 
@@ -63,30 +58,34 @@ export async function GET(req: Request) {
 
     const resultados = await Promise.allSettled(
       reservas.map(async (reserva) => {
-        const guest  = profileById.get(reserva.from_user_id)
-        const host   = profileById.get(reserva.to_user_id)
+        const guest   = profileById.get(reserva.from_user_id)
+        const host    = profileById.get(reserva.to_user_id)
         const destino = homeById.get(reserva.to_home_id)?.city || 'tu destino'
         const fechaInicio = fmt(reserva.start_date)
         const fechaFin    = fmt(reserva.end_date)
         const enviados: string[] = []
 
         if (guest?.email && guest?.name) {
-          const { data, error: errGuest } = await resend.emails.send({
-            from: 'Rukka <hola@rukka.cl>',
+          const { data, error: errGuest } = await sendEmail({
             to: guest.email,
             subject: `Tu intercambio en ${destino} comienza en 7 días 🗓️`,
             react: ReservaProximaSemana({ nombre: guest.name, destino, fechaInicio, fechaFin, nombreAnfitrion: host?.name || 'tu anfitrión' }),
+            event: 'reserva-proxima-semana',
+            userId: reserva.from_user_id,
+            triggeredBy: 'cron',
           })
           if (errGuest) throw new Error(`viajero ${guest.email}: ${errGuest.message}`)
           if (data?.id) enviados.push(data.id)
         }
 
         if (host?.email && host?.name) {
-          const { data, error: errHost } = await resend.emails.send({
-            from: 'Rukka <hola@rukka.cl>',
+          const { data, error: errHost } = await sendEmail({
             to: host.email,
             subject: `Prepara tu hogar, ${guest?.name || 'tu viajero'} llega en 7 días 🗓️`,
             react: AnfitrionProximaSemana({ nombre: host.name, nombreViajero: guest?.name || 'tu viajero', fechaLlegada: fechaInicio, fechaSalida: fechaFin, personas: reserva.guests ?? 1 }),
+            event: 'anfitrion-proxima-semana',
+            userId: reserva.to_user_id,
+            triggeredBy: 'cron',
           })
           if (errHost) throw new Error(`anfitrión ${host.email}: ${errHost.message}`)
           if (data?.id) enviados.push(data.id)
@@ -133,19 +132,23 @@ export async function GET(req: Request) {
         const sends: Promise<any>[] = []
 
         if (guest?.email && guest?.name) {
-          sends.push(resend.emails.send({
-            from: 'Rukka <hola@rukka.cl>',
+          sends.push(sendEmail({
             to: guest.email,
             subject: 'Invita a un amigo y gana Yankis 🤝',
             react: RecomiendaAmigo({ nombre: guest.name, codigoReferido: makeCode(r.from_user_id), yanquisPorReferido: 2 }),
+            event: 'recomienda-amigo',
+            userId: r.from_user_id,
+            triggeredBy: 'cron',
           }))
         }
         if (host?.email && host?.name) {
-          sends.push(resend.emails.send({
-            from: 'Rukka <hola@rukka.cl>',
+          sends.push(sendEmail({
             to: host.email,
             subject: 'Invita a un amigo y gana Yankis 🤝',
             react: RecomiendaAmigo({ nombre: host.name, codigoReferido: makeCode(r.to_user_id), yanquisPorReferido: 2 }),
+            event: 'recomienda-amigo',
+            userId: r.to_user_id,
+            triggeredBy: 'cron',
           }))
         }
         return sends

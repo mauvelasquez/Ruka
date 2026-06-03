@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server'
-import { Resend } from 'resend'
 import SolicitudAceptada from '@/emails/solicitud-aceptada'
-
-const resend = new Resend(process.env.RESEND_API_KEY || "no-key")
+import { sendEmail } from '@/lib/sendEmail'
 
 export async function POST(req: Request) {
   try {
@@ -13,22 +11,19 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'nombre, email, nombreAnfitrion, destino, fechaInicio, fechaFin y yanquisDescontados son requeridos' }, { status: 400 })
     }
 
-    const { data, error } = await resend.emails.send({
-      from: 'Rukka <hola@rukka.cl>',
+    const { data, error } = await sendEmail({
       to: email,
       subject: `¡${nombreAnfitrion} aceptó tu solicitud! 🎉`,
       react: SolicitudAceptada({ nombre, nombreAnfitrion, destino, fechaInicio, fechaFin, yanquisDescontados }),
+      event: 'solicitud-aceptada',
     })
 
     if (error) {
-      console.error('[email/solicitud-aceptada] Resend error:', error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    console.log('[email/solicitud-aceptada] sent, id:', data?.id)
     return NextResponse.json({ success: true, id: data?.id })
   } catch (err) {
-    console.error('[email/solicitud-aceptada]', err)
     return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 })
   }
 }

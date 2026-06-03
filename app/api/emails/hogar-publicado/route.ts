@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server'
-import { Resend } from 'resend'
 import HogarPublicado from '@/emails/hogar-publicado'
-
-const resend = new Resend(process.env.RESEND_API_KEY || "no-key")
+import { sendEmail } from '@/lib/sendEmail'
 
 export async function POST(req: Request) {
   try {
@@ -16,22 +14,19 @@ export async function POST(req: Request) {
       )
     }
 
-    const { data, error } = await resend.emails.send({
-      from: 'Rukka <hola@rukka.cl>',
+    const { data, error } = await sendEmail({
       to: email,
       subject: '¡Tu hogar ya está en Rukka! 🏠 Ahora compártelo',
       react: HogarPublicado({ nombre, nombreHogar, urlHogar, imagenHogar }),
+      event: 'hogar-publicado',
     })
 
     if (error) {
-      console.error('[email/hogar-publicado] Resend error:', error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    console.log('[email/hogar-publicado] sent, id:', data?.id)
     return NextResponse.json({ success: true, id: data?.id })
   } catch (err) {
-    console.error('[email/hogar-publicado]', err)
     return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 })
   }
 }
