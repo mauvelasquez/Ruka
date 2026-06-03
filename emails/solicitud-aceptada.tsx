@@ -15,7 +15,7 @@ interface SolicitudAceptadaProps {
 export default function SolicitudAceptada({
   nombre = 'Viajero',
   nombreAnfitrion = 'Carlos',
-  destino = 'Medellín',
+  destino = 'Santiago',
   fechaInicio = '10 jun',
   fechaFin = '17 jun',
   yanquisDescontados = 7,

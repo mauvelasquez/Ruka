@@ -1,24 +1,21 @@
 import { NextResponse } from 'next/server'
-import HogarPublicado from '@/emails/hogar-publicado'
+import IdentidadVerificada from '@/emails/identidad-verificada'
 import { sendEmail } from '@/lib/sendEmail'
 
 export async function POST(req: Request) {
   try {
     const body = await req.json()
-    const { nombre, email, nombreHogar, urlHogar, imagenHogar } = body
+    const { nombre, email } = body
 
-    if (!nombre || !email || !nombreHogar || !urlHogar) {
-      return NextResponse.json(
-        { error: 'nombre, email, nombreHogar y urlHogar son requeridos' },
-        { status: 400 }
-      )
+    if (!nombre || !email) {
+      return NextResponse.json({ error: 'nombre y email son requeridos' }, { status: 400 })
     }
 
     const { data, error } = await sendEmail({
       to: email,
-      subject: '¡Tu hogar está publicado! Mira quién podría ser tu anfitrión 🌿',
-      react: HogarPublicado({ nombre, nombreHogar, urlHogar, imagenHogar }),
-      event: 'hogar-publicado',
+      subject: '¡Identidad verificada! Ahora publica tu hogar 🏡',
+      react: IdentidadVerificada({ nombre }),
+      event: 'identidad-verificada',
     })
 
     if (error) {

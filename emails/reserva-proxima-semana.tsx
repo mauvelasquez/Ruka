@@ -12,7 +12,7 @@ interface ReservaProximaSemanaProps {
 
 export default function ReservaProximaSemana({
   nombre = 'Viajero',
-  destino = 'Buenos Aires',
+  destino = 'Santiago',
   fechaInicio = '10 jun',
   fechaFin = '17 jun',
   nombreAnfitrion = 'Ana',

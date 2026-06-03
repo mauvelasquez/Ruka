@@ -16,7 +16,7 @@ export default function YankisUsados({
   nombre = 'Viajero',
   yanquisUsados = 5,
   yanquisRestantes = 7,
-  destino = 'Ciudad de México',
+  destino = 'Santiago',
   fechaInicio = '10 jun',
   fechaFin = '15 jun',
 }: YankisUsadosProps) {

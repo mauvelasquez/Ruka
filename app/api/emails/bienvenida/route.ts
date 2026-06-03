@@ -13,7 +13,7 @@ export async function POST(req: Request) {
 
     const { data, error } = await sendEmail({
       to: email,
-      subject: `¡Bienvenido a Rukka, ${nombre}! 🏠`,
+      subject: '¡Email confirmado! Comienza tu primera aventura Rukka 🏡',
       react: Bienvenida({ nombre, email }),
       event: 'bienvenida',
     })

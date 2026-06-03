@@ -1,7 +1,7 @@
 import { createHash } from 'crypto'
 import { createClient } from '../../../../lib/supabase/server'
 import { createClient as createAdminClient } from '@supabase/supabase-js'
-import { sendPartialVerificationEmail } from '../../../../lib/emails'
+import { sendPartialVerificationEmail, sendIdentidadVerificadaEmail } from '../../../../lib/emails'
 
 export const runtime = 'nodejs'
 
@@ -84,6 +84,8 @@ export async function POST(request) {
         .eq('id', user.id)
 
       if (profError) throw profError
+
+      sendIdentidadVerificadaEmail(user.email, userName).catch(() => {})
 
       return Response.json({ success: true, status: 'verified' })
     } else {
