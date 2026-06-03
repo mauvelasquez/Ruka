@@ -8,7 +8,7 @@ export const contentType = 'image/png'
 
 export default async function Image({ params }) {
   let title = 'Hogar disponible para intercambio'
-  let city = 'Latinoamérica'
+  let city = 'Chile'
   let homeType = 'Casa'
   let imageUrl = null
 

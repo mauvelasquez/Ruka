@@ -29,6 +29,7 @@ export default function GoogleAnalytics() {
         function gtag(){dataLayer.push(arguments);}
         gtag('js', new Date());
         gtag('config', '${GA_ID}');
+        gtag('config', 'AW-18204995346');
       `}</Script>
       <Suspense fallback={null}>
         <RouteChangeTracker />

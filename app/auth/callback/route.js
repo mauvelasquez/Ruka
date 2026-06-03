@@ -58,14 +58,29 @@ export async function GET(request) {
 
     user = data.session.user
 
-    // Send confirmation email on fresh email verification (email provider only, not OAuth).
-    // Window extended to 30 min to cover slow email clients / link expiry re-sends.
+    const userName = user.user_metadata?.full_name || user.user_metadata?.name || 'Usuario'
+
+    // Welcome email — two independent branches:
+    // 1. Email provider: fires on fresh email confirmation (within 24h window).
+    // 2. Google provider: fires when the account is brand new (created_at within 10 min),
+    //    because Google users never go through email-confirmation flow and the profile
+    //    check in section 2 is skipped when ?next= is set.
     if (user.app_metadata?.provider === 'email' && user.email_confirmed_at) {
       const confirmedAt = new Date(user.email_confirmed_at)
-      if (Date.now() - confirmedAt.getTime() < 30 * 60 * 1000) {
-        const userName = user.user_metadata?.name || user.user_metadata?.full_name || 'Usuario'
+      const msSinceConfirm = Date.now() - confirmedAt.getTime()
+      if (msSinceConfirm < 24 * 60 * 60 * 1000) {
+        console.log(`[auth/callback] sending verification email to ${user.email} (confirmed ${Math.round(msSinceConfirm / 60000)}m ago)`)
         sendVerificationSuccessEmail(user.email, userName)
-          .catch(e => console.error('[auth/callback] verification email:', e.message))
+          .catch(e => console.error('[auth/callback] verification email failed:', e.message))
+      } else {
+        console.log(`[auth/callback] skipping verification email — confirmed ${Math.round(msSinceConfirm / 3600000)}h ago`)
+      }
+    } else if (user.app_metadata?.provider === 'google' && user.email) {
+      const msOld = Date.now() - new Date(user.created_at).getTime()
+      if (msOld < 10 * 60 * 1000) {
+        console.log(`[auth/callback] sending welcome email to new Google user: ${user.email}`)
+        sendVerificationSuccessEmail(user.email, userName)
+          .catch(e => console.error('[auth/callback] welcome email (Google) failed:', e.message))
       }
     }
   } catch (err) {
@@ -85,16 +100,15 @@ export async function GET(request) {
         .eq('id', user.id)
         .maybeSingle()
 
-      const isGoogleLogin = user.app_metadata?.provider === 'google'
-
       if (profileError) {
         // DB error → go to dashboard optimistically
         console.error('[auth/callback] profile fetch error:', profileError.message)
       } else if (!profile) {
         // First login → create basic profile
+        const userName = user.user_metadata?.full_name || user.user_metadata?.name || 'Usuario'
         const { error: upsertErr } = await supabase.from('profiles').upsert({
           id:     user.id,
-          name:   user.user_metadata?.full_name || user.user_metadata?.name || 'Usuario',
+          name:   userName,
           email:  user.email || user.user_metadata?.email || '',
           avatar: user.user_metadata?.picture || user.user_metadata?.avatar_url || null,
           status: 'pending',

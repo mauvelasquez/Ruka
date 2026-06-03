@@ -21,11 +21,14 @@ export async function POST(req: Request) {
     })
 
     if (error) {
+      console.error('[email/reserva-proxima-semana] Resend error:', error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
+    console.log('[email/reserva-proxima-semana] sent, id:', data?.id)
     return NextResponse.json({ success: true, id: data?.id })
   } catch (err) {
+    console.error('[email/reserva-proxima-semana]', err)
     return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 })
   }
 }

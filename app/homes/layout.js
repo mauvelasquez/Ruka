@@ -13,8 +13,8 @@ export const metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Hogares para intercambio en Latinoamérica — Rukka',
-    description: 'Encuentra tu hogar ideal para intercambiar. Casas, cabañas y departamentos en toda Latinoamérica.',
+    title: 'Hogares para intercambio en Chile — Rukka',
+    description: 'Encuentra tu hogar ideal para intercambiar. Casas, cabañas y departamentos en todo Chile.',
     site: '@rukka_cl',
     images: ['https://rukka.cl/rukka-logo.png'],
   },

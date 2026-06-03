@@ -23,11 +23,14 @@ export async function POST(req: Request) {
     })
 
     if (error) {
+      console.error('[email/yankis-usados] Resend error:', error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
+    console.log('[email/yankis-usados] sent, id:', data?.id)
     return NextResponse.json({ success: true, id: data?.id })
   } catch (err) {
+    console.error('[email/yankis-usados]', err)
     return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 })
   }
 }

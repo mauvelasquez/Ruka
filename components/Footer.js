@@ -26,7 +26,7 @@ export default function Footer() {
               <RukkaLogo height={44} />
             </div>
             <p className="text-sm leading-relaxed mb-4 text-gray-300">
-              <em>Rukka</em> significa "hogar" en Mapudungun, la lengua del pueblo Mapuche. Conectamos viajeros de Latinoamérica que creen en la hospitalidad como forma de conocer el mundo desde adentro.
+              <em>Rukka</em> significa "hogar" en Mapudungun, la lengua del pueblo Mapuche. Conectamos viajeros de Chile que creen en la hospitalidad como forma de conocer el mundo desde adentro.
             </p>
             <p className="text-xs text-gray-400 italic">Con cariño, desde Chile para el mundo</p>
           </div>
@@ -85,7 +85,7 @@ export default function Footer() {
           <p>© 2026 Rukka. Todos los derechos reservados.</p>
           <p className="text-gray-300 italic text-sm">"Mi casa es tu casa."</p>
           <p className="flex items-center gap-1.5">
-            Construido con <Heart className="w-3 h-3 text-terra fill-current" /> para la comunidad viajera de Latinoamérica
+            Construido con <Heart className="w-3 h-3 text-terra fill-current" /> para la comunidad viajera de Chile
           </p>
         </div>
       </div>

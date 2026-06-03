@@ -360,6 +360,13 @@ export default function PropertyPage() {
       const result = await createHome(data)
       if (!result) throw new Error('createHome devolvió null')
       setSuccess(true)
+      if (typeof window !== 'undefined' && window.gtag) {
+        window.gtag('event', 'conversion', {
+          send_to: 'AW-18204995346/hogar_publicado',
+          value: 1.0,
+          currency: 'CLP'
+        })
+      }
       setTimeout(() => router.push('/dashboard?tab=homes'), 1200)
     } catch (err) {
       console.error('Error creando propiedad:', err)

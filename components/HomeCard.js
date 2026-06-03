@@ -26,7 +26,7 @@ export default function HomeCard({ home, user, compact = false }) {
         <div className="relative h-48 overflow-hidden bg-gray-100">
           <img
             src={home.images?.[0] || `https://picsum.photos/seed/${home.id}/800/500`}
-            alt={`${home.type || 'Hogar'} en ${home.location || home.city || 'Latinoamérica'} — ${home.title}`}
+            alt={`${home.type || 'Hogar'} en ${home.location || home.city || 'Chile'} — ${home.title}`}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             onError={e => { e.target.src = `https://picsum.photos/seed/home${home.id}/800/500` }}
           />

@@ -21,11 +21,14 @@ export async function POST(req: Request) {
     })
 
     if (error) {
+      console.error('[email/solicitud-aceptada] Resend error:', error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
+    console.log('[email/solicitud-aceptada] sent, id:', data?.id)
     return NextResponse.json({ success: true, id: data?.id })
   } catch (err) {
+    console.error('[email/solicitud-aceptada]', err)
     return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 })
   }
 }

@@ -75,7 +75,7 @@ export default function WelcomePopup() {
             <span className="text-sm font-semibold tracking-widest uppercase text-forest-100 opacity-80">Rukka</span>
           </div>
           <h2 className="text-xl font-bold leading-snug pr-8">
-            La primera plataforma de intercambio de casas en Latinoamérica
+            La primera plataforma de intercambio de casas en Chile
           </h2>
         </div>
 

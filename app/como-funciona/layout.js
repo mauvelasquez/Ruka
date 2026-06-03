@@ -23,7 +23,7 @@ const pageSchema = {
     {
       '@type': 'HowTo',
       'name': 'Cómo funciona el intercambio de casas en Rukka',
-      'description': 'Rukka conecta a viajeros de Latinoamérica para intercambiar sus hogares de forma automática.',
+      'description': 'Rukka conecta a viajeros de Chile para intercambiar sus hogares de forma automática.',
       'totalTime': 'PT5M',
       'step': [
         {

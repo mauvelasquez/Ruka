@@ -101,7 +101,7 @@ export default function ComoFuncionaClient() {
             <span className="text-sand">Viaja gratis por Chile.</span>
           </h1>
           <p className="text-lg text-white/80 max-w-2xl mx-auto leading-relaxed mb-8">
-            Rukka conecta propietarios de Latinoamérica.<br className="hidden sm:block" />
+            Rukka conecta propietarios de Chile.<br className="hidden sm:block" />
             Cada vez que hospedas a alguien, ganas el derecho de alojarte en otra casa — en las fechas que quieras.
           </p>
         </div>
@@ -401,13 +401,13 @@ export default function ComoFuncionaClient() {
       <section className="py-24 bg-white">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <div className="bg-forest-dark rounded-3xl p-12 sm:p-16">
-            <p className="text-forest-light font-bold text-sm uppercase tracking-widest mb-4">Latinoamérica te espera</p>
+            <p className="text-forest-light font-bold text-sm uppercase tracking-widest mb-4">Chile te espera</p>
             <h2 className="text-3xl sm:text-4xl font-black text-white mb-4 leading-tight">
               ¿Lista tu hogar para<br />el intercambio?
             </h2>
             <p className="text-white/70 text-lg mb-8">
               Publica tu casa en 2 minutos. Recibes 3 Yankis de bienvenida.<br className="hidden sm:block" />
-              Empieza a conectar con viajeros de LATAM.
+              Empieza a conectar con viajeros de Chile.
             </p>
             <button
               onClick={openPublicarModal}
