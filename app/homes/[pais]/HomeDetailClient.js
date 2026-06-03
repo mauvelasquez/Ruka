@@ -347,6 +347,22 @@ export default function HomeDetailClient({ id }) {
                   </div>
                 </div>
               )}
+              {home.airbnb_url && (
+                <div className="mt-4">
+                  <a
+                    href={home.airbnb_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex w-full items-center justify-center gap-2 px-5 py-3 rounded-xl font-semibold text-white text-sm transition-all hover:opacity-90 active:scale-95"
+                    style={{ backgroundColor: '#FF385C' }}
+                  >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm0 4.5c1.243 0 2.25 1.007 2.25 2.25S13.243 9 12 9 9.75 7.993 9.75 6.75 10.757 4.5 12 4.5zm5.25 13.5H6.75a.75.75 0 01-.75-.75c0-3.176 2.636-5.25 6-5.25s6 2.074 6 5.25a.75.75 0 01-.75.75z"/>
+                    </svg>
+                    Ver hogar en Airbnb
+                  </a>
+                </div>
+              )}
               <div className="mt-4 bg-terra-50 rounded-2xl p-4 border border-terra/10">
                 <p className="text-xs font-bold text-terra mb-1 flex items-center gap-1.5">
                   <Sparkles className="w-3.5 h-3.5" /> ¿Mejor con match perfecto?

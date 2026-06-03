@@ -42,6 +42,7 @@ export async function POST(req) {
       private_bathroom:  data.private_bathroom || false,
       bed_type:          data.bed_type || null,
       shared_with:       data.shared_with || null,
+      airbnb_url:        data.airbnb_url || null,
       featured:          false,
     }).select().single()
 

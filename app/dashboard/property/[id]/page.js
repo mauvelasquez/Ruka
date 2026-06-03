@@ -106,6 +106,8 @@ export default function PropertyPage() {
   // Form state
   const [category,            setCategory]            = useState('full_home')
   const [subtype,             setSubtype]             = useState('')
+  const [airbnbUrl,           setAirbnbUrl]           = useState('')
+  const [airbnbUrlError,      setAirbnbUrlError]      = useState('')
   const [homeForm,            setHomeForm]            = useState({
     title: '', description: '',
     bedrooms: 1, bathrooms: 1, maxGuests: 2,
@@ -158,6 +160,7 @@ export default function PropertyPage() {
     })
     setPhotos(home.images || [])
     setAvailabilityPeriods(home.availabilityPeriods || [])
+    setAirbnbUrl(home.airbnb_url || '')
     if (home.coords) setCoords(home.coords)
   }, [isNew, ready, homes, id])
 
@@ -290,6 +293,13 @@ export default function PropertyPage() {
     }
   }
 
+  // ── Validación URL Airbnb ──────────────────────────────────────────────────
+  const AIRBNB_URL_RE = /^https:\/\/(www\.)?airbnb\.[a-z]+\//i
+  const validateAirbnbUrl = (val) => {
+    if (!val) return ''
+    return AIRBNB_URL_RE.test(val) ? '' : 'El link debe comenzar con https://www.airbnb.com/ o similar'
+  }
+
   // ── Guardado por sección ───────────────────────────────────────────────────
   const saveSection = async (section, data) => {
     setError('')
@@ -333,6 +343,10 @@ export default function PropertyPage() {
     if (location.country_code !== 'CL' && !location.city)            { setError('Selecciona la ciudad'); return }
     if (!subtype)                                                     { setError('Selecciona el tipo de hogar'); return }
 
+    const urlErr = validateAirbnbUrl(airbnbUrl)
+    if (urlErr) { setAirbnbUrlError(urlErr); return }
+    setAirbnbUrlError('')
+
     setSaving(true)
     const data = {
       title:            homeForm.title,
@@ -356,6 +370,7 @@ export default function PropertyPage() {
       private_bathroom: homeForm.private_bathroom,
       bed_type:         homeForm.bed_type,
       shared_with:      homeForm.shared_with,
+      airbnb_url:       airbnbUrl.trim() || null,
     }
     try {
       const result = await createHome(data)
@@ -590,11 +605,37 @@ export default function PropertyPage() {
               <p className="text-xs text-gray-400 flex-shrink-0 ml-2">{hf.description.length}/600</p>
             </div>
           </div>
+          <div className="mt-4">
+            <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">
+              ¿Tienes este hogar en Airbnb? Comparte el link
+              <span className="ml-1 text-gray-400 font-normal normal-case">(opcional)</span>
+            </label>
+            <input
+              type="url"
+              value={airbnbUrl}
+              onChange={e => {
+                setAirbnbUrl(e.target.value)
+                setAirbnbUrlError(validateAirbnbUrl(e.target.value))
+              }}
+              placeholder="https://www.airbnb.com/rooms/..."
+              className={`w-full border rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-forest focus:outline-none ${airbnbUrlError ? 'border-red-300 bg-red-50' : 'border-gray-200'}`}
+            />
+            {airbnbUrlError && (
+              <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
+                <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" /> {airbnbUrlError}
+              </p>
+            )}
+          </div>
           {!isNew && (
             <SectionSaveBtn
               saving={sectionSaving === 'info'}
               saved={sectionSaved === 'info'}
-              onClick={() => saveSection('info', { title: hf.title, description: hf.description })}
+              onClick={async () => {
+                const urlErr = validateAirbnbUrl(airbnbUrl)
+                if (urlErr) { setAirbnbUrlError(urlErr); return }
+                setAirbnbUrlError('')
+                saveSection('info', { title: hf.title, description: hf.description, airbnb_url: airbnbUrl.trim() || null })
+              }}
             />
           )}
         </div>
