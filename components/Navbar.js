@@ -100,8 +100,10 @@ export default function Navbar() {
               </div>
             ) : (
               <div className="flex items-center gap-2">
-                <Link href="/auth/login" className="text-sm font-semibold text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors">
-                  Iniciar sesión
+                <Link
+                  href="/auth/login"
+                  className="text-sm font-semibold text-gray-700 px-4 py-2 rounded-full border border-gray-300 hover:border-gray-400 hover:bg-gray-50 transition-colors">
+                  Ingresar
                 </Link>
                 <button
                   onClick={openPublicarModal}
@@ -156,7 +158,7 @@ export default function Navbar() {
             </>
           ) : (
             <div className="flex flex-col gap-2 pt-2">
-              <Link href="/auth/login" onClick={() => setMenuOpen(false)} className="text-center p-3 rounded-xl border border-gray-200 text-gray-700 font-semibold">Iniciar sesión</Link>
+              <Link href="/auth/login" onClick={() => setMenuOpen(false)} className="text-center p-3 rounded-xl border border-gray-300 text-gray-700 font-semibold hover:bg-gray-50 transition-colors">Ingresar</Link>
               <button onClick={() => { setMenuOpen(false); openPublicarModal() }} className="text-center p-3 rounded-xl bg-forest text-white font-bold">Publicar mi hogar</button>
             </div>
           )}
