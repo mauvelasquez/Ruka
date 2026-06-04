@@ -19,11 +19,16 @@ export function getCountryFromRequest(req) {
 export async function middleware(req) {
   let response = NextResponse.next({ request: req })
 
+  const { pathname } = req.nextUrl
+  const isAdminOnly = ADMIN_ONLY.some(p => pathname.startsWith(p))
+
   // geo: track if we need to stamp the country cookie on the final response
   const needsCountryCookie = !req.cookies.get(COUNTRY_COOKIE)
   const detectedCountry = needsCountryCookie ? getCountryFromRequest(req) : null
 
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    // Sin Supabase no hay forma de verificar sesión → fail-closed para rutas admin
+    if (isAdminOnly) return new NextResponse(null, { status: 404 })
     if (needsCountryCookie) {
       response.cookies.set(COUNTRY_COOKIE, detectedCountry, {
         path: '/', maxAge: 31536000, sameSite: 'lax', httpOnly: false,
@@ -55,10 +60,10 @@ export async function middleware(req) {
     user = authUser ?? null
   } catch (err) {
     console.error('[middleware] getUser falló:', err?.message)
+    // Error de red: fail-closed para admin, pass-through para el resto
+    if (isAdminOnly) return new NextResponse(null, { status: 404 })
     return response
   }
-
-  const { pathname } = req.nextUrl
 
   // Rutas que requieren sesión activa
   if (AUTH_REQUIRED.some(p => pathname.startsWith(p)) && !user) {
@@ -93,11 +98,11 @@ export async function middleware(req) {
     return NextResponse.redirect(new URL('/', req.url))
   }
 
-  // Rutas admin: requieren sesión + email admin
-  if (ADMIN_ONLY.some(p => pathname.startsWith(p))) {
-    if (!user) return NextResponse.redirect(new URL('/auth/login', req.url))
+  // Rutas admin: requieren sesión + email admin (404 en ambos casos — no revelar existencia)
+  if (isAdminOnly) {
+    if (!user) return new NextResponse(null, { status: 404 })
     const adminEmail = process.env.ADMIN_EMAIL || process.env.NEXT_PUBLIC_ADMIN_EMAIL
-    if (!adminEmail || user.email !== adminEmail) return NextResponse.notFound()
+    if (!adminEmail || user.email !== adminEmail) return new NextResponse(null, { status: 404 })
   }
 
   // geo: stamp country cookie on the final response (after Supabase may have replaced it)
