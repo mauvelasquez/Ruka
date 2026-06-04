@@ -85,8 +85,8 @@ export default async function PaisOHomeDetailPage({ params }) {
 
     if (supabase) {
       const [homesRes, cityRes] = await Promise.all([
-        supabase.from('homes').select('id, title, description, city, country, location, images, bedrooms, bathrooms, max_guests, type, amenities, rating, review_count, availability_periods, created_at').eq('country_code', country.code).order('rating', { ascending: false }).limit(24),
-        supabase.from('homes').select('city').eq('country_code', country.code).not('city', 'is', null),
+        supabase.from('homes').select('id, title, description, city, country, location, images, bedrooms, bathrooms, max_guests, type, amenities, rating, review_count, availability_periods, created_at').eq('country_code', country.code).or('is_demo.is.null,is_demo.is.false,country_code.eq.CL').order('rating', { ascending: false }).limit(24),
+        supabase.from('homes').select('city').eq('country_code', country.code).or('is_demo.is.null,is_demo.is.false,country_code.eq.CL').not('city', 'is', null),
       ])
       homes = homesRes.data || []
       citiesWithHomes = [...new Set((cityRes.data || []).map(r => r.city).filter(Boolean))]
