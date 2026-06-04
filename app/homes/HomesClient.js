@@ -143,7 +143,7 @@ function HomesContent() {
             <h1 className="text-3xl font-extrabold text-white mb-1">
             {selectedCountry
               ? `Hogares en ${selectedCountry.flag} ${selectedCountry.name}`
-              : 'Explorar hogares en Latinoamérica'}
+              : 'Explorar hogares en Chile'}
           </h1>
             <p className="text-white/70 mb-6 text-sm">{banner.description}</p>
             <div className="flex items-center gap-3 bg-white rounded-xl p-3 max-w-xl shadow-lg">

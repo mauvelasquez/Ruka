@@ -43,7 +43,7 @@ export const metadata = {
     description: 'Match bilateral y sistema de Yankis para intercambiar casas en Chile. Alojamiento gratuito entre propietarios.',
     url: 'https://rukka.cl',
     siteName: 'Rukka',
-    locale: 'es_419',
+    locale: 'es_CL',
     type: 'website',
     images: [{ url: 'https://rukka.cl/rukka-logo.png', width: 1080, height: 1080, alt: 'Rukka' }],
   },
@@ -57,14 +57,14 @@ export const metadata = {
   alternates: {
     canonical: 'https://rukka.cl',
     languages: {
-      'es-419': 'https://rukka.cl',
+      'es-CL': 'https://rukka.cl',
     },
   },
 }
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="es">
+    <html lang="es-CL">
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <script
@@ -91,8 +91,8 @@ export default function RootLayout({ children }) {
                     'intercambio de casas',
                     'intercambio de hogares',
                     'Yankis tokens hospedaje',
-                    'viaje gratuito intercambio',
-                    'intercambio vacacional LATAM',
+                    'viaje gratuito intercambio Chile',
+                    'home exchange Chile',
                     'match bilateral propiedades',
                   ],
                   'areaServed': [
@@ -108,7 +108,7 @@ export default function RootLayout({ children }) {
                     'contactType': 'customer support',
                     'availableLanguage': 'Spanish',
                   },
-                  'inLanguage': 'es-419',
+                  'inLanguage': 'es-CL',
                   'sameAs': [
                     'https://twitter.com/rukka_cl',
                     'https://x.com/rukka_cl',

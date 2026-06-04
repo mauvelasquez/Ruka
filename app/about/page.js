@@ -114,7 +114,7 @@ const faqSchema = {
 }
 
 const COMPARISON = [
-  { feature: 'Foco geográfico',    rukka: 'Latinoamérica',              kindred: 'EE.UU. + Europa',   homeexchange: 'Global',              airbnb: 'Global' },
+  { feature: 'Foco geográfico',    rukka: 'Chile',                       kindred: 'EE.UU. + Europa',   homeexchange: 'Global',              airbnb: 'Global' },
   { feature: 'Modelo',             rukka: 'Bilateral + Yankis',          kindred: 'Solo tokens',        homeexchange: 'Sistema de puntos',    airbnb: 'Alquiler (sin intercambio)' },
   { feature: 'Costo alojamiento',  rukka: 'Gratis',                      kindred: 'Fees de servicio',   homeexchange: '$220 USD/año membresía', airbnb: 'Tarifa por noche' },
   { feature: 'Asistente IA',       rukka: 'Fresia (Claude/Anthropic)',   kindred: 'No',                 homeexchange: 'No',                   airbnb: 'No' },

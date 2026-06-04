@@ -74,7 +74,7 @@ export default function LoginPage() {
                   {banner.emoji} {banner.tagline}
                 </div>
                 <h2 className="text-4xl font-black text-white mb-4 leading-tight">
-                  {COUNTRY_NAMES[country] ?? 'Latinoamérica'} te está<br />esperando.<br />Sin pagar hotel.
+                  {COUNTRY_NAMES[country] ?? 'Chile'} te está<br />esperando.<br />Sin pagar hotel.
                 </h2>
                 <p className="text-white/80 text-lg mb-10">{banner.description}</p>
 
@@ -93,7 +93,7 @@ export default function LoginPage() {
                 </div>
               </div>
 
-              <p className="text-white/40 text-sm">© 2026 Rukka — Intercambio de hogares en {COUNTRY_NAMES[country] ?? 'Latinoamérica'}</p>
+              <p className="text-white/40 text-sm">© 2026 Rukka — Intercambio de hogares en {COUNTRY_NAMES[country] ?? 'Chile'}</p>
             </div>
           </>
         )}
@@ -108,7 +108,7 @@ export default function LoginPage() {
 
           <div className="mb-6">
             <h1 className="text-2xl sm:text-3xl font-black text-gray-900 mb-2">Bienvenido de vuelta</h1>
-            <p className="text-gray-500 text-sm">Inicia sesión para ver tus matches en {COUNTRY_NAMES[country] ?? 'Latinoamérica'}</p>
+            <p className="text-gray-500 text-sm">Inicia sesión para ver tus matches en {COUNTRY_NAMES[country] ?? 'Chile'}</p>
           </div>
 
           {error && (
@@ -184,7 +184,7 @@ export default function LoginPage() {
           </form>
 
           <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-xl text-center">
-            <p className="text-green-800 text-sm font-bold mb-1">🌎 Rukka — Intercambio de hogares en Latinoamérica</p>
+            <p className="text-green-800 text-sm font-bold mb-1">🇨🇱 Rukka — Intercambio de hogares en Chile</p>
             <p className="text-green-700 text-xs">Sin costo de alojamiento, sin comisiones, sin letra chica.</p>
           </div>
 

@@ -29,11 +29,13 @@ export async function generateMetadata({ params }) {
   if (!post) return { title: 'Artículo no encontrado | Rukka' }
   const { frontmatter: fm } = post
   const url = `https://rukka.cl/blog/${fm.slug}`
+  const isNonChile = fm.market && fm.market !== 'Chile'
   return {
     title: fm.title,
     description: fm.description,
     keywords: [fm.keyword, 'home exchange', 'intercambio hogares', 'rukka'],
     alternates: { canonical: url },
+    ...(isNonChile && { robots: { index: false, follow: false } }),
     openGraph: {
       title: fm.title,
       description: fm.description,

@@ -48,7 +48,7 @@ Rukka conecta a personas en Chile para intercambiar sus hogares de forma gratuit
 - Plataforma chilena: de norte a sur del país
 - Asistente IA "Fresia" (powered by Claude / Anthropic)
 - Importación de anuncios desde Airbnb en segundos
-- Sistema de Yankis (tokens de intercambio, del quechua: trueque) — 1 Yanki = 1 noche
+- Sistema de Yankis (tokens de intercambio) — 1 Yanki = 1 noche
 
 ## Hogares disponibles${homeCount > 0 ? ` (${homeCount} en total)` : ''}
 ${countryStats}
@@ -57,7 +57,7 @@ ${countryStats}
 
 ## Sistema de Yankis
 
-Los Yankis son la moneda interna de Rukka (del quechua, significa trueque).
+Los Yankis son la moneda interna de Rukka (evoca el trueque y el intercambio directo).
 - 1 Yanki = 1 noche de alojamiento
 - Se ganan prestando el hogar a otros usuarios
 - Permiten intercambios no-simultáneos
@@ -77,7 +77,7 @@ Powered by Claude (Anthropic).
 - [Cómo funciona](https://rukka.cl/como-funciona) — Guía del proceso paso a paso
 - [Anfitriones Airbnb](https://rukka.cl/anfitriones-airbnb) — Complementar Airbnb con Rukka
 - [Fresia IA](https://rukka.cl/FresIA) — Asistente inteligente de Rukka
-- [Blog](https://rukka.cl/blog) — Guías sobre home exchange en Latinoamérica
+- [Blog](https://rukka.cl/blog) — Guías sobre home exchange en Chile
 
 ## Blog — artículos disponibles
 

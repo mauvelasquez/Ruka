@@ -61,7 +61,7 @@ const faqSchema = {
       name: '¿Qué son los Yankis de Rukka?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Yanki es una palabra quechua que significa trueque. Es la moneda interna de Rukka: 1 Yanki = 1 noche de alojamiento. Los miembros ganan Yankis al hospedar a visitantes y los usan para alojarse en cualquier hogar de Rukka cuando quieran viajar. Los Yankis no caducan y no se compran — solo se ganan hospedando.',
+        text: 'Yanki es la moneda interna de Rukka: 1 Yanki = 1 noche de alojamiento. El nombre evoca el trueque y el intercambio directo entre personas. Los miembros ganan Yankis al hospedar a visitantes y los usan para alojarse en cualquier hogar de Rukka cuando quieran viajar. Los Yankis no caducan y no se compran — solo se ganan hospedando.',
       },
     },
     {

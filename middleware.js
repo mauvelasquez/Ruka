@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server'
 
 const AUTH_REQUIRED = ['/dashboard', '/matches', '/onboarding']
 const AUTH_ONLY = ['/auth/login', '/auth/register']
+const ADMIN_ONLY = ['/auditorias']
 
 const SUPPORTED_COUNTRIES = ['CL', 'CO', 'AR', 'MX']
 const COUNTRY_COOKIE = 'rukka_country'
@@ -92,6 +93,13 @@ export async function middleware(req) {
     return NextResponse.redirect(new URL('/', req.url))
   }
 
+  // Rutas admin: requieren sesión + email admin
+  if (ADMIN_ONLY.some(p => pathname.startsWith(p))) {
+    if (!user) return NextResponse.redirect(new URL('/auth/login', req.url))
+    const adminEmail = process.env.ADMIN_EMAIL || process.env.NEXT_PUBLIC_ADMIN_EMAIL
+    if (!adminEmail || user.email !== adminEmail) return NextResponse.notFound()
+  }
+
   // geo: stamp country cookie on the final response (after Supabase may have replaced it)
   if (needsCountryCookie) {
     response.cookies.set(COUNTRY_COOKIE, detectedCountry, {
@@ -109,6 +117,8 @@ export const config = {
     '/onboarding/:path*',
     '/auth/login',
     '/auth/register',
+    '/auditorias/:path*',
+    '/auditorias',
     '/',
     '/homes/:path*',
     '/como-funciona',

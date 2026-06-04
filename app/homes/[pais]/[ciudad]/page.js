@@ -34,18 +34,20 @@ export async function generateMetadata({ params }) {
   const description = `Conoce ${city.name} intercambiando tu hogar. Rukka es gratuito, con verificación de identidad.`
   const url = `https://rukka.cl/homes/${pais}/${ciudad}`
 
+  const isNonChile = pais !== 'chile'
   return {
     title,
     description,
     keywords: city.keywords,
     alternates: { canonical: url },
+    ...(isNonChile && { robots: { index: false, follow: true } }),
     openGraph: {
       title,
       description,
       url,
       siteName: 'Rukka',
       type: 'website',
-      locale: 'es_419',
+      locale: 'es_CL',
       images: [{ url: city.heroImage || 'https://rukka.cl/rukka-logo.png', width: 1200, height: 630, alt: `Hogares en ${city.name}` }],
     },
     twitter: { card: 'summary_large_image', title, description, images: [city.heroImage || 'https://rukka.cl/rukka-logo.png'] },
@@ -248,7 +250,7 @@ export default async function CiudadPage({ params }) {
                   <strong>intercambiar casas en {city.name}</strong> sin costo.
                   El <strong>home exchange en {city.name}</strong> es la forma más
                   económica de conocer la ciudad de verdad. Publica tu hogar y accede
-                  a <strong>alojamiento gratis en {city.name}</strong> y en toda Latinoamérica.
+                  a <strong>alojamiento gratis en {city.name}</strong> y en todo Chile.
                   Crear una cuenta es <strong>gratuito</strong> y todos los usuarios pasan por
                   verificación de identidad.
                 </p>
@@ -263,7 +265,7 @@ export default async function CiudadPage({ params }) {
                 ¿Qué es Rukka y cómo funciona?
               </h2>
               <p className="text-gray-600 text-sm">
-                El intercambio de hogares más sencillo de Latinoamérica
+                El intercambio de hogares más sencillo de Chile
               </p>
             </div>
 
@@ -348,7 +350,7 @@ export default async function CiudadPage({ params }) {
                   Todavía no hay hogares en {city.name}
                 </h3>
                 <p className="text-gray-500 text-sm mb-6 max-w-sm mx-auto">
-                  ¡Publica el tuyo y empieza a recibir viajeros de toda Latinoamérica!
+                  ¡Publica el tuyo y empieza a recibir viajeros de Chile!
                 </p>
                 <Link
                   href="/dashboard/property/new"
@@ -404,8 +406,8 @@ export default async function CiudadPage({ params }) {
               </section>
             )}
 
-            {/* Sección B: Intercambios en otros países */}
-            {featuredCountries.length > 0 && (
+            {/* Sección B: Intercambios en otros países — oculto por defecto, activar con NEXT_PUBLIC_ENABLE_MULTICOUNTRY=true */}
+            {process.env.NEXT_PUBLIC_ENABLE_MULTICOUNTRY === 'true' && featuredCountries.length > 0 && (
               <section>
                 <h2 className="text-lg font-extrabold text-forest mb-5">
                   Intercambios en otros países
@@ -421,9 +423,6 @@ export default async function CiudadPage({ params }) {
                       <div className="min-w-0 flex-1">
                         <p className="font-bold text-gray-900 text-sm group-hover:text-forest transition-colors">
                           {c.name}
-                        </p>
-                        <p className="text-xs text-forest font-medium mt-0.5">
-                          {c.approxHomes}+ hogares disponibles
                         </p>
                       </div>
                       <ArrowRight className="w-4 h-4 text-terra flex-shrink-0 group-hover:translate-x-0.5 transition-transform" />

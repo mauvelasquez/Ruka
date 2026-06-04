@@ -30,11 +30,13 @@ export async function generateMetadata({ params }) {
     const title = `Intercambio de hogares en ${country.name} | Rukka`
     const description = `Conoce ${country.name} intercambiando tu hogar. Rukka es gratuito, con verificación de identidad.`
     const url = `https://rukka.cl/homes/${pais}`
+    const isNonChile = pais !== 'chile'
     return {
       title, description,
       keywords: country.keywords,
       alternates: { canonical: url },
-      openGraph: { title, description, url, siteName: 'Rukka', type: 'website', locale: 'es_419', images: [{ url: 'https://rukka.cl/rukka-logo.png', width: 1200, height: 630, alt: `Rukka ${country.name}` }] },
+      ...(isNonChile && { robots: { index: false, follow: true } }),
+      openGraph: { title, description, url, siteName: 'Rukka', type: 'website', locale: 'es_CL', images: [{ url: 'https://rukka.cl/rukka-logo.png', width: 1200, height: 630, alt: `Rukka ${country.name}` }] },
       twitter: { card: 'summary_large_image', title, description, images: ['https://rukka.cl/rukka-logo.png'] },
     }
   }
@@ -61,7 +63,7 @@ export async function generateMetadata({ params }) {
       title, description,
       robots: { index: true, follow: true },
       alternates: { canonical: url, languages: { 'es-419': url } },
-      openGraph: { title, description, url, siteName: 'Rukka', type: 'website', locale: 'es_419', images: [{ url: imageUrl, width: 1200, height: 630, alt: home.title }] },
+      openGraph: { title, description, url, siteName: 'Rukka', type: 'website', locale: 'es_CL', images: [{ url: imageUrl, width: 1200, height: 630, alt: home.title }] },
       twitter: { card: 'summary_large_image', title, description, images: [imageUrl] },
     }
   } catch {
@@ -218,7 +220,7 @@ export default async function PaisOHomeDetailPage({ params }) {
                     Aún no hay hogares publicados en {country.name}
                   </h3>
                   <p className="text-gray-500 text-sm mb-6 max-w-sm mx-auto">
-                    ¡Sé el primero en publicar el tuyo y empieza a recibir viajeros de toda Latinoamérica!
+                    ¡Sé el primero en publicar el tuyo y empieza a recibir viajeros de Chile!
                   </p>
                   <Link
                     href="/dashboard/property/new"
@@ -239,8 +241,8 @@ export default async function PaisOHomeDetailPage({ params }) {
                 Rukka es la plataforma de <strong>home exchange en {country.name}</strong> que conecta familias para{' '}
                 <strong>intercambiar casas</strong> sin costo ni comisión. Ya sea que tengas un departamento en{' '}
                 {country.topCities[0]} o una cabaña en {country.topCities[country.topCities.length - 1]},
-                puedes ofrecer tu hogar a cambio de alojamiento gratis en {country.name} o en cualquier
-                país de Latinoamérica. El <strong>intercambio de hogares en {country.name}</strong> es la forma
+                puedes ofrecer tu hogar a cambio de alojamiento gratis en {country.name}.
+                El <strong>intercambio de hogares en {country.name}</strong> es la forma
                 más auténtica y económica de viajar: vives como un local, en casas reales, con familias de verdad.
                 Crear una cuenta es <strong>gratuito</strong> y todos los usuarios pasan por verificación de identidad.
               </p>

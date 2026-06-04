@@ -39,7 +39,7 @@ export async function generateMetadata({ params }) {
         url,
         siteName: 'Rukka',
         type: 'profile',
-        locale: 'es_419',
+        locale: 'es_CL',
         images: profile.avatar_url
           ? [{ url: profile.avatar_url, width: 400, height: 400, alt: name }]
           : [{ url: 'https://rukka.cl/rukka-logo.png', width: 1080, height: 1080, alt: 'Rukka' }],

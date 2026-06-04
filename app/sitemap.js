@@ -6,9 +6,11 @@ const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://rukka.cl'
 
 export default async function sitemap() {
   const blogPosts = getAllPosts()
+  // Solo artículos de Chile en el sitemap; los de otros mercados tienen noindex
+  const chilePosts = blogPosts.filter(p => !p.market || p.market === 'Chile')
   const blogRoutes = [
     { url: `${baseUrl}/blog`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.8 },
-    ...blogPosts.map(p => ({
+    ...chilePosts.map(p => ({
       url: `${baseUrl}/blog/${p.slug}`,
       lastModified: new Date(p.lastUpdated || p.date),
       changeFrequency: 'monthly',
@@ -27,21 +29,23 @@ export default async function sitemap() {
     { url: `${baseUrl}/terminos`,           lastModified: new Date(), changeFrequency: 'yearly',  priority: 0.3 },
   ]
 
-  // Rutas de países (/homes/chile, /homes/argentina, etc.)
-  const paisRoutes = Object.keys(COUNTRY_SLUGS).map(pais => ({
+  // Solo incluir Chile en el sitemap; los demás países tienen noindex
+  const paisRoutes = ['chile'].map(pais => ({
     url: `${baseUrl}/homes/${pais}`,
     lastModified: new Date(),
     changeFrequency: 'daily',
     priority: 0.9,
   }))
 
-  // Rutas de ciudades objetivo (pre-indexar aunque no tengan hogares aún)
-  const ciudadRoutes = Object.entries(cityData).map(([slug, data]) => ({
-    url: `${baseUrl}/homes/${data.country}/${slug}`,
-    lastModified: new Date(),
-    changeFrequency: 'weekly',
-    priority: 0.8,
-  }))
+  // Solo ciudades chilenas en el sitemap
+  const ciudadRoutes = Object.entries(cityData)
+    .filter(([, data]) => data.country === 'chile')
+    .map(([slug, data]) => ({
+      url: `${baseUrl}/homes/${data.country}/${slug}`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    }))
 
   // Las URLs con query string (/homes?country=CL) no deben ir en el sitemap:
   // Google las trata como "página alternativa con etiqueta canónica adecuada"

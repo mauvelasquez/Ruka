@@ -12,7 +12,7 @@ const ChatInterface = dynamic(
 export const metadata = {
   title: 'Fresia — Asistente de intercambio de hogares | Rukka',
   description:
-    'Fresia responde tus preguntas sobre home exchange en Chile y Latinoamérica. Cómo funciona el intercambio de casas, seguridad, ciudades disponibles y cómo usar Rukka.',
+    'Fresia responde tus preguntas sobre home exchange en Chile. Cómo funciona el intercambio de casas, seguridad, ciudades disponibles y cómo usar Rukka.',
   alternates: {
     canonical: 'https://rukka.cl/FresIA',
   },
@@ -33,7 +33,7 @@ const faqJsonLd = {
       name: '¿Cómo funciona el intercambio de hogares?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El intercambio de hogares es simple: dos familias o personas acuerdan hospedarse mutuamente en sus casas durante fechas convenidas, sin ningún pago entre ellas. En Rukka el proceso es bilateral: cuando tú alojas a alguien, ellos te alojan a ti. Lo único que necesitas es publicar tu hogar, activar tu verificación de identidad y empezar a explorar las propuestas disponibles en Chile y Latinoamérica.',
+        text: 'El intercambio de hogares es simple: dos familias o personas acuerdan hospedarse mutuamente en sus casas durante fechas convenidas, sin ningún pago entre ellas. En Rukka el proceso es bilateral: cuando tú alojas a alguien, ellos te alojan a ti. Lo único que necesitas es publicar tu hogar, activar tu verificación de identidad y empezar a explorar las propuestas disponibles en Chile.',
       },
     },
     {
@@ -62,7 +62,7 @@ const faqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: '¿En qué países de Latinoamérica funciona Rukka?',
+      name: '¿En qué ciudades de Chile funciona Rukka?',
       acceptedAnswer: {
         '@type': 'Answer',
         text: 'Rukka opera en Chile. Puedes encontrar hogares en Santiago, Valparaíso, Viña del Mar, Puerto Varas, Villarrica, Pichilemu y muchas otras ciudades y regiones del país.',
@@ -81,7 +81,7 @@ const faqJsonLd = {
       name: '¿Qué puede hacer Fresia por mí en Rukka?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Fresia es la asistente IA de Rukka, desarrollada con tecnología Claude de Anthropic. Puede ayudarte a publicar tu hogar, buscar hogares disponibles en cualquier ciudad de Latinoamérica, y responder preguntas sobre el proceso de intercambio. Fresia habla en español chileno natural y conoce la comunidad de Rukka.',
+        text: 'Fresia es la asistente IA de Rukka, desarrollada con tecnología Claude de Anthropic. Puede ayudarte a publicar tu hogar, buscar hogares disponibles en cualquier ciudad de Chile, y responder preguntas sobre el proceso de intercambio. Fresia habla en español chileno natural y conoce la comunidad de Rukka.',
       },
     },
     {

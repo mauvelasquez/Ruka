@@ -177,8 +177,8 @@ export default function ComoFuncionaClient() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div>
                 <p className="text-gray-600 leading-relaxed mb-4">
-                  <strong>Yanki</strong> es una palabra quechua que significa <em>trueque</em>.
-                  Es la moneda interna de Rukka — pero no la compras con plata, la ganas hospedando.
+                  <strong>Yanki</strong> es la moneda interna de Rukka — evoca el trueque, el intercambio directo entre personas.
+                  No la compras con plata, la ganas hospedando.
                 </p>
                 <p className="text-2xl font-black text-terra mb-4">1 Yanki = 1 noche de alojamiento</p>
                 <ul className="space-y-2 text-sm text-gray-600">

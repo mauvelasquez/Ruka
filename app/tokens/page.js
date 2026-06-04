@@ -9,9 +9,9 @@ export const metadata = {
     'sistema de tokens intercambio casas',
     'Yankis Rukka',
     'intercambio casas sin fechas simultáneas',
-    'tokens home exchange latinoamerica',
+    'tokens home exchange Chile',
     'acumular créditos viaje gratis',
-    'hospedar sin pagar LATAM',
+    'hospedar sin pagar Chile',
   ],
   openGraph: {
     title: 'Yankis Rukka — Intercambia sin Coincidir en Fechas',

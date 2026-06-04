@@ -210,7 +210,7 @@ export default function HomePage() {
       </section>
 
 
-      {/* ── 4 PAÍSES LATAM ───────────────────────────────────────────────────── */}
+      {/* ── DESTINOS CHILE ───────────────────────────────────────────────────── */}
       <section className="py-16" style={{ background: '#F8F4EE' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between mb-4">
