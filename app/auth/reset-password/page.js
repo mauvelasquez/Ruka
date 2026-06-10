@@ -15,8 +15,12 @@ export default function ResetPasswordPage() {
     e.preventDefault()
     setError('')
     setLoading(true)
+    // NEXT_PUBLIC_SITE_URL es la única var configurada en Vercel; fallback a origin
+    // del navegador para no romper el flujo si faltara en algún entorno.
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL
+      || (typeof window !== 'undefined' ? window.location.origin : '')
     const { error: err } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: process.env.NEXT_PUBLIC_APP_URL + '/auth/update-password',
+      redirectTo: `${siteUrl}/auth/update-password`,
     })
     setLoading(false)
     if (err) {

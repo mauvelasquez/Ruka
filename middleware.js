@@ -21,10 +21,27 @@ export async function middleware(req) {
 
   const { pathname } = req.nextUrl
   const isAdminOnly = ADMIN_ONLY.some(p => pathname.startsWith(p))
+  // Solo estas rutas necesitan verificar la sesión. El resto (/, /homes, /blog,
+  // /como-funciona, /about) está en el matcher únicamente para estampar la cookie
+  // de país — no debe pagar el round-trip de auth.getUser() en cada request.
+  const needsAuthCheck =
+    isAdminOnly ||
+    AUTH_REQUIRED.some(p => pathname.startsWith(p)) ||
+    AUTH_ONLY.some(p => pathname.startsWith(p))
 
   // geo: track if we need to stamp the country cookie on the final response
   const needsCountryCookie = !req.cookies.get(COUNTRY_COOKIE)
   const detectedCountry = needsCountryCookie ? getCountryFromRequest(req) : null
+
+  // Fast path para rutas públicas: solo cookie de país, sin tocar Supabase.
+  if (!needsAuthCheck) {
+    if (needsCountryCookie) {
+      response.cookies.set(COUNTRY_COOKIE, detectedCountry, {
+        path: '/', maxAge: 31536000, sameSite: 'lax', httpOnly: false,
+      })
+    }
+    return response
+  }
 
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
     // Sin Supabase no hay forma de verificar sesión → fail-closed para rutas admin
