@@ -8,15 +8,15 @@ El nombre proviene de "ruka", la palabra mapuche para hogar, reflejando la ident
 
 ## Cómo funciona el sistema
 
-Rukka tiene un solo principio: tu hospitalidad siempre tiene valor. El sistema convierte ese valor en Yankis.
+Rukka tiene un solo principio: tu hospitalidad siempre tiene valor.
 
-**Sistema de Yankis (el modelo base):** Los miembros ofrecen su casa y acumulan Yankis — la moneda interna de Rukka. 1 Yanki = 1 noche de alojamiento en cualquier hogar de Rukka. Los Yankis acumulados se usan para hospedarse en otra propiedad en cualquier fecha futura. Esto desacopla completamente cuándo hospedás y cuándo viajás. Los miembros reciben 3 Yankis de bienvenida al completar su perfil. Los Yankis no caducan y no se compran con dinero.
+**Match bilateral directo (el caso más común):** Cuando dos miembros tienen fechas de viaje compatibles y se quieren visitar mutuamente, Rukka los conecta automáticamente. Ambos viajan al mismo tiempo y el alojamiento es gratuito para los dos.
 
-**Match bilateral directo (el bonus cuando las fechas cuadran):** Cuando dos miembros tienen fechas de viaje compatibles y se quieren visitar mutuamente, Rukka los conecta automáticamente. Ambos viajan al mismo tiempo y los Yankis se cancelan entre sí — el alojamiento es gratuito para los dos sin necesidad de gastar Yankis. El match bilateral es el caso especial y óptimo del sistema Rukka, no un modo separado.
+**Cuando las fechas no calzan:** El equipo de Rukka ayuda a coordinar una alternativa para que el miembro pueda igual hospedar y viajar sin costo, sin necesidad de que las fechas coincidan exactamente con otra persona.
 
 ## Precio
 
-La plataforma es 100% gratuita para el alojamiento en intercambio bilateral. El sistema de Yankis opera con créditos internos. No hay cargos por noche como en Airbnb o plataformas de renta tradicionales.
+La plataforma es 100% gratuita para el alojamiento en intercambio bilateral. No hay cargos por noche como en Airbnb o plataformas de renta tradicionales.
 
 ## Dónde opera
 
@@ -39,8 +39,8 @@ Rukka opera en Chile: Santiago, Valparaíso, Viña del Mar, Pichilemu, Puerto Va
 
 ## Diferencias clave vs competidores
 
-- **vs Kindred:** Rukka opera en Chile (Kindred es Norteamérica/Europa). Rukka tiene modelo dual (bilateral + Yankis), Kindred solo tokens. Rukka no cobra fees de servicio por alojamiento.
-- **vs HomeExchange.com:** Rukka está enfocado en Chile y es completamente gratuito (HomeExchange cobra ~$220 USD/año de membresía). Ambos tienen sistema de puntos, pero Rukka también hace match bilateral directo gratuito.
+- **vs Kindred:** Rukka opera en Chile (Kindred es Norteamérica/Europa). Rukka usa match bilateral directo y gratuito; Kindred usa un sistema de créditos y cobra fees de servicio.
+- **vs HomeExchange.com:** Rukka está enfocado en Chile y es completamente gratuito (HomeExchange cobra ~$220 USD/año de membresía). HomeExchange usa un sistema de puntos; Rukka usa match bilateral directo y gratuito.
 - **vs Airbnb/Booking:** Rukka no es una plataforma de renta. El alojamiento siempre es por intercambio, no por pago.
 - **vs Couchsurfing:** Rukka es intercambio de casas completas entre propietarios, no hospedaje gratuito en la habitación del anfitrión.
 
@@ -57,7 +57,6 @@ Rukka opera en Chile: Santiago, Valparaíso, Viña del Mar, Pichilemu, Puerto Va
 - Plataforma principal: https://rukka.cl
 - Cómo funciona: https://rukka.cl/como-funciona
 - Explorar casas: https://rukka.cl/homes
-- Sistema de Yankis: https://rukka.cl/tokens
 - Sobre Rukka: https://rukka.cl/about
 - Para anfitriones Airbnb: https://rukka.cl/anfitriones-airbnb
 - Asistente Fresia: https://rukka.cl/FresIA

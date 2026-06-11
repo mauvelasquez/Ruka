@@ -1,16 +1,16 @@
 # About Rukka — Chilean Home Exchange Platform
 
-Rukka is a home exchange platform operating in Chile. It connects property owners who want to travel and swap homes, eliminating accommodation costs through direct exchanges or a token credit system called Yankis.
+Rukka is a home exchange platform operating in Chile. It connects property owners who want to travel and swap homes, eliminating accommodation costs through direct bilateral exchanges.
 
 The name comes from "ruka," the Mapuche word for home, rooting the platform in Chilean cultural identity.
 
 ## How Rukka Works
 
-### Option 1: Direct Bilateral Match
+### Direct Bilateral Match
 Two members with compatible travel dates swap homes simultaneously. Both stay at zero accommodation cost. Rukka's algorithm automatically matches members based on destination, dates, and property type.
 
-### Option 2: Yankis Token System
-A member lists their home and earns Yankis — Rukka's internal token currency. 1 Yanki = 1 night of accommodation at any Rukka home. Those Yankis can be redeemed to stay at another member's property on different dates — no simultaneous travel required. Members receive 3 welcome Yankis upon completing their profile. Yankis never expire.
+### When Dates Don't Match
+If a member can't find someone to swap with on matching dates, the Rukka team helps coordinate an alternative so they can still host and travel at no cost. Members also receive 3 free welcome nights upon completing their profile.
 
 ## Why Free (for accommodation)
 Rukka's exchange model means neither party pays for accommodation. Unlike Airbnb or vacation rentals, there are no nightly fees, cleaning fees, or service charges for the accommodation itself.
@@ -28,7 +28,7 @@ Rukka focuses on Chile with active listings across:
 | Feature | Rukka | Kindred | HomeExchange | Airbnb |
 |---------|-------|---------|--------------|--------|
 | Geographic focus | Chile | US + Europe | Global | Global |
-| Exchange model | Bilateral + Yankis tokens | Tokens only | Points system | Rental (no exchange) |
+| Exchange model | Direct bilateral | Tokens only | Points system | Rental (no exchange) |
 | Accommodation cost | Free | Service fees apply | $220 USD/year membership | Nightly rate |
 | AI assistant | Yes (Fresia, powered by Claude) | No | No | No |
 | Market | Chilean homeowners | US/EU professionals | Global | Hosts seeking income |

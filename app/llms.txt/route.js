@@ -48,21 +48,16 @@ Rukka conecta a personas en Chile para intercambiar sus hogares de forma gratuit
 - Plataforma chilena: de norte a sur del país
 - Asistente IA "Fresia" (powered by Claude / Anthropic)
 - Importación de anuncios desde Airbnb en segundos
-- Sistema de Yankis (tokens de intercambio) — 1 Yanki = 1 noche
+- Coordinación de alternativas cuando las fechas no calzan exactamente
 
 ## Hogares disponibles${homeCount > 0 ? ` (${homeCount} en total)` : ''}
 ${countryStats}
 - Ver catálogo: https://rukka.cl/homes
 - Chile: https://rukka.cl/homes?country=CL
 
-## Sistema de Yankis
+## Cuando las fechas no calzan
 
-Los Yankis son la moneda interna de Rukka (evoca el trueque y el intercambio directo).
-- 1 Yanki = 1 noche de alojamiento
-- Se ganan prestando el hogar a otros usuarios
-- Permiten intercambios no-simultáneos
-- 3 Yankis de bienvenida al completar el perfil
-- No caducan
+Si dos miembros no tienen fechas de viaje compatibles, el equipo de Rukka ayuda a coordinar una alternativa para que igual puedan hospedar y viajar sin costo. Además, al completar el perfil cada miembro recibe 3 noches de alojamiento gratis de bienvenida.
 
 ## Asistente IA — Fresia
 
@@ -81,7 +76,7 @@ Powered by Claude (Anthropic).
 
 ## Blog — artículos disponibles
 
-- [Qué es home exchange y cómo funciona](https://rukka.cl/blog/que-es-home-exchange) — Concepto, modelo bilateral, Yankis y por qué es gratis
+- [Qué es home exchange y cómo funciona](https://rukka.cl/blog/que-es-home-exchange) — Concepto, modelo bilateral y por qué es gratis
 - [Intercambio de casas en Chile](https://rukka.cl/blog/intercambio-casas-chile) — Hub de autoridad: Santiago, Valparaíso, Puerto Varas
 - [Alternativa a Airbnb gratis en Chile](https://rukka.cl/blog/alternativa-airbnb-gratis) — Comparación Rukka vs Airbnb: costos, modelo, perfil de usuario
 - [Cómo viajar gratis intercambiando tu casa](https://rukka.cl/blog/viajar-sin-pagar-alojamiento) — Guía práctica paso a paso

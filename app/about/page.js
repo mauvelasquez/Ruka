@@ -4,13 +4,12 @@ import Footer from '../../components/Footer'
 
 export const metadata = {
   title: 'Sobre Rukka — Plataforma de Intercambio de Casas en Chile',
-  description: 'Rukka es la plataforma chilena de intercambio de casas. Viaja por Chile con modelo dual: match bilateral directo gratuito y sistema de Yankis (tokens). Fresia, asistente IA integrada.',
+  description: 'Rukka es la plataforma chilena de intercambio de casas. Viaja por Chile con match bilateral directo y gratuito. Fresia, asistente IA integrada.',
   keywords: [
     'qué es Rukka',
     'intercambio de casas Chile',
     'home exchange Chile',
     'Rukka Chile',
-    'sistema Yankis tokens',
     'match bilateral casas',
     'alternativa Airbnb gratuita Chile',
     'Kindred alternativa Chile',
@@ -18,7 +17,7 @@ export const metadata = {
   ],
   openGraph: {
     title: 'Sobre Rukka — Intercambio de Casas en Chile',
-    description: 'Plataforma chilena de home exchange con modelo dual (match bilateral + Yankis). Viaja por Chile intercambiando tu hogar. 100% gratuito.',
+    description: 'Plataforma chilena de home exchange con match bilateral directo. Viaja por Chile intercambiando tu hogar. 100% gratuito.',
     url: 'https://rukka.cl/about',
   },
   alternates: {
@@ -35,7 +34,7 @@ const faqSchema = {
       name: '¿Qué es Rukka?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Rukka es una plataforma de intercambio de casas que opera en Chile. Permite que propietarios intercambien sus hogares de forma gratuita, ya sea mediante match bilateral directo (intercambio simultáneo entre dos usuarios con fechas compatibles) o mediante un sistema de Yankis (tokens que se acumulan al ofrecer tu casa y se usan para hospedarte después).',
+        text: 'Rukka es una plataforma de intercambio de casas que opera en Chile. Permite que propietarios intercambien sus hogares de forma gratuita mediante match bilateral: el algoritmo detecta automáticamente cuando dos usuarios quieren visitarse mutuamente en fechas compatibles y propone el intercambio.',
       },
     },
     {
@@ -48,18 +47,10 @@ const faqSchema = {
     },
     {
       '@type': 'Question',
-      name: '¿Cómo funciona el sistema de Yankis de Rukka?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'El sistema de Yankis de Rukka permite que un propietario ofrezca su casa y acumule créditos (Yankis). "Yanki" proviene del quechua y significa trueque o intercambio. 1 Yanki = 1 noche de alojamiento. Esos Yankis pueden usarse posteriormente para hospedarse en la casa de otro miembro, sin necesidad de que los viajes sean simultáneos. Los miembros reciben 3 Yankis de bienvenida y los Yankis no caducan.',
-      },
-    },
-    {
-      '@type': 'Question',
       name: '¿Cuál es la diferencia entre Rukka y Kindred?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Rukka se enfoca en Chile mientras que Kindred opera principalmente en Estados Unidos y Europa. Rukka ofrece dos modelos: match bilateral directo gratuito y sistema de Yankis. Kindred solo usa sistema de créditos y cobra fees de servicio. Rukka no tiene costo de alojamiento en intercambio bilateral.',
+        text: 'Rukka se enfoca en Chile mientras que Kindred opera principalmente en Estados Unidos y Europa. Rukka ofrece match bilateral directo y gratuito: el algoritmo detecta automáticamente cuando dos usuarios quieren visitarse mutuamente. Kindred usa un sistema de créditos y cobra fees de servicio. Rukka no tiene costo de alojamiento.',
       },
     },
     {
@@ -107,7 +98,7 @@ const faqSchema = {
       name: '¿En qué se diferencia Rukka de HomeExchange.com?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Rukka está especializado en el mercado chileno, con comunidad activa en distintas regiones del país, y es completamente gratuito. Mientras HomeExchange opera globalmente con membresía de pago (~$220 USD/año), Rukka tiene modelo dual (bilateral directo + Yankis) con enfoque local.',
+        text: 'Rukka está especializado en el mercado chileno, con comunidad activa en distintas regiones del país, y es completamente gratuito. Mientras HomeExchange opera globalmente con membresía de pago (~$220 USD/año), Rukka ofrece match bilateral directo sin costo, con enfoque local.',
       },
     },
   ],
@@ -115,7 +106,7 @@ const faqSchema = {
 
 const COMPARISON = [
   { feature: 'Foco geográfico',    rukka: 'Chile',                       kindred: 'EE.UU. + Europa',   homeexchange: 'Global',              airbnb: 'Global' },
-  { feature: 'Modelo',             rukka: 'Bilateral + Yankis',          kindred: 'Solo tokens',        homeexchange: 'Sistema de puntos',    airbnb: 'Alquiler (sin intercambio)' },
+  { feature: 'Modelo',             rukka: 'Bilateral directo',           kindred: 'Solo tokens',        homeexchange: 'Sistema de puntos',    airbnb: 'Alquiler (sin intercambio)' },
   { feature: 'Costo alojamiento',  rukka: 'Gratis',                      kindred: 'Fees de servicio',   homeexchange: '$220 USD/año membresía', airbnb: 'Tarifa por noche' },
   { feature: 'Asistente IA',       rukka: 'Fresia (Claude/Anthropic)',   kindred: 'No',                 homeexchange: 'No',                   airbnb: 'No' },
 ]
@@ -157,10 +148,10 @@ export default function AboutPage() {
           </p>
         </section>
 
-        {/* Modelo dual */}
+        {/* Cómo funciona */}
         <section className="mb-16">
           <h2 className="text-2xl font-black text-gray-900 mb-8 text-center">
-            Modelo dual de intercambio
+            Cómo funciona el intercambio
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="bg-white rounded-3xl p-8 border-2 border-forest/20 shadow-sm">
@@ -175,17 +166,17 @@ export default function AboutPage() {
             </div>
 
             <div className="bg-white rounded-3xl p-8 border-2 border-terra/20 shadow-sm">
-              <div className="text-4xl mb-4">🪙</div>
-              <h3 className="text-xl font-black text-terra mb-3">Sistema de Yankis</h3>
+              <div className="text-4xl mb-4">🧭</div>
+              <h3 className="text-xl font-black text-terra mb-3">¿Y si las fechas no calzan?</h3>
               <p className="text-gray-600 text-sm leading-relaxed mb-4">
-                <strong>Yanki</strong> viene del quechua y significa "trueque". Es la moneda interna de Rukka:
-                1 Yanki = 1 noche de alojamiento. Los miembros ganan Yankis al hospedar visitantes y los
-                usan para hospedarse en otra propiedad después, sin necesidad de viajar simultáneamente.
+                No siempre dos personas quieren visitarse exactamente al mismo tiempo. En esos casos,
+                nuestro equipo te ayuda a coordinar una alternativa para que igual puedas viajar y
+                alojarte sin costo.
               </p>
               <ul className="text-gray-600 text-sm space-y-1">
-                <li>• 3 Yankis de bienvenida al completar tu perfil</li>
-                <li>• Los Yankis no caducan</li>
-                <li>• Flexibilidad total de fechas</li>
+                <li>• Acompañamiento personalizado para encontrar alternativas</li>
+                <li>• Sin costo de alojamiento</li>
+                <li>• Flexibilidad de fechas</li>
               </ul>
             </div>
           </div>

@@ -2,20 +2,18 @@ import ComoFuncionaClient from './ComoFuncionaClient'
 
 export const metadata = {
   title: 'Cómo funciona Rukka — Intercambia tu hogar y viaja gratis por Chile',
-  description: 'Publica tu hogar, ganas Yankis cada vez que hospedas, y úsalos para alojarte en cualquier rincón de Chile cuando quieras. Si las fechas cuadran con alguien, el intercambio es directo y gratis al instante.',
+  description: 'Publica tu hogar y, cuando las fechas cuadran con otro miembro, el intercambio es directo y gratis al instante. Si no coinciden, nuestro equipo te ayuda a coordinar una alternativa para que igual viajes sin pagar alojamiento.',
   keywords: [
     'cómo funciona Rukka',
     'intercambio de casas Chile',
     'home exchange gratis Chile',
-    'qué son los Yankis Rukka',
     'intercambio de hogares Chile',
     'viajar gratis sin hotel Chile',
     'match bilateral casas',
-    'sistema Yankis tokens intercambio',
   ],
   openGraph: {
     title: 'Cómo funciona Rukka — Intercambia tu hogar y viaja gratis por Chile',
-    description: 'Tu hospitalidad siempre vale. Cada noche que hospedas se convierte en un Yanki (1 Yanki = 1 noche). Cuando las fechas cuadran, match directo gratuito. Conoce Chile intercambiando tu hogar.',
+    description: 'Publica tu hogar y conecta con viajeros de todo Chile. Cuando las fechas cuadran, match directo y gratuito al instante. Conoce Chile intercambiando tu hogar.',
     url: 'https://rukka.cl/como-funciona',
   },
   alternates: {
@@ -27,27 +25,27 @@ const howToSchema = {
   '@context': 'https://schema.org',
   '@type': 'HowTo',
   name: 'Cómo funciona Rukka: intercambiar tu hogar y viajar gratis por Chile',
-  description: 'Rukka convierte tu hospitalidad en créditos de viaje llamados Yankis (1 Yanki = 1 noche). Publica tu hogar, acumula Yankis al hospedar, y úsalos para alojarte en cualquier rincón de Chile cuando quieras. Si encuentras a alguien con fechas compatibles, el match es directo y gratis — los Yankis se cancelan entre sí.',
+  description: 'Rukka conecta a propietarios de hogares en Chile para intercambiar alojamiento de forma gratuita. Publica tu hogar y, si encuentras a alguien con fechas compatibles, el match es directo y gratis al instante. Si no, nuestro equipo te ayuda a coordinar una alternativa.',
   step: [
     {
       '@type': 'HowToStep',
       position: 1,
       name: 'Publica tu hogar',
-      text: 'Crea tu perfil y registra tu propiedad. Si ya tienes listing en Airbnb, impórtalo automáticamente con un link. Al completar tu perfil recibes 3 Yankis de bienvenida.',
+      text: 'Crea tu perfil y registra tu propiedad. Si ya tienes listing en Airbnb, impórtalo automáticamente con un link. Al completar tu perfil recibes 3 noches de alojamiento gratis de bienvenida.',
       url: 'https://rukka.cl/auth/register',
     },
     {
       '@type': 'HowToStep',
       position: 2,
       name: 'Explora destinos y encuentra tu match',
-      text: 'Busca hogares disponibles en Chile. El sistema detecta automáticamente si hay alguien con fechas compatibles (match directo) o te muestra cuántos Yankis necesitas para reservar.',
+      text: 'Busca hogares disponibles en Chile. El sistema detecta automáticamente si hay alguien con fechas compatibles para un match directo.',
       url: 'https://rukka.cl/homes',
     },
     {
       '@type': 'HowToStep',
       position: 3,
       name: 'Intercambia y viaja sin pagar alojamiento',
-      text: 'Confirma el intercambio dentro de Rukka. Si hay match directo, ambos viajan al mismo tiempo y los Yankis se cancelan entre sí. Si no, tus Yankis se descuentan automáticamente al confirmar. En ambos casos, el alojamiento es gratuito.',
+      text: 'Confirma el intercambio dentro de Rukka. Si hay match directo, ambos viajan al mismo tiempo y el alojamiento es gratuito para los dos. Si las fechas no calzan exactamente, nuestro equipo te ayuda a coordinar una alternativa.',
     },
   ],
 }
@@ -58,18 +56,10 @@ const faqSchema = {
   mainEntity: [
     {
       '@type': 'Question',
-      name: '¿Qué son los Yankis de Rukka?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'Yanki es la moneda interna de Rukka: 1 Yanki = 1 noche de alojamiento. El nombre evoca el trueque y el intercambio directo entre personas. Los miembros ganan Yankis al hospedar a visitantes y los usan para alojarse en cualquier hogar de Rukka cuando quieran viajar. Los Yankis no caducan y no se compran — solo se ganan hospedando.',
-      },
-    },
-    {
-      '@type': 'Question',
       name: '¿Qué pasa si no coincido en fechas con nadie?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Para eso están los Yankis. Publica tu casa, hospeda cuando puedas y acumula Yankis que usas cuando quieras viajar — sin necesidad de que los tiempos cuadren con otra persona. 1 Yanki = 1 noche en cualquier hogar de Rukka.',
+        text: 'Nuestro equipo te ayuda a coordinar una alternativa para que igual puedas viajar y alojarte sin costo, sin necesidad de que las fechas calcen exactamente con otra persona.',
       },
     },
     {
@@ -77,7 +67,7 @@ const faqSchema = {
       name: '¿Qué es el match bilateral en Rukka?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El match bilateral ocurre cuando dos miembros tienen fechas compatibles: el usuario A quiere ir a donde vive el usuario B, y viceversa, en el mismo período. El sistema los conecta automáticamente. Ambos viajan al mismo tiempo y los Yankis se cancelan entre sí — el alojamiento es gratuito para los dos.',
+        text: 'El match bilateral ocurre cuando dos miembros tienen fechas compatibles: el usuario A quiere ir a donde vive el usuario B, y viceversa, en el mismo período. El sistema los conecta automáticamente. Ambos viajan al mismo tiempo y el alojamiento es gratuito para los dos.',
       },
     },
     {

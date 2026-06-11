@@ -11,17 +11,11 @@
 - Registro de cuenta ilimitado
 - Publicación de hogares (sin límite)
 - Matching automático bilateral
-- Sistema de Yankis (tokens de intercambio)
+- Coordinación de alternativas cuando las fechas no calzan
 - Importación automática desde Airbnb
 - Asistente IA Fresia
 - Verificación de identidad
-- Acceso a hogares en Chile, México, Colombia y Argentina
-
-### Próximamente
-
-- Compra de Yankis adicionales con Mercado Pago (para viajar
-  sin haber hospedado previamente)
-- Precio estimado: por definir
+- Acceso a hogares en Chile
 
 ## Comparación con competidores
 

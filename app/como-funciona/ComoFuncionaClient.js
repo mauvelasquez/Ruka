@@ -10,7 +10,7 @@ import { openPublicarModal } from '../../components/PublicarModal'
 const FAQS = [
   {
     q: '¿Qué pasa si no coincido en fechas con nadie?',
-    a: 'Para eso están los Yankis. Publica tu casa, hospeda cuando puedas, y acumulas créditos (Yankis) que usas cuando quieras viajar — sin necesidad de que los tiempos cuadren con otra persona. 1 Yanki = 1 noche de alojamiento en cualquier hogar de Rukka.',
+    a: 'Nuestro equipo te ayuda a coordinar una alternativa para que igual puedas viajar y alojarte sin costo, sin necesidad de que las fechas calcen exactamente con otra persona.',
   },
   {
     q: '¿Cómo sé que las personas son de confianza?',
@@ -22,7 +22,7 @@ const FAQS = [
   },
   {
     q: '¿Qué pasa si me cancelan el intercambio?',
-    a: 'Si el intercambio no se concreta, tus Yankis se devuelven íntegros de forma automática. No hay penalidades para ti.',
+    a: 'Si el intercambio no se concreta, no hay penalidades para ti. Puedes seguir buscando otro match o coordinar una alternativa con nuestro equipo.',
   },
   {
     q: '¿Cuánto cuesta usar Rukka?',
@@ -34,7 +34,7 @@ const FAQS = [
   },
   {
     q: '¿Tengo que saber de antemano quién va a ser mi match?',
-    a: 'No. El sistema de Yankis desacopla completamente el "¿quién me hospeda?" del "¿a quién hospedo yo?". Puedes hospedar a alguien en Santiago en marzo y luego usar esos Yankis para alojarte en Pichilemu en septiembre — sin ninguna relación entre esas dos personas.',
+    a: 'No necesariamente. Si tus fechas no calzan exactamente con las de otra persona, nuestro equipo te ayuda a coordinar para que de todas formas puedas hospedar y viajar, sin depender de que sea la misma persona ni el mismo momento.',
   },
 ]
 
@@ -155,68 +155,23 @@ export default function ComoFuncionaClient() {
           <div className="text-center mb-14">
             <p className="text-xs font-bold uppercase tracking-widest text-terra mb-3">Cómo funciona</p>
             <h2 id="sistema-heading" className="text-3xl sm:text-4xl font-black text-gray-900 mb-4">
-              Tu hospitalidad siempre vale — ahora o después
+              Encuentra a alguien con quien intercambiar
             </h2>
             <p className="text-gray-500 max-w-2xl mx-auto leading-relaxed">
-              El sistema Rukka convierte cada noche que hospedas en un crédito de viaje llamado <strong>Yanki</strong>.
-              Cuando las fechas cuadran con alguien, los Yankis se cancelan solos — y viajan al mismo tiempo gratis.
-              Cuando no cuadran, guardas los Yankis y los usas cuando estés listo para viajar.
+              Rukka conecta automáticamente a personas que quieren visitarse mutuamente en fechas
+              compatibles. Cuando hay match, ambos viajan al mismo tiempo y el alojamiento es
+              gratis para los dos. Si tus fechas no calzan con nadie todavía, nuestro equipo
+              te ayuda a coordinar una alternativa.
             </p>
           </div>
 
-          {/* Yankis — the default model */}
-          <div className="bg-white border-2 border-terra/20 rounded-3xl p-8 sm:p-10 mb-6">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="bg-terra text-white rounded-2xl p-3 text-2xl leading-none flex-shrink-0">🪙</div>
-              <div>
-                <p className="text-xs font-bold uppercase tracking-widest text-terra mb-0.5">La base del sistema</p>
-                <h3 className="font-black text-gray-900 text-xl sm:text-2xl">Yankis: tu hospitalidad convertida en viaje</h3>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div>
-                <p className="text-gray-600 leading-relaxed mb-4">
-                  <strong>Yanki</strong> es la moneda interna de Rukka — evoca el trueque, el intercambio directo entre personas.
-                  No la compras con plata, la ganas hospedando.
-                </p>
-                <p className="text-2xl font-black text-terra mb-4">1 Yanki = 1 noche de alojamiento</p>
-                <ul className="space-y-2 text-sm text-gray-600">
-                  <li className="flex items-start gap-2"><span className="text-terra font-bold mt-0.5">✓</span> 3 Yankis de bienvenida al completar tu perfil</li>
-                  <li className="flex items-start gap-2"><span className="text-terra font-bold mt-0.5">✓</span> Acumulas 1 Yanki por cada noche que hospedas</li>
-                  <li className="flex items-start gap-2"><span className="text-terra font-bold mt-0.5">✓</span> Los Yankis no caducan — usalos cuando quieras</li>
-                  <li className="flex items-start gap-2"><span className="text-terra font-bold mt-0.5">✓</span> Si cancela el intercambio, se te devuelven íntegros</li>
-                </ul>
-              </div>
-
-              <div className="bg-terra-50 rounded-2xl p-6">
-                <p className="text-xs font-bold uppercase tracking-widest text-terra mb-4">Ejemplo</p>
-                <ol className="space-y-3 text-sm text-gray-700">
-                  <li className="flex items-start gap-3">
-                    <span className="bg-terra text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-black flex-shrink-0 mt-0.5">1</span>
-                    <span><strong>Valentina</strong> (Santiago) hospeda a Matías por 5 noches → gana <strong>5 Yankis</strong></span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <span className="bg-terra text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-black flex-shrink-0 mt-0.5">2</span>
-                    <span>En septiembre, busca hogares disponibles en Pichilemu</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <span className="bg-terra text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-black flex-shrink-0 mt-0.5">3</span>
-                    <span>Usa sus 5 Yankis. Viaja sin pagar una noche de alojamiento.</span>
-                  </li>
-                </ol>
-                <p className="mt-4 text-terra font-bold text-sm">→ Sin necesidad de coincidir en fechas. 🌎</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Match directo — the bonus */}
-          <div className="bg-white border-2 border-forest/20 rounded-3xl p-8 sm:p-10">
+          {/* Match directo */}
+          <div className="bg-white border-2 border-forest/20 rounded-3xl p-8 sm:p-10 mb-6">
             <div className="flex items-center gap-3 mb-6">
               <div className="bg-forest text-white rounded-2xl p-3 text-2xl leading-none flex-shrink-0">⚡</div>
               <div>
                 <p className="text-xs font-bold uppercase tracking-widest text-forest mb-0.5">Cuando las fechas cuadran</p>
-                <h3 className="font-black text-gray-900 text-xl sm:text-2xl">Match directo: los Yankis se cancelan solos</h3>
+                <h3 className="font-black text-gray-900 text-xl sm:text-2xl">Match directo: ambos viajan al mismo tiempo</h3>
               </div>
             </div>
 
@@ -224,10 +179,10 @@ export default function ComoFuncionaClient() {
               <div>
                 <p className="text-gray-600 leading-relaxed mb-4">
                   Si dos personas quieren visitarse mutuamente en fechas compatibles,
-                  Rukka las conecta automáticamente. Ambas viajan al mismo tiempo — sus Yankis
-                  se cancelan entre sí, y el costo de alojamiento para ambas es cero.
+                  Rukka las conecta automáticamente. Ambas viajan al mismo tiempo
+                  y el costo de alojamiento para ambas es cero.
                 </p>
-                <p className="text-forest font-bold text-sm">Costo de alojamiento: $0. Sin Yankis necesarios.</p>
+                <p className="text-forest font-bold text-sm">Costo de alojamiento: $0.</p>
               </div>
 
               <div className="bg-forest-50 rounded-2xl p-6">
@@ -249,14 +204,46 @@ export default function ComoFuncionaClient() {
             </div>
           </div>
 
+          {/* Cuando las fechas no calzan */}
+          <div className="bg-white border-2 border-terra/20 rounded-3xl p-8 sm:p-10">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="bg-terra text-white rounded-2xl p-3 text-2xl leading-none flex-shrink-0">🧭</div>
+              <div>
+                <p className="text-xs font-bold uppercase tracking-widest text-terra mb-0.5">Cuando las fechas no calzan</p>
+                <h3 className="font-black text-gray-900 text-xl sm:text-2xl">Te ayudamos a coordinar una alternativa</h3>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div>
+                <p className="text-gray-600 leading-relaxed mb-4">
+                  No siempre dos personas quieren visitarse exactamente al mismo tiempo.
+                  Cuando eso pasa, nuestro equipo revisa tu perfil y te ayuda a coordinar
+                  una alternativa para que igual puedas hospedar y viajar sin costo.
+                </p>
+                <p className="text-terra font-bold text-sm">→ Tu hospitalidad siempre cuenta. 🌎</p>
+              </div>
+
+              <div className="bg-terra-50 rounded-2xl p-6">
+                <p className="text-xs font-bold uppercase tracking-widest text-terra mb-4">Cómo te acompañamos</p>
+                <ul className="space-y-2 text-sm text-gray-600">
+                  <li className="flex items-start gap-2"><span className="text-terra font-bold mt-0.5">✓</span> 3 noches de alojamiento gratis al completar tu perfil</li>
+                  <li className="flex items-start gap-2"><span className="text-terra font-bold mt-0.5">✓</span> Acompañamiento personalizado para encontrar alternativas</li>
+                  <li className="flex items-start gap-2"><span className="text-terra font-bold mt-0.5">✓</span> Flexibilidad de fechas — sin apuro</li>
+                  <li className="flex items-start gap-2"><span className="text-terra font-bold mt-0.5">✓</span> Si el intercambio no se concreta, no hay penalidades</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
           {/* Unifying statement */}
           <div className="mt-6 bg-forest-dark rounded-3xl p-8 text-white text-center">
             <p className="text-forest-light text-sm font-bold uppercase tracking-widest mb-3">En cualquier caso</p>
             <h3 className="text-2xl font-black mb-3 m-0">Tu hospitalidad siempre tiene valor.</h3>
             <p className="text-white/70 max-w-xl mx-auto">
               Si las fechas cuadran, viajas de inmediato con un match directo.
-              Si no, los Yankis guardan ese valor para que lo uses cuando tengas ganas de viajar.
-              El sistema resuelve el problema por ti.
+              Si no, nuestro equipo te ayuda a encontrar una alternativa para que viajes igual.
+              Nosotros resolvemos el problema por ti.
             </p>
           </div>
         </div>
@@ -282,7 +269,7 @@ export default function ComoFuncionaClient() {
                 icon: '🏔️',
                 title: 'Publica tu hogar',
                 desc: 'Crea tu perfil y registra tu propiedad en 2 minutos. ¿Ya estás en Airbnb? Sube los pantallazos y Fresia, nuestra IA, importa fotos y descripción automáticamente.',
-                tag: 'Recibes 3 Yankis de bienvenida al completar tu perfil.',
+                tag: 'Recibes 3 noches de alojamiento gratis al completar tu perfil.',
               },
               {
                 n: '02',
@@ -295,7 +282,7 @@ export default function ComoFuncionaClient() {
                 n: '03',
                 icon: '🤝',
                 title: 'Intercambia y viaja',
-                desc: 'Si hay match directo viajas al mismo tiempo. Si no, usas tus Yankis. Confirmas dentro de Rukka y viajas sin pagar alojamiento.',
+                desc: 'Si hay match directo viajas al mismo tiempo. Si no, nuestro equipo te ayuda a coordinar una alternativa. Confirmas dentro de Rukka y viajas sin pagar alojamiento.',
                 tag: null,
               },
             ].map((s, i) => (
@@ -355,7 +342,7 @@ export default function ComoFuncionaClient() {
                 colorBg: 'bg-andean-50 border-andean/15',
                 colorIcon: 'text-andean',
                 title: 'Si cancela, vuelves al inicio',
-                desc: 'Tus Yankis se devuelven íntegros de forma automática si el intercambio no se concreta. Sin penalidades.',
+                desc: 'Si el intercambio no se concreta, no hay penalidades. Puedes seguir buscando otro match o coordinar una alternativa con nuestro equipo.',
               },
             ].map(({ Icon, colorBg, colorIcon, title, desc }, i) => (
               <div key={i} className={`border-2 rounded-3xl p-7 ${colorBg}`}>
@@ -406,7 +393,7 @@ export default function ComoFuncionaClient() {
               ¿Lista tu hogar para<br />el intercambio?
             </h2>
             <p className="text-white/70 text-lg mb-8">
-              Publica tu casa en 2 minutos. Recibes 3 Yankis de bienvenida.<br className="hidden sm:block" />
+              Publica tu casa en 2 minutos. Recibe 3 noches de alojamiento gratis de bienvenida.<br className="hidden sm:block" />
               Empieza a conectar con viajeros de Chile.
             </p>
             <button
