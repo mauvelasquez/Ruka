@@ -80,4 +80,18 @@
 **Priority:** P3
 **Depends on:** None
 
+## Blog / SEO
+
+### Posts con `market: "LATAM"` quedan noindex/fuera de sitemap pero Fresia y llms.txt los siguen recomendando
+
+**What:** Este release agrega filtros nuevos basados en `market === 'Chile'` en `app/blog/page.jsx` (oculta de la lista pública), `app/sitemap.js` (excluye del sitemap) y `app/blog/[slug]/page.jsx` (`robots: noindex,nofollow`). `content/blog/que-es-home-exchange.mdx` y `content/blog/viajar-sin-pagar-alojamiento.mdx` siguen con `market: "LATAM"`, por lo que quedan afectados por los tres filtros — pero `app/api/fresia/chat/route.js` y `app/llms.txt/route.js` (editados en el mismo release) siguen recomendando esas dos URLs como contenido canónico.
+
+**Why:** Las páginas siguen siendo accesibles vía URL directa (no dan 404) y Fresia/llms.txt funcionan para usuarios y agentes IA, pero Google las desindexa y no aparecen en `/blog` ni en el sitemap — inconsistencia de cara a SEO.
+
+**Context:** `que-es-home-exchange.mdx` tiene contenido mayormente agnóstico de país (salvo el CTA final que menciona Chile/Argentina/Colombia/México); `viajar-sin-pagar-alojamiento.mdx` sí promueve activamente destinos en Argentina, Colombia y México, lo cual además contradice el resto de este release (chile-only). Resolver junto con la limpieza de contenido/SEO de la sesión de refactor chile-only ya diferida: relabelar `market` donde corresponda y/o reescribir contenido LATAM-específico.
+
+**Effort:** M
+**Priority:** P1
+**Depends on:** None
+
 ## Completed

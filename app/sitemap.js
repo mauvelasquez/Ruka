@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
-import { COUNTRY_SLUGS, cityData, TARGET_CITIES_BY_COUNTRY } from '../lib/cityData'
+import { cityData } from '../lib/cityData'
 import { getAllPosts } from '../lib/blog'
 
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://rukka.cl'
