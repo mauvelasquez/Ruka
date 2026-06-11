@@ -1,7 +1,7 @@
 'use client'
 import { Suspense, useState, useEffect, useRef } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
-import { createBrowserClient } from '@supabase/ssr'
+import { supabase } from '../../lib/supabase'
 import { useApp } from '../../lib/store'
 import Navbar from '../../components/Navbar'
 import ConsentStep  from './components/ConsentStep'
@@ -234,10 +234,7 @@ function VerificarContent() {
   useEffect(() => {
     async function checkProfile() {
       try {
-        const supabase = createBrowserClient(
-          process.env.NEXT_PUBLIC_SUPABASE_URL,
-          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-        )
+        if (!supabase) return
         const { data: { user } } = await supabase.auth.getUser()
         if (!user) return
         const { data: profile } = await supabase

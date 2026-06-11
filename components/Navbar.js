@@ -1,8 +1,9 @@
 'use client'
 import { useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useApp } from '../lib/store'
-import { Menu, X, Globe, User, LogOut, LayoutDashboard, ChevronDown, Sparkles } from 'lucide-react'
+import { Menu, X, Globe, User, LogOut, LayoutDashboard, ChevronDown, Sparkles, Loader2 } from 'lucide-react'
 import Image from 'next/image'
 import { FresiaAvatar } from './fresia/ChatInterface'
 import { analytics } from '../lib/analytics'
@@ -10,14 +11,27 @@ import { openPublicarModal } from './PublicarModal'
 
 export default function Navbar() {
   const { user, logout } = useApp()
+  const router = useRouter()
   const [menuOpen, setMenuOpen] = useState(false)
   const [dropdownOpen, setDropdownOpen] = useState(false)
+  const [loggingOut, setLoggingOut] = useState(false)
 
   const handleLogout = async () => {
+    if (loggingOut) return
+    setLoggingOut(true)
+    const { error } = await logout()
+    setLoggingOut(false)
     setDropdownOpen(false)
     setMenuOpen(false)
-    await logout()
-    window.location.href = '/'
+    if (error) {
+      // signOut quedó colgado/falló — la sesión local ya se limpió a mano,
+      // forzamos un reload completo para descartar el cliente Supabase
+      // (su lock interno puede haber quedado bloqueado para siempre).
+      window.location.href = '/'
+      return
+    }
+    router.push('/')
+    router.refresh()
   }
 
   return (
@@ -82,9 +96,10 @@ export default function Navbar() {
                       </Link>
                     ))}
                     <div className="border-t border-gray-100 mt-1 pt-1">
-                      <button onClick={handleLogout}
-                        className="flex items-center gap-3 px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 w-full">
-                        <LogOut className="w-4 h-4" /> Cerrar sesión
+                      <button onClick={handleLogout} disabled={loggingOut}
+                        className="flex items-center gap-3 px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 w-full disabled:opacity-60 disabled:cursor-not-allowed">
+                        {loggingOut ? <Loader2 className="w-4 h-4 animate-spin" /> : <LogOut className="w-4 h-4" />}
+                        {loggingOut ? 'Cerrando sesión…' : 'Cerrar sesión'}
                       </button>
                     </div>
                   </div>
@@ -138,8 +153,9 @@ export default function Navbar() {
               <Link href="/dashboard" onClick={() => setMenuOpen(false)} className="flex items-center gap-2 p-3 rounded-xl text-gray-700 hover:bg-forest-50">
                 <LayoutDashboard className="w-4 h-4 text-forest" /> Mi Rukka
               </Link>
-              <button onClick={handleLogout} className="flex items-center gap-2 p-3 rounded-xl text-red-500 w-full hover:bg-red-50">
-                <LogOut className="w-4 h-4" /> Cerrar sesión
+              <button onClick={handleLogout} disabled={loggingOut} className="flex items-center gap-2 p-3 rounded-xl text-red-500 w-full hover:bg-red-50 disabled:opacity-60 disabled:cursor-not-allowed">
+                {loggingOut ? <Loader2 className="w-4 h-4 animate-spin" /> : <LogOut className="w-4 h-4" />}
+                {loggingOut ? 'Cerrando sesión…' : 'Cerrar sesión'}
               </button>
             </>
           ) : (
