@@ -1,0 +1,293 @@
+================================================================================
+RUKKA — REVISIÓN ESTRATÉGICA MODO CEO
+Fecha: 2026-05-29  |  Modo: SCOPE EXPANSION (estrategia de producto completo)
+Branch: main  |  Repo: mauvelasquez/rukka
+Generado con /plan-ceo-review
+================================================================================
+
+Documento de referencia. Resume TODO lo analizado y decidido en la sesión de
+revisión CEO. Copia también guardada en:
+~/.gstack/projects/mauvelasquez-Ruka/ceo-plans/2026-05-29-rukka-whole-product-strategy.md
+
+
+================================================================================
+LA ESTRATEGIA EN UNA LÍNEA
+================================================================================
+
+Ganar UN corredor chileno hasta tener liquidez real, posicionado como "el
+intercambio de hogares verificado", financiado con venta de Yankis acotada
+(gated), y sembrado con reclutamiento de hogares hecho por el fundador.
+Todo lo demás espera.
+
+        FOCO         Depth-first — corredor Santiago ↔ costa/lagos
+                     (congelar la expansión geográfica)
+           │
+           ├── POSICIONAMIENTO   "El único intercambio de hogares de LATAM
+           │                     donde todos están verificados con identidad"
+           │                     (apoyarse en el moat de verificación ya construido)
+           │
+           ├── INGRESOS          Vender Yankis ya — gated por corredor, favoreciendo
+           │                     los ganados (cap al % de una estadía pagable con
+           │                     Yankis comprados; hospedar siempre conviene más)
+           │
+           └── SUPPLY            Concierge hecho por el fundador: reclutar + verificar
+                                 + fotografiar 100-200 hogares deseables del corredor
+                                 (SEO degradado a capa de largo plazo)
+
+
+================================================================================
+1. AUDITORÍA DEL ESTADO ACTUAL DE RUKKA
+================================================================================
+
+QUÉ ES RUKKA
+  Un marketplace de intercambio de hogares. Publicás tu hogar → hospedás para
+  ganar Yankis (créditos) → gastás Yankis para viajar. El swap bilateral directo
+  es la ruta bonus cuando las fechas cuadran. Stack: Next.js 14 + Supabase +
+  Resend + verificación con face-api, desplegado en Vercel.
+
+AUDIENCIA
+  Viajero ABC1 chileno que tiene casa, quiere viajar barato y desconfía de
+  "dejar entrar extraños". La objeción central es la confianza.
+
+LO QUE ESTÁ GENUINAMENTE FUERTE
+  • El mecanismo de Yankis es la primitiva correcta para arrancar (cold-start).
+    Desacopla el tiempo-de-hospedar del tiempo-de-viajar: podés hospedar hoy y
+    viajar en 8 meses. Rompe el problema de la "doble coincidencia de deseos"
+    que mata a las plataformas de puro swap. Buen instinto, bien narrado en
+    /como-funciona.
+  • El stack de confianza es real y diferenciado: liveness + OCR de documento +
+    face-match + framing "mutual hostage". Es más difícil de construir de lo que
+    parece y la mayoría de los competidores no lo tienen.
+  • La narrativa es disciplinada: Yankis-default / match-como-bonus es el modelo
+    mental correcto y se sostuvo la línea.
+
+QUÉ REVELA EL TRABAJO RECIENTE SOBRE LA APUESTA
+  Los últimos ~10 commits son (a) una expansión geográfica LATAM en 4 fases
+  (detección CL/CO/AR/MX en el edge, contenido local-first) y (b) inversión
+  fuerte en SEO/AI-indexing (10 artículos de blog, llms.txt, schema). Son DOS
+  apuestas de adquisición corriendo ANTES de resolver la pregunta de liquidez.
+
+LO QUE NO APARECE, Y ES LO GRANDE
+  No hay modelo de negocio visible. Los Yankis se GANAN, no se compran. No hay
+  price_per_night, ni membresía, ni service fee en el esquema. Rukka hoy factura
+  $0 por diseño. Eso es o bien una decisión deliberada de "crecer primero,
+  monetizar después", o una pregunta sin responder. Cambia todo lo de abajo.
+
+
+================================================================================
+2. DESAFÍO DE PREMISAS (lo que un CEO cuestiona)
+================================================================================
+
+1) ¿Es la amplitud geográfica el problema correcto AHORA?
+   Tu propio LOCAL_FIRST_REPORT dice que CO/AR/MX tienen "pocos o ninguno"
+   hogares. Construiste personalización por país para cuatro mercados donde tres
+   no tienen oferta. Los marketplaces de dos lados mueren por LIQUIDEZ DELGADA,
+   no por mala segmentación geográfica. La falla clásica es dispersarse entre
+   mercados antes de que uno solo alcance densidad. Jobs pasó de 350 a 10
+   productos. La jugada de "foco como sustracción" acá es: dominar un corredor
+   (Santiago ↔ costa/lagos) hasta que tenga liquidez real, y RECIÉN ahí clonar
+   el playbook.
+
+2) ¿Es el SEO el canal de adquisición correcto para un marketplace en cold-start?
+   Orgánico + AI-indexing es lento y solo compone DESPUÉS de tener inventario
+   que valga la pena encontrar. Pulir llms.txt y schema antes de tener 200
+   hogares deseables es optimizar el embudo antes de que haya agua en el tanque.
+   Puede ser el canal correcto de largo plazo y el incorrecto para este trimestre.
+
+3) ¿Qué pasa si no hacés nada con la monetización por 12 meses?
+   O estás bien (land-grab deliberado), o construís un producto querido y gratis
+   sin camino a ingresos y sin leverage para levantar capital. Eso tiene que ser
+   una DECISIÓN, no un default.
+
+
+================================================================================
+3. ESTADO IDEAL A 12 MESES (mapa de visión)
+================================================================================
+
+  ESTADO ACTUAL                TRABAJO DE ESTE TRIM.        IDEAL A 12 MESES
+  ~1 mercado con hogares   --> amplitud geo (4 países) + --> UN corredor con
+  reales                       pulido del embudo SEO         liquidez real: cada
+  Sistema Yankis vivo                                        búsqueda devuelve 5+
+  Stack de confianza listo                                   hogares verificados y
+  Monetización: ninguna                                      deseables; velocidad
+                                                             de Yankis probada; una
+                                                             palanca de ingresos
+                                                             viva; y RECIÉN AHÍ un
+                                                             playbook de expansión
+                                                             repetible
+
+  EL RIESGO: el trabajo de este trimestre se mueve DE COSTADO (amplitud, embudo)
+  en vez de HACIA el ideal (profundidad, liquidez, modelo de ingresos).
+
+
+================================================================================
+4. DIRECCIONES ESTRATÉGICAS CONSIDERADAS (alternativas)
+================================================================================
+
+DIRECCIÓN A: Depth-first — "Ganar un corredor"
+  Resumen: Congelar la amplitud geo. Volcar todo en liquidez chilena hasta
+           probar densidad de búsqueda + velocidad de Yankis. La expansión pasa
+           a ser un playbook que corrés después, no cuatro mercados medio vacíos.
+  Esfuerzo: M (sobre todo foco + hustle del lado oferta, poco código nuevo)
+  Riesgo:  Bajo — concentra la apuesta donde ya hay señal
+  Reutiliza: Todo el código geo queda; solo dejás de expandirlo por ahora
+  >>> RECOMENDADA <<<
+
+DIRECCIÓN B: Breadth-first — "Land grab LATAM"
+  Resumen: Seguir empujando geo de 4 países + SEO. Apostar a que el inbound
+           orgánico siembra oferta entre mercados más rápido que los competidores.
+  Esfuerzo: L (siembra de oferta por mercado, contenido, ops, en curso)
+  Riesgo:  Alto — cuatro mercados delgados, ninguno alcanza liquidez; la muerte
+           clásica por dispersión.
+
+DIRECCIÓN C: Trust-as-wedge — "El intercambio verificado"
+  Resumen: Hacer de la verificación de identidad TODO el posicionamiento. Liderar
+           con "el único intercambio de hogares de LATAM donde todos están
+           verificados". La confianza es tu moat ya construido; apuntar el
+           producto entero a la objeción #1 del escéptico.
+  Esfuerzo: M (reposicionamiento + apoyarse más en la UX de verificación que ya existe)
+  Riesgo:  Medio — diferenciación fuerte, pero la confianza sola no crea liquidez.
+
+RECOMENDACIÓN DE LA REVISIÓN: A, con C como capa de posicionamiento encima.
+  Depth-first resuelve el riesgo existencial del marketplace (liquidez);
+  trust-as-wedge es CÓMO ganás ese corredor frente a Airbnb y los swaps
+  informales. B es la trampa seductora: se SIENTE como progreso porque siempre
+  hay más código para escribir, pero es movimiento, no tracción.
+
+
+================================================================================
+5. LAS CUATRO DECISIONES (tomadas en la sesión)
+================================================================================
+
+#1 — FOCO: Depth-first — ganar un corredor chileno
+   ELECCIÓN: Ganar el corredor Santiago ↔ costa/lagos (Zapallar, Pichilemu,
+   Pucón, Puerto Varas, Valparaíso). CONGELAR la expansión geo — mantener el
+   código CL/CO/AR/MX pero dejar de hacerlo crecer.
+   POR QUÉ: Los marketplaces mueren por liquidez delgada, no por geo-targeting
+   débil. 3 de 4 mercados geo tenían ~cero oferta. Concentrar donde hay señal.
+
+#2 — POSICIONAMIENTO: Trust-as-wedge, sobre la profundidad
+   ELECCIÓN: Liderar con "el único intercambio de hogares de LATAM donde todos
+   están verificados con identidad". Apalancar el stack de verificación existente
+   (liveness + OCR + face-match + mutual-hostage). Apuntar a la objeción #1 del
+   escéptico.
+   POR QUÉ: El moat ya está construido y subutilizado. El trabajo es
+   posicionamiento, no ingeniería.
+
+#3 — INGRESOS: Vender Yankis ya — gated por corredor + favoreciendo los ganados
+   ELECCIÓN: Activar la compra de Yankis, pero acotada: vender solo donde la
+   oferta es real (el corredor), poner un cap al % de una estadía pagable con
+   Yankis COMPRADOS, y mantener los Yankis GANADOS como la mejor opción.
+   POR QUÉ: Ingresos desde el día uno + cold-start más suave del lado demanda.
+   Las barandas contienen la inflación y protegen la primera estadía.
+   NOTA: Reutiliza la RPC credit_yankis existente (service-role). Es agregar un
+   punto de COMPRA, no una moneda nueva.
+
+#4 — SUPPLY: Concierge hecho por el fundador (hand-seeding)
+   ELECCIÓN: Reclutar + verificar + fotografiar 100-200 hogares deseables del
+   corredor (el propio playbook de Airbnb). Degradar SEO/AI-indexing a capa de
+   largo plazo, solo mantenimiento.
+   POR QUÉ: Depth-first necesita un motor. El SEO compone demasiado lento para
+   arrancar un marketplace. "Hacer cosas que no escalan."
+
+
+================================================================================
+6. QUÉ YA EXISTE (apalancar, no reconstruir)
+================================================================================
+
+  • Ledger de Yankis + RPC (credit_yankis/debit_yankis, gated por service-role):
+    los rieles para vender Yankis ya están. Agregás un punto de COMPRA, no una moneda.
+  • Stack de verificación (liveness, OCR de ID, face-match, verified/id_verified):
+    tu wedge está construido. El trabajo es posicionamiento, no ingeniería.
+  • Personalización geo (detección en edge, contenido local-first, CountryPill):
+    dejarlo dormido. Se convierte gratis en el playbook de expansión, más adelante.
+  • 9 emails transaccionales + cron: las comunicaciones de ciclo de vida para un
+    corredor funcionando ya existen.
+
+
+================================================================================
+7. FUERA DE ALCANCE AHORA (diferido, con justificación)
+================================================================================
+
+  • Activación CO / AR / MX — el código queda, el crecimiento se pausa. Liquidez
+    en uno le gana a presencia en cuatro.
+  • SEO/AI-indexing nuevo — solo mantenimiento. Compone DESPUÉS de que haya
+    inventario que valga la pena encontrar.
+  • Membresía y service fees por estadía — etapa equivocada; un paywall mata el
+    cold-start. Revisar cuando el volumen de intercambios sea real.
+  • Rollout nacional Chile / multi-corredor — el playbook viene DESPUÉS de que el
+    corredor #1 funcione.
+
+
+================================================================================
+8. RIESGOS A VIGILAR
+================================================================================
+
+  • Volumen de Yankis comprados superando la oferta de hospedaje → inflación +
+    decepción de "góndola vacía". Mitigado por las barandas de la Decisión #3.
+  • El tiempo del fundador como cuello de botella del hand-seeding — es por
+    diseño, pero medí la conversión para saber cuándo sumar partnerships.
+  • Riesgo de disciplina: "más código geo/SEO para escribir" disfraza la falta de
+    tracción. Sostené la línea depth-first. El tiempo del fundador va a reclutar
+    hogares (T3), que es lo más palanca y lo más fácil de evitar.
+
+
+================================================================================
+9. TAREAS DE IMPLEMENTACIÓN (accionables, derivadas de las decisiones)
+================================================================================
+
+  [ ] T1 (P1) — Definir "corredor ganado": escribir la métrica de liquidez —
+      cada búsqueda del corredor devuelve ≥5 hogares verificados y deseables +
+      velocidad de Yankis + objetivo de estadías repetidas.
+      Verificar: un dashboard/query que puedas revisar semanalmente.
+
+  [ ] T2 (P1) — Flujo de compra de Yankis: checkout gated por corredor, pricing
+      peso→Yanki, cap al % de estadía pagable con Yankis comprados, ventaja para
+      Yankis ganados. Reutiliza la RPC credit_yankis existente (service-role).
+      Archivos: app/api/yankis/*, tokens/, store.js.
+
+  [ ] T3 (P1) — Motor de supply concierge: lista objetivo de 100-200 hogares del
+      corredor, script de outreach, checklist de onboarding white-glove +
+      verificación + fotografía. Esto es ops del fundador, no código.
+      Verificar: la góndola se ve llena antes de empujar demanda.
+
+  [ ] T4 (P2) — Reposicionar en torno a la verificación: hero, /como-funciona,
+      OG/meta liderando con "todos están verificados". Mostrar badges de
+      verificado de forma prominente en la búsqueda.
+
+  [ ] T5 (P2) — Baranda freeze-geo: poner los mercados no-Chile detrás de un flag
+      para que el producto lea "Chile, bien hecho" y no "4 países vacíos".
+      Mantener el código intacto.
+
+  [ ] T6 (P3) — Protección de góndola vacía: bloquear/marcar la compra de Yankis
+      cuando las fechas del corredor no tienen oferta matcheable, para que los
+      créditos comprados nunca choquen con una góndola vacía.
+
+  PRIORIDADES: P1 bloquea / es lo primero. P2 mismo ciclo. P3 follow-up.
+
+
+================================================================================
+10. PREGUNTAS ABIERTAS PARA EJECUCIÓN
+================================================================================
+
+  • ¿Qué umbral exacto de liquidez define "corredor ganado"? (densidad de
+    búsqueda + velocidad de Yankis + tasa de estadías repetidas)
+  • Pricing de Yankis: precio en pesos por Yanki, cap % de estadía pagable con
+    Yankis comprados, tamaño del bonus de Yanki ganado.
+  • Objetivo concierge: ¿qué 100-200 hogares, de dónde sacados? (redes,
+    anfitriones de Airbnb en temporada baja, dueños de segundas viviendas)
+
+
+================================================================================
+11. PRÓXIMOS PASOS SUGERIDOS
+================================================================================
+
+  • /spec sobre el FLUJO DE COMPRA DE YANKIS (T2) — es el build más concreto y de
+    mayor riesgo (pricing, caps, gating por corredor, protección de góndola
+    vacía) y merece una spec precisa antes de codear.
+  • /plan-eng-review una vez que exista esa spec, para presionar los cambios de
+    modelo de datos contra los rieles de Yankis service-role existentes.
+
+================================================================================
+FIN DEL DOCUMENTO
+================================================================================
