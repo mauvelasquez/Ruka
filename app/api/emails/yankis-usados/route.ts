@@ -11,11 +11,11 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'nombre, email, yanquisUsados, yanquisRestantes, destino, fechaInicio y fechaFin son requeridos' }, { status: 400 })
     }
 
-    const label = yanquisUsados === 1 ? 'Yanki' : 'Yankis'
+    const label = yanquisUsados === 1 ? 'noche' : 'noches'
 
     const { data, error } = await sendEmail({
       to: email,
-      subject: `Usaste ${yanquisUsados} ${label} en ${destino} 🏠`,
+      subject: `Usaste ${yanquisUsados} ${label} gratis en ${destino} 🏠`,
       react: YankisUsados({ nombre, yanquisUsados, yanquisRestantes, destino, fechaInicio, fechaFin }),
       event: 'yankis-usados',
     })

@@ -114,6 +114,9 @@ export async function GET(req) {
     if (minBeds > 0) query = query.gte('bedrooms', minBeds)
 
     const orderCol = sort === 'reviews' ? 'review_count' : sort === 'newest' ? 'created_at' : 'rating'
+    // Hide demo homes from non-Chilean countries (AR, CO, MX)
+    query = query.or('is_demo.is.null,is_demo.is.false,country_code.eq.CL')
+
     // is_demo homes always appear last — false/NULL (real homes) before true (demo)
     query = query
       .order('is_demo', { ascending: true, nullsFirst: true })

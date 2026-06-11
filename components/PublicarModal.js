@@ -104,11 +104,11 @@ export default function PublicarModal() {
           ))}
         </div>
 
-        {/* Yankis callout */}
+        {/* Bono de bienvenida */}
         <div className="mx-7 mt-4 bg-terra/10 border border-terra/20 rounded-2xl px-4 py-3 flex items-center gap-3">
-          <span className="text-2xl flex-shrink-0" aria-hidden="true">🪙</span>
+          <span className="text-2xl flex-shrink-0" aria-hidden="true">🎁</span>
           <p className="text-terra text-sm font-semibold">
-            <span className="font-black">3 Yankis de bienvenida</span> al completar tu perfil = 3 noches de alojamiento gratis
+            <span className="font-black">3 noches de alojamiento gratis</span> al completar tu perfil
           </p>
         </div>
 

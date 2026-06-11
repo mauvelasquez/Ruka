@@ -7,13 +7,13 @@ export const metadata = {
     description: 'Publica tu hogar, encuentra tu match y viaja. 4 pasos simples para intercambiar casas en Chile.',
     url: 'https://rukka.cl/como-funciona',
     siteName: 'Rukka',
-    locale: 'es_419',
+    locale: 'es_CL',
     type: 'website',
     images: [{ url: 'https://rukka.cl/rukka-logo.png', width: 1080, height: 1080, alt: 'Rukka' }],
   },
   alternates: {
     canonical: 'https://rukka.cl/como-funciona',
-    languages: { 'es-419': 'https://rukka.cl/como-funciona' },
+    languages: { 'es-CL': 'https://rukka.cl/como-funciona' },
   },
 }
 
@@ -109,22 +109,6 @@ const pageSchema = {
           'acceptedAnswer': {
             '@type': 'Answer',
             'text': 'Sí. Puedes definir fechas específicas para intercambio en Rukka y mantener tu propiedad disponible en Airbnb el resto del tiempo. Son modelos compatibles.',
-          },
-        },
-        {
-          '@type': 'Question',
-          'name': '¿Qué son los Yankis de Rukka?',
-          'acceptedAnswer': {
-            '@type': 'Answer',
-            'text': 'Los Yankis son la moneda interna de Rukka. La palabra "Yanki" viene del quechua y significa trueque. 1 Yanki equivale a 1 noche de alojamiento. Puedes ganar Yankis prestando tu casa y usarlos para alojarte en cualquier otro hogar de Rukka.',
-          },
-        },
-        {
-          '@type': 'Question',
-          'name': '¿Cómo gano Yankis en Rukka?',
-          'acceptedAnswer': {
-            '@type': 'Answer',
-            'text': 'Por cada noche que prestas tu hogar a otro usuario de Rukka, recibes 1 Yanki automáticamente. También recibes 3 Yankis de bienvenida al completar tu perfil.',
           },
         },
       ],

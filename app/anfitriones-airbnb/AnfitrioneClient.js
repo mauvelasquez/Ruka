@@ -176,7 +176,7 @@ export default function AnfitrionesAirbnbPage() {
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
             {[
               { n: '$0',    label: 'Costo por usar Rukka' },
-              { n: '4',     label: 'Países de Latinoamérica' },
+              { n: '15+',   label: 'Destinos en Chile' },
               { n: '3 pasos', label: 'Para publicar tu hogar' },
               { n: '100%',  label: 'Anfitriones verificados' },
             ].map((s, i) => (
@@ -319,7 +319,7 @@ export default function AnfitrionesAirbnbPage() {
                   color: 'text-andean',
                   bg: 'bg-andean/10',
                   title: 'Ya eres parte de la comunidad',
-                  desc: 'Tu propiedad aparece disponible para anfitriones de toda Latinoamérica que buscan intercambio.',
+                  desc: 'Tu propiedad aparece disponible para anfitriones de Chile que buscan intercambio.',
                 },
               ].map(({ icon: Icon, color, bg, title, desc }, i) => (
                 <div key={i} className="flex items-start gap-4">
@@ -410,7 +410,7 @@ export default function AnfitrionesAirbnbPage() {
               {
                 emoji: '🌊',
                 title: 'Anfitriones de costa',
-                desc: 'Tu propiedad está en una zona de playa o naturaleza y quieres visitar capitales o ciudades de Latinoamérica.',
+                desc: 'Tu propiedad está en una zona de playa o naturaleza y quieres visitar capitales o ciudades de Chile.',
                 tag: 'Muy solicitado',
                 tagColor: 'bg-[#ff5a5f]/10 text-[#ff5a5f]',
               },
@@ -492,7 +492,7 @@ export default function AnfitrionesAirbnbPage() {
                 {[
                   ['Costo por noche',      '🔄 Intercambio',   '$80k-300k',       '$50k-200k'],
                   ['Publicar tu hogar',    '✓ Con pantallazos', '—',               '—'],
-                  ['Comunidad verificada', '✓ LATAM',          '—',               'Parcial'],
+                  ['Comunidad verificada', '✓ Chile',          '—',               'Parcial'],
                   ['Match automático',     '✓ Bilateral',      '—',               '—'],
                   ['Comisión',             '✓ 0%',             'Fija',            '3–15%'],
                   ['Experiencia local',    '✓ Casa real',      'No',              'Parcial'],

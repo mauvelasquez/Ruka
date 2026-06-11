@@ -6,9 +6,9 @@ export const metadata = {
   keywords: [
     'anfitriones Airbnb intercambio casas',
     'importar Airbnb Rukka',
-    'home exchange anfitriones latinoamerica',
+    'home exchange anfitriones Chile',
     'alternativa Airbnb intercambio',
-    'viaje gratis anfitrión LATAM',
+    'viaje gratis anfitrión Chile',
     'complemento Airbnb intercambio hogares',
   ],
   openGraph: {

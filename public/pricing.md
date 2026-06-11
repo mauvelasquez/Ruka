@@ -11,26 +11,20 @@
 - Registro de cuenta ilimitado
 - Publicación de hogares (sin límite)
 - Matching automático bilateral
-- Sistema de Yankis (tokens de intercambio)
+- Coordinación de alternativas cuando las fechas no calzan
 - Importación automática desde Airbnb
 - Asistente IA Fresia
 - Verificación de identidad
-- Acceso a hogares en Chile, México, Colombia y Argentina
-
-### Próximamente
-
-- Compra de Yankis adicionales con Mercado Pago (para viajar
-  sin haber hospedado previamente)
-- Precio estimado: por definir
+- Acceso a hogares en Chile
 
 ## Comparación con competidores
 
-| Plataforma       | Costo anual     | Latam-first | Matching auto |
-|-----------------|-----------------|-------------|---------------|
-| Rukka           | Gratis          | Sí          | Sí            |
-| HomeExchange    | $220 USD/año    | No          | No            |
-| Intervac        | ~$100 USD/año   | No          | No            |
-| HomeLink        | ~$80 USD/año    | No          | No            |
+| Plataforma       | Costo anual     | Foco en Chile | Matching auto |
+|-----------------|-----------------|---------------|---------------|
+| Rukka           | Gratis          | Sí            | Sí            |
+| HomeExchange    | $220 USD/año    | No            | No            |
+| Intervac        | ~$100 USD/año   | No            | No            |
+| HomeLink        | ~$80 USD/año    | No            | No            |
 
 Contacto: hola@rukka.cl
 Sitio: https://rukka.cl

@@ -30,7 +30,7 @@ const CLUSTER_COLORS = {
   México:    { bg: 'bg-orange-50',  text: 'text-orange-700',   border: 'border-orange-200', label: '🇲🇽 México'   },
 }
 
-const MARKETS = ['Todos', 'Chile', 'Argentina', 'Colombia', 'México', 'LATAM']
+const MARKETS = ['Todos', 'Chile']
 
 function PostCard({ post }) {
   const cluster = CLUSTER_COLORS[post.market] || CLUSTER_COLORS.LATAM
@@ -74,7 +74,9 @@ function PostCard({ post }) {
 }
 
 export default function BlogPage({ searchParams }) {
-  const posts = getAllPosts()
+  const allPosts = getAllPosts()
+  // Solo mostrar artículos de Chile públicamente; los otros mercados están ocultos
+  const posts = allPosts.filter(p => !p.market || p.market === 'Chile')
   const mercado = searchParams?.mercado || 'Todos'
   const filtered = mercado === 'Todos' ? posts : posts.filter(p => p.market === mercado)
 
@@ -89,7 +91,7 @@ export default function BlogPage({ searchParams }) {
             Viaja sin pagar alojamiento
           </h1>
           <p className="text-white/75 text-lg max-w-xl mx-auto">
-            Guías sobre home exchange en Chile, Argentina, Colombia y México. Todo lo que necesitas para viajar gratis intercambiando tu hogar.
+            Guías sobre home exchange en Chile. Todo lo que necesitas para viajar gratis intercambiando tu hogar.
           </p>
         </div>
       </div>

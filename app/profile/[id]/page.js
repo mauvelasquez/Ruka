@@ -13,11 +13,14 @@ export async function generateMetadata({ params }) {
   try {
     const { data: profile } = await getSupabase()
       .from('profiles')
-      .select('id, full_name, city, country, avatar_url, id_verified')
+      .select('id, full_name, city, country, country_code, avatar_url, id_verified')
       .eq('id', params.id)
       .single()
 
     if (!profile) return { robots: { index: false } }
+
+    // Chile-focus: perfiles demo de AR/CO/MX no se indexan individualmente
+    const isNonChile = profile.country_code && profile.country_code !== 'CL'
 
     const name = profile.full_name ?? 'Anfitrión'
     const location = profile.city ?? 'Chile'
@@ -28,7 +31,7 @@ export async function generateMetadata({ params }) {
     return {
       title,
       description,
-      robots: { index: true, follow: true },
+      robots: isNonChile ? { index: false, follow: false } : { index: true, follow: true },
       alternates: {
         canonical: url,
         languages: { 'es-419': url },
@@ -39,7 +42,7 @@ export async function generateMetadata({ params }) {
         url,
         siteName: 'Rukka',
         type: 'profile',
-        locale: 'es_419',
+        locale: 'es_CL',
         images: profile.avatar_url
           ? [{ url: profile.avatar_url, width: 400, height: 400, alt: name }]
           : [{ url: 'https://rukka.cl/rukka-logo.png', width: 1080, height: 1080, alt: 'Rukka' }],

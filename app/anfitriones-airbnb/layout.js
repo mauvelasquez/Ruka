@@ -7,13 +7,13 @@ export const metadata = {
     description: 'Importa tu Airbnb a Rukka en segundos. Comunidad chilena de anfitriones que intercambian sus propiedades. Gratuito, con verificación de identidad.',
     url: 'https://rukka.cl/anfitriones-airbnb',
     siteName: 'Rukka',
-    locale: 'es_419',
+    locale: 'es_CL',
     type: 'website',
     images: [{ url: 'https://rukka.cl/rukka-logo.png', width: 1080, height: 1080, alt: 'Rukka' }],
   },
   alternates: {
     canonical: 'https://rukka.cl/anfitriones-airbnb',
-    languages: { 'es-419': 'https://rukka.cl/anfitriones-airbnb' },
+    languages: { 'es-CL': 'https://rukka.cl/anfitriones-airbnb' },
   },
 }
 

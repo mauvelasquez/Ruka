@@ -13,7 +13,7 @@ export async function POST(req: Request) {
 
     const { data, error } = await sendEmail({
       to: email,
-      subject: 'Invita a un amigo y gana Yankis 🤝',
+      subject: 'Invita a un amigo y gana noches gratis 🤝',
       react: RecomiendaAmigo({ nombre, codigoReferido, yanquisPorReferido }),
       event: 'recomienda-amigo',
     })

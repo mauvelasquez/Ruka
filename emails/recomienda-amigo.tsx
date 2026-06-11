@@ -19,7 +19,7 @@ export default function RecomiendaAmigo({
   return (
     <Html lang="es">
       <Head />
-      <Preview>Invita a un amigo y gana Yankis. Comparte Rukka y viaja más.</Preview>
+      <Preview>Invita a un amigo y gana noches gratis. Comparte Rukka y viaja más.</Preview>
       <Body style={{ backgroundColor: '#ffffff', margin: 0, padding: 0, fontFamily: 'system-ui, sans-serif' }}>
         <Container style={{ maxWidth: '600px', margin: '0 auto' }}>
           <RukkaHeader />
@@ -29,7 +29,7 @@ export default function RecomiendaAmigo({
               ¡Hola, {nombre}! 🤝
             </Text>
             <Text style={{ fontSize: '16px', color: '#1a1a1a', lineHeight: '1.6', margin: '0 0 8px' }}>
-              Esperamos que tu intercambio haya sido increíble. Ahora puedes compartir Rukka con tus amigos — y ganar Yankis por cada uno que se sume.
+              Esperamos que tu intercambio haya sido increíble. Ahora puedes compartir Rukka con tus amigos — y ganar noches de alojamiento gratis por cada uno que se sume.
             </Text>
 
             <Section style={{ backgroundColor: '#F5F0E8', borderRadius: '12px', padding: '24px', margin: '24px 0', textAlign: 'center' }}>
@@ -38,7 +38,7 @@ export default function RecomiendaAmigo({
               </Text>
               <YankisBadge cantidad={yanquisPorReferido} />
               <Text style={{ fontSize: '14px', color: '#666666', margin: '12px 0 0' }}>
-                Sin límite — más amigos, más Yankis.
+                Sin límite — más amigos, más noches gratis.
               </Text>
             </Section>
 
@@ -52,7 +52,7 @@ export default function RecomiendaAmigo({
             </Section>
 
             <Text style={{ fontSize: '14px', color: '#666666', lineHeight: '1.6', margin: '0 0 24px' }}>
-              Cuando un amigo use tu link, se registre y publique su hogar, los Yankis se acreditan automáticamente a tu cuenta. ¡Así de simple!
+              Cuando un amigo use tu link, se registre y publique su hogar, las noches gratis se acreditan automáticamente a tu cuenta. ¡Así de simple!
             </Text>
 
             <Section style={{ textAlign: 'center', margin: '0 0 8px' }}>
