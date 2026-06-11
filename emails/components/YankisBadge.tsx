@@ -3,7 +3,7 @@ interface YankisBadgeProps {
 }
 
 export function YankisBadge({ cantidad }: YankisBadgeProps) {
-  const label = cantidad === 1 ? 'Yanki' : 'Yankis'
+  const label = cantidad === 1 ? 'noche' : 'noches'
   return (
     <span
       style={{
@@ -17,7 +17,7 @@ export function YankisBadge({ cantidad }: YankisBadgeProps) {
         fontFamily: 'system-ui, sans-serif',
       }}
     >
-      🪙 {cantidad} {label}
+      🎁 {cantidad} {label} gratis
     </span>
   )
 }

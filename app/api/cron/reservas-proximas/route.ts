@@ -134,7 +134,7 @@ export async function GET(req: Request) {
         if (guest?.email && guest?.name) {
           sends.push(sendEmail({
             to: guest.email,
-            subject: 'Invita a un amigo y gana Yankis 🤝',
+            subject: 'Invita a un amigo y gana noches gratis 🤝',
             react: RecomiendaAmigo({ nombre: guest.name, codigoReferido: makeCode(r.from_user_id), yanquisPorReferido: 2 }),
             event: 'recomienda-amigo',
             userId: r.from_user_id,
@@ -144,7 +144,7 @@ export async function GET(req: Request) {
         if (host?.email && host?.name) {
           sends.push(sendEmail({
             to: host.email,
-            subject: 'Invita a un amigo y gana Yankis 🤝',
+            subject: 'Invita a un amigo y gana noches gratis 🤝',
             react: RecomiendaAmigo({ nombre: host.name, codigoReferido: makeCode(r.to_user_id), yanquisPorReferido: 2 }),
             event: 'recomienda-amigo',
             userId: r.to_user_id,

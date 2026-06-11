@@ -20,13 +20,13 @@ export default function YankisUsados({
   fechaInicio = '10 jun',
   fechaFin = '15 jun',
 }: YankisUsadosProps) {
-  const labelUsados = yanquisUsados === 1 ? 'Yanki' : 'Yankis'
-  const labelRestantes = yanquisRestantes === 1 ? 'Yanki' : 'Yankis'
+  const labelUsados = yanquisUsados === 1 ? 'noche' : 'noches'
+  const labelRestantes = yanquisRestantes === 1 ? 'noche' : 'noches'
 
   return (
     <Html lang="es">
       <Head />
-      <Preview>{`Usaste ${yanquisUsados} ${labelUsados} para tu estadía en ${destino}.`}</Preview>
+      <Preview>{`Usaste ${yanquisUsados} ${labelUsados} gratis para tu estadía en ${destino}.`}</Preview>
       <Body style={{ backgroundColor: '#ffffff', margin: 0, padding: 0, fontFamily: 'system-ui, sans-serif' }}>
         <Container style={{ maxWidth: '600px', margin: '0 auto' }}>
           <RukkaHeader />
@@ -36,16 +36,16 @@ export default function YankisUsados({
               ¡Hola, {nombre}! 🏠
             </Text>
             <Text style={{ fontSize: '16px', color: '#1a1a1a', lineHeight: '1.6', margin: '0 0 24px' }}>
-              Confirmamos el descuento de Yankis para tu próxima estadía.
+              Confirmamos el descuento de noches gratis para tu próxima estadía.
             </Text>
 
             <Section style={{ backgroundColor: '#F5F0E8', borderRadius: '10px', padding: '20px', margin: '0 0 20px' }}>
               <Text style={{ fontSize: '14px', color: '#888888', margin: '0 0 8px', textTransform: 'uppercase', letterSpacing: '1px' }}>
-                Yankis descontados
+                Noches gratis descontadas
               </Text>
               <YankisBadge cantidad={yanquisUsados} />
               <Text style={{ fontSize: '14px', color: '#888888', margin: '12px 0 0' }}>
-                Saldo restante: <strong style={{ color: '#1a1a1a' }}>{yanquisRestantes} {labelRestantes}</strong>
+                Saldo restante: <strong style={{ color: '#1a1a1a' }}>{yanquisRestantes} {labelRestantes} gratis</strong>
               </Text>
             </Section>
 
@@ -63,7 +63,7 @@ export default function YankisUsados({
 
             <Section style={{ backgroundColor: '#f0f7ec', borderRadius: '8px', padding: '14px 16px', margin: '0 0 28px', borderLeft: '4px solid #2D5016' }}>
               <Text style={{ fontSize: '14px', color: '#2D5016', margin: '0' }}>
-                🔄 <strong>¿Necesitas cancelar?</strong> Si cancelas tu reserva, tus {yanquisUsados} {labelUsados} se devuelven íntegros a tu cuenta.
+                🔄 <strong>¿Necesitas cancelar?</strong> Si cancelas tu reserva, tus {yanquisUsados} {labelUsados} gratis se devuelven íntegras a tu cuenta.
               </Text>
             </Section>
 

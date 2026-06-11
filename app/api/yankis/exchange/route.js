@@ -114,7 +114,7 @@ export async function POST(req) {
         if (hostProfile?.email) {
           sends.push(sendEmail({
             to:      hostProfile.email,
-            subject: 'Recibiste 1 Yanki 🪙',
+            subject: 'Sumaste 1 noche de alojamiento gratis 🎁',
             react: YankisRecibidos({ nombre: hostProfile.name || 'Anfitrión', yanquisRecibidos: 1, yanquisTotal: hostBalanceRow?.balance ?? 1, motivo: `Intercambio confirmado en ${destino}`, nombreHuesped: travelerProfile?.name }),
             event: 'yankis-recibidos',
             userId: exchange.to_user_id,
@@ -124,7 +124,7 @@ export async function POST(req) {
         if (!debitErr && travelerProfile?.email) {
           sends.push(sendEmail({
             to:      travelerProfile.email,
-            subject: `Usaste 1 Yanki en ${destino} 🏠`,
+            subject: `Usaste 1 noche gratis en ${destino} 🏠`,
             react: YankisUsados({ nombre: travelerProfile.name || 'Viajero', yanquisUsados: 1, yanquisRestantes: travelerBalanceRow?.balance ?? 0, destino, fechaInicio, fechaFin }),
             event: 'yankis-usados',
             userId: exchange.from_user_id,

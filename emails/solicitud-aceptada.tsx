@@ -54,7 +54,7 @@ export default function SolicitudAceptada({
 
             <Section style={{ backgroundColor: '#FDF0EA', borderRadius: '10px', padding: '20px', margin: '0 0 20px', textAlign: 'center' }}>
               <Text style={{ fontSize: '14px', color: '#666666', margin: '0 0 8px' }}>
-                Yankis descontados de tu saldo
+                Noches gratis descontadas de tu saldo
               </Text>
               <YankisBadge cantidad={yanquisDescontados} />
             </Section>
