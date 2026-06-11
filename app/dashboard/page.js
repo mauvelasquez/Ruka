@@ -7,7 +7,7 @@ import Navbar from '../../components/Navbar'
 import MessageThread from '../../components/MessageThread'
 import {
   Home, Heart, ArrowLeftRight, Plus, MapPin, Users, Calendar,
-  CheckCircle, XCircle, Clock, Trash2, Eye, Star, Sparkles, ScrollText, MessageSquare, User, ChevronRight, TrendingUp, ExternalLink, Share2
+  CheckCircle, XCircle, Clock, Trash2, Eye, Star, Sparkles, ScrollText, MessageSquare, User, TrendingUp, ExternalLink, Share2
 } from 'lucide-react'
 import { COMUNAS_RUKKA } from '../../lib/comunas'
 import { COUNTRIES as LATAM_COUNTRIES } from '../../lib/geo/latam'
@@ -38,8 +38,6 @@ function StatusBadge({ status }) {
   )
 }
 
-const TX_ICON = { earned: '📈', bonus: '🎁', spent: '✈️', refunded: '↩️' }
-
 const VALID_TABS = new Set(Object.values(TAB))
 
 function DashboardContent() {
@@ -64,19 +62,11 @@ function DashboardContent() {
   const [wishBlockReason, setWishBlockReason] = useState(null)
   const [activeThread, setActiveThread] = useState(null)
   const [isAdmin, setIsAdmin] = useState(false)
-  const [yankiBalance, setYankiBalance] = useState(null)
-  const [yankiTxs, setYankiTxs] = useState([])
   const [copiedHomeId, setCopiedHomeId] = useState(null)
 
   useEffect(() => {
     if (!ready || !currentUser) return
     fetch('/api/admin/me').then(r => r.json()).then(({ isAdmin: a }) => setIsAdmin(a)).catch(() => {})
-  }, [ready, currentUser])
-
-  useEffect(() => {
-    if (!ready || !currentUser) return
-    fetch('/api/yankis/balance').then(r => r.json()).then(d => setYankiBalance(d)).catch(() => {})
-    fetch('/api/yankis/transactions').then(r => r.json()).then(d => setYankiTxs((d || []).slice(0, 4))).catch(() => {})
   }, [ready, currentUser])
 
   useEffect(() => {
@@ -170,59 +160,12 @@ function DashboardContent() {
           </div>
         </div>
 
-        {/* Módulo Yankis — compacto */}
-        <div className="bg-white rounded-2xl border border-terra/15 shadow-sm mb-5 overflow-hidden">
-          <div className="bg-gradient-to-r from-terra to-terra-dark px-4 py-3 text-white">
-            <div className="flex items-center justify-between gap-3 flex-wrap">
-              <div className="flex items-center gap-4 flex-wrap">
-                {/* Saldo */}
-                <div className="flex items-baseline gap-1.5">
-                  <span className="text-2xl font-black tabular-nums">
-                    {yankiBalance === null ? '—' : yankiBalance.balance ?? 0}
-                  </span>
-                  <span className="text-lg">🪙</span>
-                  <span className="text-white/60 text-xs ml-0.5">disponibles</span>
-                </div>
-                {/* Ganados / Gastados */}
-                {yankiBalance !== null && (
-                  <div className="flex gap-4 border-l border-white/20 pl-4">
-                    <div>
-                      <p className="text-white/50 text-[10px] leading-none">Ganados</p>
-                      <p className="text-white font-black text-sm">{yankiBalance.total_earned ?? 0} 🪙</p>
-                    </div>
-                    <div>
-                      <p className="text-white/50 text-[10px] leading-none">Gastados</p>
-                      <p className="text-white font-black text-sm">{yankiBalance.total_spent ?? 0} 🪙</p>
-                    </div>
-                  </div>
-                )}
-              </div>
-              <Link href="/dashboard/yankis"
-                className="flex-shrink-0 bg-white/20 hover:bg-white/30 text-white text-xs font-bold px-3 py-1.5 rounded-xl transition-colors flex items-center gap-1">
-                Ver todo <ChevronRight className="w-3 h-3" />
-              </Link>
-            </div>
-          </div>
-          {/* Último movimiento */}
-          {yankiTxs.length > 0 && (
-            <div className="px-4 py-2 flex items-center justify-between gap-2">
-              <div className="flex items-center gap-2 min-w-0">
-                <span className="text-sm flex-shrink-0">{TX_ICON[yankiTxs[0].type] || '🪙'}</span>
-                <p className="text-xs text-gray-500 truncate">{yankiTxs[0].description}</p>
-              </div>
-              <span className={`text-xs font-black flex-shrink-0 ${yankiTxs[0].type === 'spent' ? 'text-red-500' : 'text-forest'}`}>
-                {yankiTxs[0].type === 'spent' ? '−' : '+'}{yankiTxs[0].amount} 🪙
-              </span>
-            </div>
-          )}
-        </div>
-
         {/* CTA si no tiene hogar */}
         {myHomes.length === 0 && (
           <div className="bg-gradient-to-r from-forest to-forest-dark rounded-2xl p-5 text-white flex flex-col sm:flex-row items-center gap-4 mb-5 shadow-md">
             <div className="flex-1">
               <p className="font-black text-base mb-1">🏠 Aún no tienes un hogar registrado</p>
-              <p className="text-white/75 text-sm">Publica tu hogar para intercambiar estadías y ganar Yankis.</p>
+              <p className="text-white/75 text-sm">Publica tu hogar para empezar a intercambiar estadías.</p>
             </div>
             <button onClick={() => gate('publish', () => router.push('/dashboard/property/new'))}
               className="flex-shrink-0 bg-white text-forest-dark font-black px-5 py-2.5 rounded-xl text-sm hover:bg-sand transition-colors flex items-center gap-2 whitespace-nowrap shadow-sm">

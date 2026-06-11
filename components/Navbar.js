@@ -6,7 +6,6 @@ import { Menu, X, Globe, User, LogOut, LayoutDashboard, ChevronDown, Sparkles } 
 import Image from 'next/image'
 import { FresiaAvatar } from './fresia/ChatInterface'
 import { analytics } from '../lib/analytics'
-import YankiBalance from './yankis/YankiBalance'
 import { openPublicarModal } from './PublicarModal'
 
 export default function Navbar() {
@@ -52,47 +51,44 @@ export default function Navbar() {
               <FresiaAvatar size={20} /> Conversa con Fresia
             </Link>
             {user ? (
-              <div className="flex items-center gap-3 relative">
-                <YankiBalance size="sm" showLabel linkable />
-                <div className="relative">
-                  <button
-                    onClick={() => setDropdownOpen(!dropdownOpen)}
-                    className="flex items-center gap-2 border border-gray-200 rounded-full py-1.5 px-3 hover:shadow-md transition-shadow bg-white"
-                    aria-label="Menú de usuario"
-                    aria-expanded={dropdownOpen}
-                  >
-                    <img src={user.avatar} alt={user.name}
-                      className="w-8 h-8 rounded-full object-cover"
-                      onError={e => { e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=2d6a4f&color=fff&size=150` }}
-                    />
-                    <span className="text-sm font-semibold text-gray-700 max-w-20 truncate">{user.name.split(' ')[0]}</span>
-                    <ChevronDown className="w-4 h-4 text-gray-400" />
-                  </button>
-                  {dropdownOpen && (
-                    <div className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-gray-100 py-2 z-50">
-                      <div className="px-4 py-3 border-b border-gray-50">
-                        <p className="font-bold text-gray-900 text-sm">{user.name}</p>
-                        <p className="text-gray-400 text-xs truncate">{user.email}</p>
-                      </div>
-                      {[
-                        { href: '/perfil', icon: <User className="w-4 h-4" />, label: 'Mi Perfil' },
-                        { href: '/dashboard', icon: <LayoutDashboard className="w-4 h-4" />, label: 'Mi Rukka' },
-                        { href: '/matches', icon: <Sparkles className="w-4 h-4" />, label: 'Buscar match' },
-                      ].map(item => (
-                        <Link key={item.href} href={item.href} onClick={() => setDropdownOpen(false)}
-                          className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-forest-50 hover:text-forest transition-colors">
-                          {item.icon} {item.label}
-                        </Link>
-                      ))}
-                      <div className="border-t border-gray-100 mt-1 pt-1">
-                        <button onClick={handleLogout}
-                          className="flex items-center gap-3 px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 w-full">
-                          <LogOut className="w-4 h-4" /> Cerrar sesión
-                        </button>
-                      </div>
+              <div className="relative">
+                <button
+                  onClick={() => setDropdownOpen(!dropdownOpen)}
+                  className="flex items-center gap-2 border border-gray-200 rounded-full py-1.5 px-3 hover:shadow-md transition-shadow bg-white"
+                  aria-label="Menú de usuario"
+                  aria-expanded={dropdownOpen}
+                >
+                  <img src={user.avatar} alt={user.name}
+                    className="w-8 h-8 rounded-full object-cover"
+                    onError={e => { e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=2d6a4f&color=fff&size=150` }}
+                  />
+                  <span className="text-sm font-semibold text-gray-700 max-w-20 truncate">{user.name.split(' ')[0]}</span>
+                  <ChevronDown className="w-4 h-4 text-gray-400" />
+                </button>
+                {dropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-gray-100 py-2 z-50">
+                    <div className="px-4 py-3 border-b border-gray-50">
+                      <p className="font-bold text-gray-900 text-sm">{user.name}</p>
+                      <p className="text-gray-400 text-xs truncate">{user.email}</p>
                     </div>
-                  )}
-                </div>
+                    {[
+                      { href: '/perfil', icon: <User className="w-4 h-4" />, label: 'Mi Perfil' },
+                      { href: '/dashboard', icon: <LayoutDashboard className="w-4 h-4" />, label: 'Mi Rukka' },
+                      { href: '/matches', icon: <Sparkles className="w-4 h-4" />, label: 'Buscar match' },
+                    ].map(item => (
+                      <Link key={item.href} href={item.href} onClick={() => setDropdownOpen(false)}
+                        className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-forest-50 hover:text-forest transition-colors">
+                        {item.icon} {item.label}
+                      </Link>
+                    ))}
+                    <div className="border-t border-gray-100 mt-1 pt-1">
+                      <button onClick={handleLogout}
+                        className="flex items-center gap-3 px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 w-full">
+                        <LogOut className="w-4 h-4" /> Cerrar sesión
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             ) : (
               <div className="flex items-center gap-2">
@@ -134,8 +130,7 @@ export default function Navbar() {
             <>
               <div className="px-3 py-2 border-b border-gray-100 mb-1">
                 <p className="font-bold text-gray-900 text-sm">{user.name}</p>
-                <p className="text-gray-400 text-xs truncate mb-2">{user.email}</p>
-                <YankiBalance size="sm" showLabel linkable />
+                <p className="text-gray-400 text-xs truncate">{user.email}</p>
               </div>
               <Link href="/perfil" onClick={() => setMenuOpen(false)} className="flex items-center gap-2 p-3 rounded-xl text-gray-700 hover:bg-forest-50">
                 <User className="w-4 h-4 text-forest" /> Mi Perfil
