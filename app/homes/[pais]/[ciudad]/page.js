@@ -303,15 +303,15 @@ export default async function CiudadPage({ params }) {
               ))}
             </div>
 
-            {/* Bloque Yankis */}
+            {/* Bloque coordinación */}
             <div className="bg-white rounded-2xl border-2 border-terra/40 p-5 mb-7">
               <h3 className="font-extrabold text-terra text-base mb-2">
-                ¿Qué son los Yankis? 🪙
+                ¿Y si las fechas no calzan? 🧭
               </h3>
               <p className="text-sm text-gray-700 leading-relaxed">
-                Los Yankis son los créditos de Rukka. Si alguien se queda en tu casa pero
-                tú no puedes ir en ese momento, ganas Yankis. Úsalos después para alojarte
-                en cualquier hogar de la red. Sin dinero, sin complicaciones.
+                No siempre dos personas quieren visitarse exactamente al mismo tiempo. En esos
+                casos, nuestro equipo te ayuda a coordinar una alternativa para que igual puedas
+                viajar y alojarte sin costo, en cualquier hogar de la red.
               </p>
             </div>
 

@@ -193,12 +193,12 @@ export default function HomePage() {
       <section className="py-8 bg-white border-y border-stone-200/60">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <AdBanner variant="primary" />
-          {/* Yankis welcome callout */}
+          {/* Bono de bienvenida */}
           <div className="mt-4 flex items-center gap-3 bg-terra/10 border border-terra/20 rounded-2xl px-5 py-3.5">
-            <span className="text-2xl leading-none flex-shrink-0">🪙</span>
+            <span className="text-2xl leading-none flex-shrink-0">🎁</span>
             <p className="text-terra font-semibold text-sm sm:text-base">
               <span className="font-black">Regístrate hoy</span> y recibe{' '}
-              <span className="font-black">3 Yankis de bienvenida</span> = 3 noches de alojamiento gratis
+              <span className="font-black">3 noches de alojamiento gratis</span> de bienvenida
             </p>
             <button
               onClick={openPublicarModal}

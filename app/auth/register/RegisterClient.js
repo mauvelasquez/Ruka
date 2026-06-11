@@ -129,7 +129,7 @@ export default function RegisterClient({ subtitle }) {
           </form>
 
           <p className="mt-4 text-center text-sm text-terra font-medium">
-            🪙 Al completar tu perfil recibes <span className="font-bold">3 Yankis de bienvenida</span>.
+            🎁 Al completar tu perfil recibes <span className="font-bold">3 noches de alojamiento gratis</span> de bienvenida.
           </p>
 
           <div className="mt-4 pt-4 border-t border-gray-100 text-center">
