@@ -64,7 +64,7 @@ export default async function sitemap() {
     const { data: homes } = await supabase
       .from('homes')
       .select('id, updated_at, created_at')
-      .or('is_demo.is.null,is_demo.is.false,country_code.eq.CL')
+      .or('is_demo.is.null,is_demo.is.false')
       .order('created_at', { ascending: false })
       .limit(5000)
 

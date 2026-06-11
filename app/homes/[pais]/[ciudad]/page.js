@@ -70,7 +70,7 @@ export default async function CiudadPage({ params }) {
       .from('homes')
       .select('id, title, description, city, country, location, images, bedrooms, bathrooms, max_guests, type, amenities, rating, review_count, availability_periods, created_at')
       .eq('country_code', country.code)
-      .or('is_demo.is.null,is_demo.is.false,country_code.eq.CL')
+      .or('is_demo.is.null,is_demo.is.false')
       .ilike('city', `%${cityNameFirst}%`)
       .order('rating', { ascending: false })
       .limit(24)
