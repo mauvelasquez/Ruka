@@ -19,12 +19,12 @@
 
 ## Comparación con competidores
 
-| Plataforma       | Costo anual     | Latam-first | Matching auto |
-|-----------------|-----------------|-------------|---------------|
-| Rukka           | Gratis          | Sí          | Sí            |
-| HomeExchange    | $220 USD/año    | No          | No            |
-| Intervac        | ~$100 USD/año   | No          | No            |
-| HomeLink        | ~$80 USD/año    | No          | No            |
+| Plataforma       | Costo anual     | Foco en Chile | Matching auto |
+|-----------------|-----------------|---------------|---------------|
+| Rukka           | Gratis          | Sí            | Sí            |
+| HomeExchange    | $220 USD/año    | No            | No            |
+| Intervac        | ~$100 USD/año   | No            | No            |
+| HomeLink        | ~$80 USD/año    | No            | No            |
 
 Contacto: hola@rukka.cl
 Sitio: https://rukka.cl
