@@ -198,6 +198,34 @@ export default function HomeDetailClient({ id }) {
               {home.size && <p className="text-xs text-gray-400 mt-3">📐 {home.size}m² {home.floor ? `· Piso ${home.floor}` : ''}</p>}
             </div>
 
+            {/* Airbnb */}
+            {home.airbnb_url && (
+              <a
+                href={home.airbnb_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-4 sm:gap-5 rounded-2xl p-4 sm:p-5 shadow-sm hover:shadow-md active:scale-[0.99] transition-all"
+                style={{ backgroundColor: '#FF385C' }}
+              >
+                <img
+                  src={imgs[0] || `https://picsum.photos/seed/${home.id}/200/200`}
+                  alt={home.title}
+                  className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl object-cover flex-shrink-0"
+                  onError={e => { e.target.src = `https://picsum.photos/seed/home${home.id}/200/200` }}
+                />
+                <div className="flex-1 min-w-0 text-white">
+                  <p className="text-sm font-medium text-white/80">Este hogar también está publicado en</p>
+                  <p className="text-2xl sm:text-3xl font-extrabold tracking-tight flex items-center gap-2 mt-0.5">
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg" className="flex-shrink-0">
+                      <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm0 4.5c1.243 0 2.25 1.007 2.25 2.25S13.243 9 12 9 9.75 7.993 9.75 6.75 10.757 4.5 12 4.5zm5.25 13.5H6.75a.75.75 0 01-.75-.75c0-3.176 2.636-5.25 6-5.25s6 2.074 6 5.25a.75.75 0 01-.75.75z"/>
+                    </svg>
+                    Airbnb
+                  </p>
+                  <p className="text-sm font-semibold text-white/90 mt-1.5">Ver hogar y reseñas →</p>
+                </div>
+              </a>
+            )}
+
             {/* Map */}
             {(home.latitude || home.comuna || home.region) && (
               <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
@@ -345,22 +373,6 @@ export default function HomeDetailClient({ id }) {
                       <div key={i} className="flex items-center gap-2 text-xs text-gray-400">{icon} {txt}</div>
                     ))}
                   </div>
-                </div>
-              )}
-              {home.airbnb_url && (
-                <div className="mt-4">
-                  <a
-                    href={home.airbnb_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex w-full items-center justify-center gap-2 px-5 py-3 rounded-xl font-semibold text-white text-sm transition-all hover:opacity-90 active:scale-95"
-                    style={{ backgroundColor: '#FF385C' }}
-                  >
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm0 4.5c1.243 0 2.25 1.007 2.25 2.25S13.243 9 12 9 9.75 7.993 9.75 6.75 10.757 4.5 12 4.5zm5.25 13.5H6.75a.75.75 0 01-.75-.75c0-3.176 2.636-5.25 6-5.25s6 2.074 6 5.25a.75.75 0 01-.75.75z"/>
-                    </svg>
-                    Ver hogar en Airbnb
-                  </a>
                 </div>
               )}
               <div className="mt-4 bg-terra-50 rounded-2xl p-4 border border-terra/10">
