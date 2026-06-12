@@ -229,7 +229,7 @@ function DashboardContent() {
                 <div>
                   <p className="font-bold text-purple-900 text-sm mb-1">Verificación requerida</p>
                   <p className="text-purple-700 text-xs mb-2">Debes verificarte para agregar destinos de viaje.</p>
-                  <Link href="/onboarding"
+                  <Link href="/verificar"
                     className="inline-flex items-center gap-1.5 bg-forest text-white text-xs font-bold px-3 py-1.5 rounded-lg hover:bg-forest-dark transition-colors">
                     Verificar mi identidad →
                   </Link>

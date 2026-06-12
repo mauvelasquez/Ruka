@@ -1,6 +1,6 @@
 'use client'
 import { useState, useRef, useEffect, useCallback } from 'react'
-import { Camera, AlertCircle, Loader, CheckCircle, Eye, RotateCcw, ExternalLink } from 'lucide-react'
+import { Camera, AlertCircle, Loader, CheckCircle, Eye, RotateCcw, ExternalLink, Upload, Smartphone } from 'lucide-react'
 import { VERIFICATION_ERRORS } from '../../../lib/verification-errors'
 
 // Eye Aspect Ratio for blink detection
@@ -26,9 +26,22 @@ function getCamErrorCode(err) {
     case 'NotReadableError':
     case 'TrackStartError':
       return 'CAMERA_IN_USE'
+    case 'SecurityError':
+      return 'CAMERA_BLOCKED'
+    case 'OverconstrainedError':
+    case 'ConstraintNotSatisfiedError':
+      // Llegamos aquí solo si el fallback sin constraints también falló.
+      return 'CAMERA_NOT_FOUND'
     default:
       return 'LIVENESS_FAILED'
   }
+}
+
+// WhatsApp, Instagram y Facebook abren los links en su propio navegador embebido,
+// donde getUserMedia suele fallar de forma silenciosa o quedar bloqueado.
+function isInAppBrowser(ua) {
+  if (!ua) return false
+  return /FBAN|FBAV|FB_IAB|Instagram|WhatsApp|Line\//i.test(ua)
 }
 
 export default function FaceMatchStep({ ocrResult, onSuccess }) {
@@ -36,8 +49,9 @@ export default function FaceMatchStep({ ocrResult, onSuccess }) {
   const canvasRef   = useRef()
   const streamRef   = useRef()
   const faceapiRef  = useRef(null)
+  const mountedRef  = useRef(true)
 
-  const [phase, setPhase]         = useState('loading_models') // loading_models | camera | liveness | capturing | matching | done | error
+  const [phase, setPhase]         = useState('loading_models') // loading_models | idle | camera | liveness | capturing | matching | done | error
   const [modelProgress, setModelProgress] = useState(0)
   const [camError, setCamError]     = useState(null)
   const [camErrorCode, setCamErrorCode] = useState(null)
@@ -49,13 +63,24 @@ export default function FaceMatchStep({ ocrResult, onSuccess }) {
   const [errorCode, setErrorCode]   = useState(null)
   const [error, setError]           = useState(null)
   const [stream, setStream]         = useState(null)
+  const [captureMode, setCaptureMode] = useState(null) // 'camera' | 'photo' | null
+  const [previewUrl, setPreviewUrl] = useState(null)
+  const [cameraSupported, setCameraSupported] = useState(true)
+  const [isWebView, setIsWebView] = useState(false)
   const blinkRef = useRef({ wasOpen: true, count: 0 })
   const goodFramesRef = useRef(0)
   const animRef = useRef()
 
+  // ── Detect environment (camera support / in-app browser) ─────────────────────
+  useEffect(() => {
+    setCameraSupported(window.isSecureContext !== false && !!navigator.mediaDevices?.getUserMedia)
+    setIsWebView(isInAppBrowser(navigator.userAgent))
+  }, [])
+
   // ── Cleanup stream on unmount only ───────────────────────────────────────────
   useEffect(() => {
     return () => {
+      mountedRef.current = false
       cancelAnimationFrame(animRef.current)
       streamRef.current?.getTracks().forEach(t => t.stop())
     }
@@ -76,7 +101,7 @@ export default function FaceMatchStep({ ocrResult, onSuccess }) {
         setModelProgress(70)
         await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL)
         setModelProgress(100)
-        if (!cancelled) setPhase('camera')
+        if (!cancelled) setPhase('idle')
       } catch (err) {
         if (!cancelled) {
           setErrorCode('LIVENESS_FAILED')
@@ -89,75 +114,72 @@ export default function FaceMatchStep({ ocrResult, onSuccess }) {
     return () => { cancelled = true }
   }, [])
 
-  // ── Start camera ─────────────────────────────────────────────────────────────
-  useEffect(() => {
-    if (phase !== 'camera') return
-    let active = true
+  // ── Start camera (disparado por gesto del usuario, nunca automático) ─────────
+  const startCam = useCallback(async () => {
+    // Gate camera access behind a secure context (HTTPS / localhost).
+    // Browsers hide navigator.mediaDevices entirely on insecure origins.
+    if (typeof window !== 'undefined' && window.isSecureContext === false) {
+      setCamErrorCode('CAMERA_NOT_FOUND')
+      setCamError('La cámara solo funciona en sitios seguros (HTTPS). Abre Rukka con https:// e intenta de nuevo.')
+      setPhase('error')
+      return
+    }
+    // Check API availability (older Safari / HTTP pages)
+    if (!navigator.mediaDevices?.getUserMedia) {
+      setCamErrorCode('CAMERA_NOT_FOUND')
+      setCamError('Tu navegador no soporta acceso a cámara. Usa Chrome, Safari 11+ o Firefox 36+, o sube una foto desde tu galería.')
+      setPhase('error')
+      return
+    }
 
-    async function startCam() {
-      // Gate camera access behind a secure context (HTTPS / localhost).
-      // Browsers hide navigator.mediaDevices entirely on insecure origins.
-      if (typeof window !== 'undefined' && window.isSecureContext === false) {
-        if (!active) return
-        setCamErrorCode('CAMERA_NOT_FOUND')
-        setCamError('La cámara solo funciona en sitios seguros (HTTPS). Abre Rukka con https:// e intenta de nuevo.')
-        setPhase('error')
-        return
-      }
-      // Check API availability (older Safari / HTTP pages)
-      if (!navigator.mediaDevices?.getUserMedia) {
-        if (!active) return
-        setCamErrorCode('CAMERA_NOT_FOUND')
-        setCamError('Tu navegador no soporta acceso a cámara. Usa Chrome, Safari 11+ o Firefox 36+.')
-        setPhase('error')
-        return
-      }
+    const primaryConstraints = {
+      video: { facingMode: { ideal: 'user' }, width: { ideal: 1280 }, height: { ideal: 720 } },
+      audio: false,
+    }
 
-      const primaryConstraints = {
-        video: { facingMode: { ideal: 'user' }, width: { ideal: 640 }, height: { ideal: 480 } },
-        audio: false,
-      }
-
-      let camStream
-      try {
-        camStream = await navigator.mediaDevices.getUserMedia(primaryConstraints)
-      } catch (primaryErr) {
-        if (!active) return
-        // Retry without constraints if they caused the failure
-        if (primaryErr.name === 'OverconstrainedError' || primaryErr.name === 'ConstraintNotSatisfiedError') {
-          try {
-            camStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false })
-          } catch (fallbackErr) {
-            if (!active) return
-            const code = getCamErrorCode(fallbackErr)
-            setCamErrorCode(code)
-            setCamError(VERIFICATION_ERRORS[code]?.message ?? 'No se pudo acceder a la cámara.')
-            setPhase('error')
-            return
-          }
-        } else {
-          const code = getCamErrorCode(primaryErr)
+    let camStream
+    try {
+      camStream = await navigator.mediaDevices.getUserMedia(primaryConstraints)
+    } catch (primaryErr) {
+      if (!mountedRef.current) return
+      // Retry without constraints if they caused the failure
+      if (primaryErr.name === 'OverconstrainedError' || primaryErr.name === 'ConstraintNotSatisfiedError') {
+        try {
+          camStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+        } catch (fallbackErr) {
+          if (!mountedRef.current) return
+          const code = getCamErrorCode(fallbackErr)
           setCamErrorCode(code)
           setCamError(VERIFICATION_ERRORS[code]?.message ?? 'No se pudo acceder a la cámara.')
           setPhase('error')
           return
         }
+      } else {
+        const code = getCamErrorCode(primaryErr)
+        setCamErrorCode(code)
+        setCamError(VERIFICATION_ERRORS[code]?.message ?? 'No se pudo acceder a la cámara.')
+        setPhase('error')
+        return
       }
-
-      if (!active) { camStream.getTracks().forEach(t => t.stop()); return }
-
-      // Hand the stream to state + ref. The <video> element is NOT mounted during
-      // the 'camera' phase, so assigning srcObject here would no-op. A dedicated
-      // effect attaches the stream once the element mounts in the 'liveness' phase.
-      streamRef.current = camStream
-      setStream(camStream)
-      setPhase('liveness')
     }
 
+    if (!mountedRef.current) { camStream.getTracks().forEach(t => t.stop()); return }
+
+    // Hand the stream to state + ref. The <video> element is NOT mounted during
+    // the 'camera' phase, so assigning srcObject here would no-op. A dedicated
+    // effect attaches the stream once the element mounts in the 'liveness' phase.
+    streamRef.current = camStream
+    setCaptureMode('camera')
+    setStream(camStream)
+    setPhase('liveness')
+  }, [])
+
+  const handleOpenCamera = () => {
+    setCamError(null)
+    setCamErrorCode(null)
+    setPhase('camera')
     startCam()
-    // Only cancel active flag on cleanup — stream lifecycle is managed by the unmount effect
-    return () => { active = false }
-  }, [phase])
+  }
 
   // ── Attach stream to <video> once both exist ──────────────────────────────────
   // Decoupled from getUserMedia so the assignment never races the element mount.
@@ -251,12 +273,14 @@ export default function FaceMatchStep({ ocrResult, onSuccess }) {
   }, [phase, livenessOk])
 
   // ── Capture + match ───────────────────────────────────────────────────────────
-  const captureAndMatch = useCallback(async (video) => {
+  // Acepta tanto un <video> (cámara en vivo) como un <img> (foto subida) — face-api
+  // procesa ambos elementos de la misma forma. No tocar: matching ni MATCH_THRESHOLD.
+  const captureAndMatch = useCallback(async (source) => {
     const faceapi = faceapiRef.current
     setPhase('matching')
     try {
       const selfieResult = await faceapi
-        .detectSingleFace(video, new faceapi.SsdMobilenetv1Options({ minConfidence: 0.6 }))
+        .detectSingleFace(source, new faceapi.SsdMobilenetv1Options({ minConfidence: 0.6 }))
         .withFaceLandmarks()
         .withFaceDescriptor()
 
@@ -307,6 +331,33 @@ export default function FaceMatchStep({ ocrResult, onSuccess }) {
     captureAndMatch(videoRef.current)
   }
 
+  // ── Fallback universal: subir foto desde galería/cámara nativa ───────────────
+  // Cubre getUserMedia ausente, fallas repetidas y navegadores embebidos (WebView).
+  const handlePhotoFile = async (e) => {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file) return
+
+    setError(null)
+    setErrorCode(null)
+    setCamError(null)
+    setCamErrorCode(null)
+    setCaptureMode('photo')
+
+    const url = URL.createObjectURL(file)
+    setPreviewUrl(url)
+    setPhase('matching')
+
+    const img = await loadImageFromObjectUrl(url)
+    if (!img) {
+      setErrorCode('FACE_NOT_DETECTED')
+      setError(VERIFICATION_ERRORS.FACE_NOT_DETECTED.message)
+      setPhase('error')
+      return
+    }
+    captureAndMatch(img)
+  }
+
   const retry = () => {
     cancelAnimationFrame(animRef.current)
     streamRef.current?.getTracks().forEach(t => t.stop())
@@ -322,7 +373,10 @@ export default function FaceMatchStep({ ocrResult, onSuccess }) {
     setErrorCode(null)
     setCamError(null)
     setCamErrorCode(null)
-    setPhase('camera')
+    setCaptureMode(null)
+    if (previewUrl) URL.revokeObjectURL(previewUrl)
+    setPreviewUrl(null)
+    setPhase('idle')
   }
 
   // ── Render ────────────────────────────────────────────────────────────────────
@@ -330,7 +384,11 @@ export default function FaceMatchStep({ ocrResult, onSuccess }) {
     <div className="space-y-5">
       <div className="text-center">
         <h2 className="text-xl font-black text-gray-900 mb-1">Verificación facial</h2>
-        <p className="text-sm text-gray-500">Mira directo a la cámara con buena iluminación</p>
+        <p className="text-sm text-gray-500">
+          {phase === 'idle' || phase === 'camera' || phase === 'error'
+            ? 'Activa tu cámara o sube una foto para comparar con tu documento'
+            : 'Mira directo a la cámara con buena iluminación'}
+        </p>
       </div>
 
       {phase === 'loading_models' && (
@@ -349,7 +407,34 @@ export default function FaceMatchStep({ ocrResult, onSuccess }) {
         </div>
       )}
 
-      {(phase === 'liveness' || phase === 'capturing' || phase === 'matching') && (
+      {phase === 'idle' && (
+        <div className="space-y-3">
+          {isWebView && <WebViewBanner />}
+          {cameraSupported && !isWebView && (
+            <button
+              onClick={handleOpenCamera}
+              className="w-full flex items-center justify-center gap-2 bg-forest text-white py-3.5 rounded-xl font-bold text-sm hover:bg-forest-dark transition-colors"
+            >
+              <Camera className="w-4 h-4" />
+              Abrir cámara
+            </button>
+          )}
+          <label className="w-full flex items-center justify-center gap-2 border border-gray-200 py-3 rounded-xl font-medium text-sm text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer">
+            <Upload className="w-4 h-4" />
+            {cameraSupported && !isWebView ? '¿Problemas con la cámara? Sube una foto' : 'Subir foto desde la galería'}
+            <input type="file" accept="image/*" capture="user" className="hidden" onChange={handlePhotoFile} />
+          </label>
+        </div>
+      )}
+
+      {phase === 'camera' && (
+        <div className="flex flex-col items-center gap-3 py-10">
+          <Loader className="w-8 h-8 text-forest animate-spin" />
+          <p className="text-sm font-medium text-gray-700">Solicitando acceso a la cámara...</p>
+        </div>
+      )}
+
+      {captureMode === 'camera' && (phase === 'liveness' || phase === 'capturing' || phase === 'matching') && (
         <div className="space-y-3">
           <div className="relative rounded-2xl overflow-hidden bg-black aspect-[4/3]">
             <video autoPlay playsInline muted ref={videoRef} className="w-full h-full object-cover" />
@@ -398,6 +483,19 @@ export default function FaceMatchStep({ ocrResult, onSuccess }) {
         </div>
       )}
 
+      {captureMode === 'photo' && phase === 'matching' && (
+        <div className="relative rounded-2xl overflow-hidden bg-black aspect-[4/3]">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={previewUrl} alt="Foto subida" className="w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+            <div className="text-center text-white space-y-2">
+              <Loader className="w-8 h-8 animate-spin mx-auto" />
+              <p className="text-sm font-medium">Comparando rostros...</p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {phase === 'done' && matchResult && (
         <div className={`rounded-2xl p-5 flex flex-col items-center gap-3 ${matchResult.match ? 'bg-forest/5 border border-forest/20' : 'bg-red-50 border border-red-200'}`}>
           {matchResult.match
@@ -417,7 +515,12 @@ export default function FaceMatchStep({ ocrResult, onSuccess }) {
               <p className="text-sm text-red-700">{error || camError}</p>
               {(camErrorCode === 'CAMERA_DENIED') && (
                 <p className="text-xs text-red-500 mt-1">
-                  En tu navegador: Configuración → Privacidad → Cámara → Permitir para este sitio.
+                  En tu navegador: Configuración → Privacidad → Cámara → Permitir para este sitio. También puedes subir una foto.
+                </p>
+              )}
+              {(camErrorCode === 'CAMERA_BLOCKED') && (
+                <p className="text-xs text-red-500 mt-1">
+                  Tu navegador bloqueó el acceso a la cámara por seguridad. Puedes subir una foto en su lugar.
                 </p>
               )}
               {((errorCode ?? camErrorCode) === 'CAMERA_NOT_FOUND') && (
@@ -427,14 +530,29 @@ export default function FaceMatchStep({ ocrResult, onSuccess }) {
               )}
             </div>
           </div>
-          {VERIFICATION_ERRORS[errorCode ?? camErrorCode]?.can_retry !== false && (
-            <button onClick={retry} className="w-full flex items-center justify-center gap-2 border border-gray-200 py-3 rounded-xl font-medium text-sm text-gray-700 hover:bg-gray-50 transition-colors">
-              <RotateCcw className="w-4 h-4" />
-              Reintentar
-            </button>
-          )}
+
+          {isWebView && <WebViewBanner />}
+
+          <button onClick={retry} className="w-full flex items-center justify-center gap-2 border border-gray-200 py-3 rounded-xl font-medium text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+            <RotateCcw className="w-4 h-4" />
+            Intentar de nuevo
+          </button>
         </div>
       )}
+    </div>
+  )
+}
+
+function WebViewBanner() {
+  return (
+    <div className="flex gap-2 bg-amber-50 border border-amber-200 rounded-xl p-3">
+      <Smartphone className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
+      <div className="min-w-0">
+        <p className="text-sm text-amber-800 font-semibold">Estás en el navegador de WhatsApp, Instagram o Facebook</p>
+        <p className="text-xs text-amber-700 mt-1">
+          La cámara puede no funcionar aquí. Abre este enlace en Chrome o Safari, o sube una foto desde tu galería.
+        </p>
+      </div>
     </div>
   )
 }
@@ -460,5 +578,14 @@ function loadImageFromBase64(base64) {
     img.onload = () => resolve(img)
     img.onerror = () => resolve(null)
     img.src = `data:image/jpeg;base64,${base64}`
+  })
+}
+
+function loadImageFromObjectUrl(url) {
+  return new Promise((resolve) => {
+    const img = new Image()
+    img.onload = () => resolve(img)
+    img.onerror = () => resolve(null)
+    img.src = url
   })
 }

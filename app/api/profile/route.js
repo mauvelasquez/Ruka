@@ -1,4 +1,5 @@
 import { createClient } from '../../../lib/supabase/server'
+import { normalizeChileanPhone } from '../../../lib/phone'
 
 export const runtime = 'nodejs'
 
@@ -20,6 +21,14 @@ export async function PATCH(req) {
     }
     if (Object.keys(updates).length === 0) {
       return Response.json({ error: 'Sin campos válidos' }, { status: 400 })
+    }
+
+    if (updates.phone !== null && updates.phone !== undefined) {
+      const normalized = normalizeChileanPhone(updates.phone)
+      if (!normalized) {
+        return Response.json({ error: 'Teléfono inválido. Debe ser un número móvil chileno (+56 9 seguido de 8 dígitos).' }, { status: 400 })
+      }
+      updates.phone = normalized
     }
 
     const { data: profile, error } = await supabase

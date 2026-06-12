@@ -4,6 +4,10 @@ import crypto from 'crypto'
 const hash = (val) =>
   val ? crypto.createHash('sha256').update(val.toLowerCase().trim()).digest('hex') : undefined
 
+// Meta exige el teléfono en E.164 sin el '+' (ej: 56912345678) antes de hashear.
+const hashPhone = (val) =>
+  val ? hash(val.replace(/\D/g, '')) : undefined
+
 export async function POST(req) {
   try {
     const body = await req.json()
@@ -23,7 +27,7 @@ export async function POST(req) {
         action_source: 'website',
         user_data: {
           em: hash(email),
-          ph: hash(phone),
+          ph: hashPhone(phone),
           client_ip_address: ip,
           client_user_agent: user_agent,
         },

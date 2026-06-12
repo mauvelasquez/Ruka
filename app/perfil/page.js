@@ -256,7 +256,7 @@ export default function PerfilPage() {
                   <span className="inline-flex items-center gap-1.5 bg-gray-100 text-gray-500 text-sm font-bold px-3 py-1.5 rounded-full border border-gray-200">
                     <User className="w-4 h-4" /> Sin verificar
                   </span>
-                  <Link href="/onboarding"
+                  <Link href="/verificar"
                     className="text-sm font-bold text-forest hover:text-forest-dark underline underline-offset-2 transition-colors">
                     Verificar mi identidad →
                   </Link>

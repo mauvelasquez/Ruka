@@ -5,6 +5,7 @@ export type VerificationErrorCode =
   | 'CAMERA_DENIED'
   | 'CAMERA_NOT_FOUND'
   | 'CAMERA_IN_USE'
+  | 'CAMERA_BLOCKED'
   | 'LIVENESS_FAILED'
   | 'DOCUMENT_INVALID'
   | 'DOCUMENT_UNSUPPORTED_COUNTRY'
@@ -35,6 +36,7 @@ export const VERIFICATION_ERRORS: Record<VerificationErrorCode, Omit<Verificatio
   CAMERA_DENIED:                { message: 'Acceso a la cámara denegado. Ve a los ajustes de tu navegador y habilítala.', suggested_action: 'check_camera_permissions', can_retry: false },
   CAMERA_NOT_FOUND:             { message: 'No se encontró cámara en tu dispositivo.', suggested_action: 'contact_support', can_retry: false },
   CAMERA_IN_USE:                { message: 'La cámara está siendo usada por otra aplicación. Ciérrala e intenta nuevamente.', suggested_action: 'retry_selfie', can_retry: true },
+  CAMERA_BLOCKED:               { message: 'El acceso a la cámara está bloqueado por configuración de seguridad del sitio. Sube una foto en su lugar.', suggested_action: 'retry_selfie', can_retry: true },
   LIVENESS_FAILED:              { message: 'No pudimos completar la prueba de vida. Intenta en un lugar con mejor iluminación.', suggested_action: 'retry_selfie', can_retry: true },
   DOCUMENT_INVALID:             { message: 'El documento no es legible o no es válido. Verifica que esté completo y bien iluminado.', suggested_action: 'retry_document', can_retry: true },
   DOCUMENT_UNSUPPORTED_COUNTRY: { message: 'El documento debe ser de Chile, Colombia, Argentina o México.', suggested_action: 'contact_support', can_retry: false },

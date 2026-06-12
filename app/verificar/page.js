@@ -8,10 +8,17 @@ import ConsentStep  from './components/ConsentStep'
 import IdCaptureStep from './components/IdCaptureStep'
 import FaceMatchStep from './components/FaceMatchStep'
 import ResultStep   from './components/ResultStep'
+import DatosBasicosStep from './components/DatosBasicosStep'
+import { isValidChileanPhone } from '../../lib/phone'
 import { detectUserCountry, SUPPORTED_COUNTRIES, COUNTRY_NAMES, COUNTRY_FLAGS } from '../../lib/country-detection'
 import { Shield, FileText, Camera, CheckCircle, Loader, ArrowRight, ChevronDown } from 'lucide-react'
 
 const FACIAL_ENABLED = process.env.NEXT_PUBLIC_FACIAL_VERIFICATION_ENABLED !== 'false'
+
+// Piloto enfocado en Chile: el selector de país del documento queda oculto y
+// fijo en 'CL'. Reversible — basta con poner esta env var en 'true' para
+// volver a habilitar el selector multi-país (CL/CO/AR/MX).
+const COUNTRY_SELECTOR_ENABLED = process.env.NEXT_PUBLIC_VERIFICAR_COUNTRY_SELECTOR_ENABLED === 'true'
 
 const STEPS = FACIAL_ENABLED
   ? [
@@ -225,28 +232,31 @@ function VerificarContent() {
   const [idImageBase64, setIdImageBase64] = useState(null)
   const [existingProfile, setExistingProfile] = useState(null)
   const [forceUpload, setForceUpload] = useState(false)
+  const [basicData, setBasicData] = useState(null) // { phone, country_user } | null mientras carga
 
-  // Detect country by IP on mount
+  // Detect country by IP on mount (solo si el selector multi-país está habilitado)
   useEffect(() => {
+    if (!COUNTRY_SELECTOR_ENABLED) return
     detectUserCountry().then(setCountry)
   }, [])
 
   useEffect(() => {
     async function checkProfile() {
       try {
-        if (!supabase) return
+        if (!supabase) { setBasicData({ phone: null, country_user: null }); return }
         const { data: { user } } = await supabase.auth.getUser()
-        if (!user) return
+        if (!user) { setBasicData({ phone: null, country_user: null }); return }
         const { data: profile } = await supabase
           .from('profiles')
-          .select('id_full_name, identification_number, birth_date')
+          .select('id_full_name, identification_number, birth_date, phone, country_user')
           .eq('id', user.id)
           .single()
         if (profile?.identification_number && profile?.id_full_name) {
           setExistingProfile(profile)
         }
+        setBasicData({ phone: profile?.phone ?? null, country_user: profile?.country_user ?? null })
       } catch {
-        // non-critical
+        setBasicData({ phone: null, country_user: null })
       }
     }
     checkProfile()
@@ -285,12 +295,28 @@ function VerificarContent() {
           <Stepper current={step} />
 
           {/* Country selector — visible only on consent step */}
-          {step === 1 && (
+          {step === 1 && COUNTRY_SELECTOR_ENABLED && (
             <CountrySelector country={country} onChange={setCountry} />
           )}
 
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8">
-            {step === 1 && <ConsentStep onAccept={handleConsent} country={country} />}
+            {step === 1 && !basicData && (
+              <div className="flex items-center justify-center py-10">
+                <Loader className="w-6 h-6 text-forest animate-spin" />
+              </div>
+            )}
+
+            {step === 1 && basicData && !isValidChileanPhone(basicData.phone) && (
+              <DatosBasicosStep
+                initialPhone={basicData.phone}
+                needsCountryUser={!basicData.country_user}
+                onComplete={(phone) => setBasicData(prev => ({ ...prev, phone }))}
+              />
+            )}
+
+            {step === 1 && basicData && isValidChileanPhone(basicData.phone) && (
+              <ConsentStep onAccept={handleConsent} country={country} />
+            )}
 
             {step === 2 && showExistingProfile && (
               <ExistingProfileStep
