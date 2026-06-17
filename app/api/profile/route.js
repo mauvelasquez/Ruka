@@ -5,6 +5,35 @@ export const runtime = 'nodejs'
 
 const ALLOWED_FIELDS = ['phone', 'birth_date', 'country_user', 'avatar']
 
+// GET: campos de perfil que necesita el flujo de /verificar.
+// Server-side (cookie-based) — NO pasa por el Navigator Lock del browser, así que
+// no se cuelga si un refresh de token previo dejó el lock de auth-js tomado.
+export async function GET() {
+  try {
+    const supabase = await createClient()
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    if (authError || !user) {
+      return Response.json({ error: 'No autorizado' }, { status: 401 })
+    }
+
+    const { data: profile, error } = await supabase
+      .from('profiles')
+      .select('id_full_name, identification_number, birth_date, phone, country_user')
+      .eq('id', user.id)
+      .maybeSingle()
+
+    if (error) {
+      console.error('[api/profile GET]', error.message)
+      return Response.json({ error: error.message }, { status: 500 })
+    }
+
+    return Response.json({ profile: profile ?? null })
+  } catch (err) {
+    console.error('[api/profile GET] unexpected:', err.message)
+    return Response.json({ error: 'Error interno' }, { status: 500 })
+  }
+}
+
 export async function PATCH(req) {
   try {
     const supabase = await createClient()

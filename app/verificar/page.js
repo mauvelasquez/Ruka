@@ -1,7 +1,6 @@
 'use client'
 import { Suspense, useState, useEffect, useRef } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
-import { supabase } from '../../lib/supabase'
 import { useApp } from '../../lib/store'
 import Navbar from '../../components/Navbar'
 import ConsentStep  from './components/ConsentStep'
@@ -11,7 +10,7 @@ import ResultStep   from './components/ResultStep'
 import DatosBasicosStep from './components/DatosBasicosStep'
 import { isValidChileanPhone } from '../../lib/phone'
 import { detectUserCountry, SUPPORTED_COUNTRIES, COUNTRY_NAMES, COUNTRY_FLAGS } from '../../lib/country-detection'
-import { Shield, FileText, Camera, CheckCircle, Loader, ArrowRight, ChevronDown } from 'lucide-react'
+import { Shield, FileText, Camera, CheckCircle, Loader, ArrowRight, ChevronDown, AlertCircle } from 'lucide-react'
 
 const FACIAL_ENABLED = process.env.NEXT_PUBLIC_FACIAL_VERIFICATION_ENABLED !== 'false'
 
@@ -233,6 +232,7 @@ function VerificarContent() {
   const [existingProfile, setExistingProfile] = useState(null)
   const [forceUpload, setForceUpload] = useState(false)
   const [basicData, setBasicData] = useState(null) // { phone, country_user } | null mientras carga
+  const [loadError, setLoadError] = useState(false) // perfil no se pudo cargar → mostrar reintento, no spinner perpetuo
 
   // Detect country by IP on mount (solo si el selector multi-país está habilitado)
   useEffect(() => {
@@ -241,25 +241,50 @@ function VerificarContent() {
   }, [])
 
   useEffect(() => {
+    let cancelled = false
+    // Cargar el perfil vía la ruta server (cookie-based) en vez de supabase.auth.getUser()
+    // del browser: ese método pasa por el Navigator Lock de auth-js y se cuelga para
+    // siempre si un refresh de token previo dejó el lock tomado (mismo origen que el
+    // "getSession() timed out" del store). El server NO usa ese lock. Además: timeout +
+    // estado de error explícito en vez de spinner infinito.
     async function checkProfile() {
+      const ctrl = new AbortController()
+      const timer = setTimeout(() => ctrl.abort(), 8000)
       try {
-        if (!supabase) { setBasicData({ phone: null, country_user: null }); return }
-        const { data: { user } } = await supabase.auth.getUser()
-        if (!user) { setBasicData({ phone: null, country_user: null }); return }
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('id_full_name, identification_number, birth_date, phone, country_user')
-          .eq('id', user.id)
-          .single()
+        const res = await fetch('/api/profile', { signal: ctrl.signal })
+        if (cancelled) return
+        if (res.status === 401) {
+          // Sin sesión válida: dejar pasar al flujo de datos básicos (parity con el comportamiento previo)
+          setBasicData({ phone: null, country_user: null })
+          return
+        }
+        if (!res.ok) throw new Error(`HTTP ${res.status}`)
+        const { profile } = await res.json()
+        if (cancelled) return
         if (profile?.identification_number && profile?.id_full_name) {
           setExistingProfile(profile)
         }
         setBasicData({ phone: profile?.phone ?? null, country_user: profile?.country_user ?? null })
-      } catch {
-        setBasicData({ phone: null, country_user: null })
+      } catch (err) {
+        if (cancelled) return
+        // Timeout o error de red → estado de reintento, NUNCA spinner perpetuo.
+        setLoadError(true)
+        fetch('/api/log', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            level: 'error',
+            source: 'verificar.checkProfile',
+            message: err?.name === 'AbortError' ? 'profile fetch timed out (8s)' : 'profile fetch failed',
+            metadata: { error: err?.message },
+          }),
+        }).catch(() => {})
+      } finally {
+        clearTimeout(timer)
       }
     }
     checkProfile()
+    return () => { cancelled = true }
   }, [])
 
   const handleConsent = () => setStep(2)
@@ -300,9 +325,29 @@ function VerificarContent() {
           )}
 
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8">
-            {step === 1 && !basicData && (
+            {step === 1 && !basicData && !loadError && (
               <div className="flex items-center justify-center py-10">
                 <Loader className="w-6 h-6 text-forest animate-spin" />
+              </div>
+            )}
+
+            {step === 1 && loadError && (
+              <div className="space-y-5 text-center py-4">
+                <div className="w-16 h-16 bg-red-50 rounded-2xl flex items-center justify-center mx-auto">
+                  <AlertCircle className="w-8 h-8 text-red-500" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-black text-gray-900 mb-1">No pudimos verificar tu sesión</h2>
+                  <p className="text-sm text-gray-500">
+                    Hubo un problema al cargar tus datos. Recarga la página para volver a intentarlo.
+                  </p>
+                </div>
+                <button
+                  onClick={() => window.location.reload()}
+                  className="w-full flex items-center justify-center gap-2 bg-forest text-white py-3.5 rounded-xl font-bold text-sm hover:bg-forest-dark transition-colors"
+                >
+                  Recargar página
+                </button>
               </div>
             )}
 
